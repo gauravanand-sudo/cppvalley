@@ -1,15 +1,25 @@
+// src/components/TrackSidebar.tsx
 "use client";
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
-import type { TrackSection } from "@/lib/content";
+import { Lock, Search } from "lucide-react";
 
-const badge = {
-  free: "bg-green-100 text-green-800",
-  premium: "bg-purple-100 text-purple-800",
-  paid: "bg-orange-100 text-orange-800",
-};
+type Access = "free" | "premium" | "paid";
+
+type Leaf = { title: string; slug: string; access: Access };
+type Node = { title: string; access: Access; children: Leaf[] };
+type TrackItem = Leaf | Node;
+type TrackSection = { title: string; items: TrackItem[] };
+
+function isNode(it: TrackItem): it is Node {
+  return (it as any)?.children && Array.isArray((it as any).children);
+}
+
+function normalize(s: string) {
+  return s.toLowerCase().trim();
+}
 
 export default function TrackSidebar({
   trackSlug,
@@ -19,119 +29,140 @@ export default function TrackSidebar({
   sections: TrackSection[];
 }) {
   const pathname = usePathname();
+  const currentLessonSlug = pathname.split("/").pop() || "";
+  const [q, setQ] = useState("");
 
-  const activeLessonSlug = useMemo(() => {
-    const parts = pathname.split("/").filter(Boolean);
-    // /learn/tracks/<trackSlug>/<lessonSlug?>
-    return parts.length >= 4 ? parts[3] : null;
-  }, [pathname]);
+  const filtered = useMemo(() => {
+    const query = normalize(q);
+    if (!query) return sections;
 
-  const [open, setOpen] = useState<Record<number, boolean>>(
-    Object.fromEntries(sections.map((_, i) => [i, i === 0]))
-  );
+    const out: TrackSection[] = [];
+    for (const sec of sections || []) {
+      const items: TrackItem[] = [];
+
+      for (const it of sec.items || []) {
+        if (isNode(it)) {
+          const kids = (it.children || []).filter((c) =>
+            normalize(c.title).includes(query)
+          );
+          if (normalize(it.title).includes(query) || kids.length > 0) {
+            items.push({ ...it, children: kids.length ? kids : it.children });
+          }
+        } else {
+          if (normalize(it.title).includes(query)) items.push(it);
+        }
+      }
+
+      if (items.length) out.push({ ...sec, items });
+    }
+    return out;
+  }, [sections, q]);
+
+  const Row = ({
+    title,
+    slug,
+    access,
+    indent = false,
+  }: {
+    title: string;
+    slug: string;
+    access: Access;
+    indent?: boolean;
+  }) => {
+    const active = slug === currentLessonSlug;
+    const locked = access !== "free";
+
+    const href = locked
+  ? `/pricing?track=${encodeURIComponent(trackSlug)}`
+  : `/learn/tracks/${trackSlug}/${slug}`;
+
+    return (
+      <Link
+        href={href}
+        className={[
+          "group flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition",
+          indent ? "pl-7" : "",
+          active
+            ? "bg-cyan-50 border border-cyan-200 text-gray-900"
+            : "hover:bg-gray-50 text-gray-800",
+        ].join(" ")}
+      >
+        <div className="min-w-0 flex items-center gap-2">
+          <span
+            className={[
+              "h-2 w-2 rounded-full",
+              active ? "bg-cyan-600" : "bg-gray-300 group-hover:bg-gray-400",
+            ].join(" ")}
+          />
+          <span className="truncate">{title}</span>
+        </div>
+
+        {locked ? (
+          <Lock className="h-4 w-4 text-amber-500 shrink-0" />
+        ) : null}
+      </Link>
+    );
+  };
 
   return (
-    <aside className="w-full md:w-80 md:shrink-0">
-      <div className="rounded-xl border p-4">
-        <div className="text-sm font-semibold mb-3">Syllabus</div>
-
-        <div className="space-y-3">
-          {sections.map((sec, i) => (
-            <div key={sec.title} className="border rounded-lg">
-              <button
-                onClick={() => setOpen((p) => ({ ...p, [i]: !p[i] }))}
-                className="w-full flex items-center justify-between px-3 py-2 text-left"
-              >
-                <span className="font-medium text-sm">{sec.title}</span>
-                <span className="text-xs">{open[i] ? "▾" : "▸"}</span>
-              </button>
-
-              {open[i] && (
-                <div className="px-3 pb-3 space-y-2">
-                  {sec.items.map((it, idx) => {
-                    // ✅ Parent/module with children
-                    if ("children" in it) {
-                      return (
-                        <div key={`${it.title}-${idx}`} className="mt-2">
-                          <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                            {it.title}
-                          </div>
-
-                          <div className="ml-3 mt-2 space-y-1">
-                            {it.children.map((child) => {
-                              const href = `/learn/tracks/${trackSlug}/${child.slug}`;
-                              const active = activeLessonSlug === child.slug;
-
-                              return (
-                                <div
-                                  key={child.slug}
-                                  className={`flex items-center justify-between gap-2 rounded px-2 py-1 ${
-                                    active ? "bg-gray-100 dark:bg-gray-900" : ""
-                                  }`}
-                                >
-                                  <Link
-                                    className={`text-sm hover:underline ${
-                                      active ? "font-semibold" : ""
-                                    }`}
-                                    href={href}
-                                  >
-                                    {child.title}
-                                  </Link>
-
-                                  <span
-                                    className={`text-[10px] px-2 py-1 rounded ${badge[child.access]}`}
-                                  >
-                                    {child.access === "premium"
-                                      ? "LOCK"
-                                      : child.access.toUpperCase()}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    // ✅ Normal single lesson
-                    const href = `/learn/tracks/${trackSlug}/${it.slug}`;
-                    const active = activeLessonSlug === it.slug;
-
-                    return (
-                      <div
-                        key={it.slug}
-                        className={`flex items-center justify-between gap-2 rounded px-2 py-1 ${
-                          active ? "bg-gray-100 dark:bg-gray-900" : ""
-                        }`}
-                      >
-                        <Link
-                          className={`text-sm hover:underline ${
-                            active ? "font-semibold" : ""
-                          }`}
-                          href={href}
-                        >
-                          {it.title}
-                        </Link>
-
-                        <span
-                          className={`text-[10px] px-2 py-1 rounded ${badge[it.access]}`}
-                        >
-                          {it.access === "premium" ? "LOCK" : it.access.toUpperCase()}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 text-xs text-gray-600 dark:text-gray-300">
-          Free lessons open fully. Premium/Paid show preview.
+    <div className="p-4">
+      {/* search */}
+      <div className="sticky top-0 z-10 bg-white pb-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search in this track…"
+            className="w-full rounded-xl border border-gray-200 bg-white pl-9 pr-3 py-2 text-sm outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100"
+          />
         </div>
       </div>
-    </aside>
+
+      {/* syllabus */}
+      <div className="space-y-5">
+        {(filtered || []).map((sec) => (
+          <div key={sec.title} className="space-y-2">
+            <div className="px-1 text-[11px] font-mono uppercase tracking-wider text-gray-500">
+              {sec.title}
+            </div>
+
+            <div className="space-y-1">
+              {(sec.items || []).map((it, idx) => {
+                if (isNode(it)) {
+                  return (
+                    <div key={it.title + idx} className="space-y-1">
+                      <div className="px-2 pt-2 text-xs font-semibold text-gray-700">
+                        {it.title}
+                      </div>
+                      <div className="space-y-1">
+                        {(it.children || []).map((c) => (
+                          <Row
+                            key={c.slug}
+                            title={c.title}
+                            slug={c.slug}
+                            access={c.access}
+                            indent
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <Row
+                    key={(it as Leaf).slug}
+                    title={(it as Leaf).title}
+                    slug={(it as Leaf).slug}
+                    access={(it as Leaf).access}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
-

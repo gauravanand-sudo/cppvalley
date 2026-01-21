@@ -1,29 +1,34 @@
-import { getTrackBySlug, parseTrackSyllabus } from "@/lib/content";
-import TrackSidebar from "@/components/TrackSidebar";
+// src/app/learn/tracks/[trackSlug]/layout.tsx
 import { notFound } from "next/navigation";
+import { requireContent, parseTrackSyllabus } from "@/lib/content";
+import TrackLayout from "@/components/TrackLayout";
+import TrackSidebar from "@/components/TrackSidebar";
+import LessonContentWrapper from "@/components/LessonContentWrapper";
 
-export default async function TrackLayout({
+export default async function TrackLayoutPage({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ trackSlug: string }>;
+  params: any;
 }) {
-  const { trackSlug } = await params;
+  const p = await params;
+  const trackSlug = p?.trackSlug;
 
-  const track = getTrackBySlug(trackSlug);
-  if (!track) notFound();
+  if (typeof trackSlug !== "string") notFound();
 
-  const { meta, content } = track;
-  const sections = parseTrackSyllabus(content);
+  const track = requireContent("tracks", trackSlug);
+  const sections = parseTrackSyllabus(track.content);
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-10">
-      <div className="flex flex-col md:flex-row gap-8">
-        <TrackSidebar trackSlug={meta.slug} sections={sections} />
-        <section className="flex-1">{children}</section>
-      </div>
-    </main>
+    <TrackLayout sidebar={<TrackSidebar trackSlug={trackSlug} sections={sections as any} />}>
+      <LessonContentWrapper
+        trackSlug={trackSlug}
+        sections={sections as any}
+        trackTitle={track?.meta?.title || trackSlug}
+      >
+        {children}
+      </LessonContentWrapper>
+    </TrackLayout>
   );
 }
-

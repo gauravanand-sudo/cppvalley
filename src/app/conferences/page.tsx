@@ -1,22 +1,17 @@
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import { listContent } from "@/lib/content";
-import ContentCard from "@/components/ContentCard";
+import ConferencesClient from "./ConferencesClient";
 
 export default function ConferencesPage() {
+  // ✅ Runs on server → fs is allowed
   const posts = listContent("conferences");
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12">
-      <h1 className="text-3xl font-bold">C++ Conferences</h1>
-      <p className="mt-2 text-gray-600">
-        Notes, summaries, and insights from major C++ conferences.
-      </p>
-
-      <div className="mt-8 grid gap-6">
-        {posts.map((item) => (
-          <ContentCard key={item.slug} item={item} />
-        ))}
-      </div>
-    </main>
+    <>
+      <SiteHeader />
+      <ConferencesClient posts={posts} />
+      <SiteFooter />
+    </>
   );
 }
-

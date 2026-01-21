@@ -2,9 +2,13 @@
 title: "60-Day C++ Systems Mastery (EDA • HFT • BigTech)"
 slug: "60-day-cpp-interview"
 access: "premium"
+live: true
+price: 4799
 duration: "60 days"
 level: "Advanced"
-description: "A deep, systems-first C++ mastery track for cracking EDA, HFT, and low-latency engineering interviews."
+description: "A deep, systems-first C++ mastery track for cracking EDA, HFT, and low-latency engineering interviews. Master memory layout, concurrency, lock-free programming, and performance optimization."
+lessonCount: 160
+tags: ["C++", "Systems", "Concurrency", "Memory", "ABI", "Performance", "EDA", "HFT", "Low Latency"]
 ---
 
 ## Syllabus
@@ -17,10 +21,33 @@ description: "A deep, systems-first C++ mastery track for cracking EDA, HFT, and
     { "title": "Object Layout in Memory", "slug": "abi-object-layout", "access": "free" },
     { "title": "Padding & Alignment Rules", "slug": "memory-layout-padding", "access": "free" },
     { "title": "sizeof, alignof & EBO", "slug": "sizeof-alignof-ebo", "access": "free" },
+    { "title": "Standard Layout vs Trivial Types", "slug": "standard-layout-trivial", "access": "free" },
+    { "title": "POD History & Modern Equivalents", "slug": "pod-history", "access": "free" },
+
     { "title": "Stack vs Heap vs TLS", "slug": "stack-heap-tls", "access": "free" },
+    { "title": "Object Lifetime Storage Duration (static/thread/auto/dynamic)", "slug": "storage-duration", "access": "free" },
+
+    { "title": "References vs Pointers (ABI impact)", "slug": "refs-vs-ptrs-abi", "access": "free" },
+    { "title": "Value Categories (lvalue/rvalue/xvalue/prvalue)", "slug": "value-categories", "access": "free" },
+    { "title": "RVO/NRVO & Copy Elision (ABI + perf)", "slug": "rvo-nrvo-copy-elision", "access": "free" },
+
+    { "title": "This Pointer, Member Access & Object Model", "slug": "this-pointer-object-model", "access": "premium" },
+    { "title": "Name Lookup, Overload Resolution (high-level view)", "slug": "lookup-overload-resolution", "access": "premium" },
+
     { "title": "Virtual Tables & Dispatch", "slug": "vtables-internals", "access": "premium" },
+    { "title": "Virtual Inheritance Internals", "slug": "virtual-inheritance-internals", "access": "premium" },
     { "title": "Multiple Inheritance Layout", "slug": "multiple-inheritance-layout", "access": "premium" },
-    { "title": "Diamond & Virtual Bases", "slug": "virtual-base-classes", "access": "premium" }
+    { "title": "Diamond & Virtual Bases", "slug": "virtual-base-classes", "access": "premium" },
+
+    { "title": "RTTI internals (typeid/dynamic_cast)", "slug": "rtti-internals", "access": "premium" },
+    { "title": "Exception Handling ABI (unwind tables, landing pads)", "slug": "exception-abi-unwinding", "access": "premium" },
+
+    { "title": "Calling Conventions (SysV / MS ABI basics)", "slug": "calling-conventions", "access": "premium" },
+    { "title": "Itanium C++ ABI overview (vtable, name mangling)", "slug": "itanium-abi-overview", "access": "premium" },
+    { "title": "Name Mangling & Demangling", "slug": "name-mangling-demangling", "access": "premium" },
+
+    { "title": "Object Files & Relocations (ELF basics)", "slug": "elf-object-relocations", "access": "premium" },
+    { "title": "ODR (One Definition Rule) + Violations", "slug": "odr-violations", "access": "premium" }
   ]
 }
 
@@ -32,10 +59,32 @@ description: "A deep, systems-first C++ mastery track for cracking EDA, HFT, and
   "access": "free",
   "children": [
     { "title": "Construction & Destruction Order", "slug": "construction-destruction-order", "access": "free" },
+    { "title": "Member Initialization Order Pitfalls", "slug": "member-init-order", "access": "free" },
+    { "title": "Temporary Materialization & Lifetime Extension", "slug": "temporary-lifetime-extension", "access": "free" },
+    { "title": "Dangling References & UB patterns", "slug": "dangling-references-ub", "access": "free" },
+
     { "title": "Rule of 0/3/5", "slug": "rule-of-5", "access": "free" },
     { "title": "Copy vs Move Semantics", "slug": "copy-vs-move", "access": "free" },
+    { "title": "Move-Only Types & API design", "slug": "move-only-types", "access": "premium" },
+
+    { "title": "Exception Safety (basic/strong/nothrow)", "slug": "exception-safety-levels", "access": "premium" },
+    { "title": "RAII Patterns (scope_guard, unique_resource)", "slug": "raii-patterns", "access": "premium" },
+    { "title": "Resource Ownership Models", "slug": "resource-ownership", "access": "premium" },
+
+    { "title": "Smart Pointers deep dive (unique_ptr/shared_ptr/weak_ptr)", "slug": "smart-pointers-deep-dive", "access": "premium" },
+    { "title": "Custom Deleters & Allocators with smart pointers", "slug": "smartptr-deleters-allocators", "access": "premium" },
+
     { "title": "Perfect Forwarding", "slug": "perfect-forwarding", "access": "premium" },
-    { "title": "Resource Ownership Models", "slug": "resource-ownership", "access": "premium" }
+    { "title": "Universal References & Reference Collapsing", "slug": "ref-collapsing-universal-refs", "access": "premium" },
+    { "title": "std::move vs std::forward (gotchas)", "slug": "move-vs-forward", "access": "premium" },
+
+    { "title": "Copy Elision & Return-by-value APIs", "slug": "copy-elision-apis", "access": "premium" },
+    { "title": "Explicit, implicit constructors; converting operators", "slug": "explicit-implicit-ctors", "access": "premium" },
+
+    { "title": "Alignment-new & Over-aligned types", "slug": "aligned-new-overaligned", "access": "premium" },
+    { "title": "Placement new, launder, strict aliasing", "slug": "placement-new-launder-aliasing", "access": "premium" },
+
+    { "title": "RAII in concurrency (locks, thread joiners)", "slug": "raii-concurrency-guards", "access": "premium" }
   ]
 }
 
@@ -47,10 +96,32 @@ description: "A deep, systems-first C++ mastery track for cracking EDA, HFT, and
   "access": "premium",
   "children": [
     { "title": "C++ Memory Model Explained", "slug": "cpp-memory-model", "access": "premium" },
+    { "title": "Data Races vs Race Conditions", "slug": "data-race-vs-race-condition", "access": "premium" },
     { "title": "Happens-Before & Synchronization", "slug": "happens-before", "access": "premium" },
-    { "title": "Atomics & Memory Orders", "slug": "atomics-memory-order", "access": "premium" },
+
+    { "title": "Atomics & Memory Orders (relaxed/acquire/release/seq_cst)", "slug": "atomics-memory-order", "access": "premium" },
+    { "title": "Atomic RMW operations (fetch_add/exchange/CAS)", "slug": "atomic-rmw", "access": "premium" },
+    { "title": "Atomic fences (atomic_thread_fence)", "slug": "atomic-fences", "access": "premium" },
+    { "title": "std::atomic_ref & atomic<T> pitfalls", "slug": "atomic-ref-pitfalls", "access": "premium" },
+
+    { "title": "Cache Coherence & MESI basics", "slug": "cache-coherence-mesi", "access": "premium" },
     { "title": "False Sharing & Cache Lines", "slug": "false-sharing", "access": "premium" },
-    { "title": "Mutex vs Spinlock vs Futex", "slug": "locks-vs-spinlocks", "access": "premium" }
+    { "title": "Memory Reordering (compiler vs CPU)", "slug": "compiler-vs-cpu-reordering", "access": "premium" },
+
+    { "title": "Mutex vs Spinlock vs Futex", "slug": "locks-vs-spinlocks", "access": "premium" },
+    { "title": "Condition Variables (lost wakeups, spurious)", "slug": "condition-variables", "access": "premium" },
+    { "title": "Reader-Writer Locks & shared_mutex", "slug": "shared-mutex-rwlocks", "access": "premium" },
+    { "title": "Deadlocks (avoidance, ordering, try_lock)", "slug": "deadlocks-avoidance", "access": "premium" },
+    { "title": "Priority Inversion & real-time considerations", "slug": "priority-inversion", "access": "premium" },
+
+    { "title": "Thread Lifecycle (join/detach), RAII joiners", "slug": "thread-lifecycle", "access": "premium" },
+    { "title": "Thread Local Storage (TLS) performance & pitfalls", "slug": "tls-performance", "access": "premium" },
+
+    { "title": "Futures/Promises/packaged_task", "slug": "futures-promises", "access": "premium" },
+    { "title": "async launch policies & thread pools", "slug": "async-launch-policies", "access": "premium" },
+    { "title": "Latches/Barriers/Semaphores (C++20)", "slug": "latches-barriers-semaphores", "access": "premium" },
+
+    { "title": "Concurrency testing: TSAN, stress tests", "slug": "concurrency-testing-tsan", "access": "premium" }
   ]
 }
 
@@ -62,10 +133,23 @@ description: "A deep, systems-first C++ mastery track for cracking EDA, HFT, and
   "access": "premium",
   "children": [
     { "title": "CAS & ABA Problem", "slug": "cas-aba", "access": "premium" },
-    { "title": "Memory Reclamation (HP/EBR)", "slug": "memory-reclamation", "access": "premium" },
-    { "title": "Lock-Free Queues", "slug": "lockfree-queues", "access": "premium" },
+    { "title": "Tagged Pointers & Version Counters", "slug": "tagged-pointers", "access": "premium" },
+
+    { "title": "Memory Reclamation (Hazard Pointers)", "slug": "hazard-pointers", "access": "premium" },
+    { "title": "Epoch-Based Reclamation (EBR/QSBR)", "slug": "epoch-reclamation", "access": "premium" },
+    { "title": "RCU basics (read-copy-update)", "slug": "rcu-basics", "access": "premium" },
+
+    { "title": "Lock-Free Stack (Treiber) + pitfalls", "slug": "treiber-stack", "access": "premium" },
+    { "title": "Michael-Scott Queue (MSQueue)", "slug": "msqueue", "access": "premium" },
+
     { "title": "Ring Buffers & SPSC/MPMC", "slug": "ring-buffers", "access": "premium" },
-    { "title": "Wait-Free vs Lock-Free", "slug": "wait-free-vs-lock-free", "access": "premium" }
+    { "title": "Disruptor Pattern (sequencers, gating sequences)", "slug": "disruptor-pattern", "access": "premium" },
+
+    { "title": "Wait-Free vs Lock-Free vs Obstruction-Free", "slug": "progress-guarantees", "access": "premium" },
+    { "title": "Linearizability & correctness proofs (practical)", "slug": "linearizability", "access": "premium" },
+
+    { "title": "Backoff strategies & contention management", "slug": "backoff-contention", "access": "premium" },
+    { "title": "NUMA-aware lock-free data structures (overview)", "slug": "numa-lockfree-overview", "access": "premium" }
   ]
 }
 
@@ -77,10 +161,24 @@ description: "A deep, systems-first C++ mastery track for cracking EDA, HFT, and
   "access": "premium",
   "children": [
     { "title": "Template Instantiation Model", "slug": "template-instantiation", "access": "premium" },
+    { "title": "Two-Phase Name Lookup", "slug": "two-phase-lookup", "access": "premium" },
+    { "title": "Dependent Names (typename/template keywords)", "slug": "dependent-names", "access": "premium" },
+
     { "title": "SFINAE & enable_if", "slug": "sfinae-enable-if", "access": "premium" },
+    { "title": "Overload sets with constraints (modern patterns)", "slug": "overload-constraints", "access": "premium" },
+
     { "title": "Concepts & Constraints", "slug": "concepts-constraints", "access": "premium" },
+    { "title": "Requires-expressions & requires-clauses", "slug": "requires-expressions", "access": "premium" },
+
     { "title": "constexpr & consteval", "slug": "constexpr-consteval", "access": "premium" },
-    { "title": "Type Traits & TMP", "slug": "type-traits", "access": "premium" }
+    { "title": "constinit & initialization order issues", "slug": "constinit-init-order", "access": "premium" },
+    { "title": "Compile-time computation patterns (CTAD, NTTP)", "slug": "compile-time-patterns", "access": "premium" },
+
+    { "title": "Type Traits & TMP", "slug": "type-traits", "access": "premium" },
+    { "title": "std::tuple, std::variant internals (usage + cost model)", "slug": "tuple-variant-cost", "access": "premium" },
+    { "title": "Expression Templates (high-level)", "slug": "expression-templates", "access": "premium" },
+
+    { "title": "Modules overview (C++20) + build implications", "slug": "cpp20-modules", "access": "premium" }
   ]
 }
 
@@ -92,10 +190,26 @@ description: "A deep, systems-first C++ mastery track for cracking EDA, HFT, and
   "access": "premium",
   "children": [
     { "title": "Latency vs Throughput", "slug": "latency-vs-throughput", "access": "premium" },
+    { "title": "p50/p95/p99 & tail latency control", "slug": "tail-latency", "access": "premium" },
+
     { "title": "NUMA & Memory Locality", "slug": "numa-locality", "access": "premium" },
-    { "title": "Cache Optimization", "slug": "cache-optimization", "access": "premium" },
+    { "title": "CPU Affinity & Pinning (pthread_setaffinity)", "slug": "cpu-affinity-pinning", "access": "premium" },
+    { "title": "Thread Scheduling (SCHED_FIFO/RR basics)", "slug": "thread-scheduling", "access": "premium" },
+
+    { "title": "Cache Optimization (AoS vs SoA)", "slug": "cache-optimization", "access": "premium" },
     { "title": "Branch Prediction & Prefetching", "slug": "branch-prediction", "access": "premium" },
-    { "title": "Benchmarking Correctly", "slug": "benchmarking", "access": "premium" }
+    { "title": "SIMD basics (AVX/NEON overview)", "slug": "simd-basics", "access": "premium" },
+
+    { "title": "Avoiding Allocations (arena, monotonic buffer)", "slug": "avoid-allocations", "access": "premium" },
+    { "title": "Custom Allocators & PMR (polymorphic allocators)", "slug": "pmr-allocators", "access": "premium" },
+    { "title": "Memory Pools, Free-lists, Slab allocators", "slug": "memory-pool-allocators", "access": "premium" },
+
+    { "title": "I/O models: sync vs async, batching, syscall reduction", "slug": "io-models-batching", "access": "premium" },
+    { "title": "Lock contention profiling & reduction", "slug": "lock-contention-profiling", "access": "premium" },
+
+    { "title": "Benchmarking Correctly (noise, warmup, pinning)", "slug": "benchmarking", "access": "premium" },
+    { "title": "Profiling (perf, VTune basics, flamegraphs)", "slug": "profiling-perf-flamegraphs", "access": "premium" },
+    { "title": "Compiler Optimizations (-O2/-O3/LTO/PGO)", "slug": "compiler-opts-lto-pgo", "access": "premium" }
   ]
 }
 
@@ -106,11 +220,22 @@ description: "A deep, systems-first C++ mastery track for cracking EDA, HFT, and
   "title": "Build & Toolchain",
   "access": "premium",
   "children": [
-    { "title": "CMake Deep Dive", "slug": "cmake-deep-dive", "access": "premium" },
-    { "title": "ABI Stability & Versioning", "slug": "abi-stability", "access": "premium" },
+    { "title": "CMake Deep Dive (targets, properties, interface libs)", "slug": "cmake-deep-dive", "access": "premium" },
+    { "title": "Toolchains, cross-compilation, sysroots", "slug": "cmake-toolchains-cross", "access": "premium" },
+    { "title": "Build Types, Sanitizers, Coverage", "slug": "build-sanitizers-coverage", "access": "premium" },
+
     { "title": "Static vs Dynamic Linking", "slug": "linking-models", "access": "premium" },
+    { "title": "Linker Basics (ld, gold, lld) + flags", "slug": "linker-basics", "access": "premium" },
     { "title": "Symbol Visibility", "slug": "symbol-visibility", "access": "premium" },
-    { "title": "Binary Compatibility", "slug": "binary-compatibility", "access": "premium" }
+    { "title": "ELF, PLT/GOT, relocation model", "slug": "elf-plt-got", "access": "premium" },
+
+    { "title": "ABI Stability & Versioning", "slug": "abi-stability", "access": "premium" },
+    { "title": "Binary Compatibility", "slug": "binary-compatibility", "access": "premium" },
+    { "title": "Symbol Versioning & SONAME", "slug": "soname-symbol-versioning", "access": "premium" },
+
+    { "title": "Debugging toolchain (gdb/lldb) essentials", "slug": "gdb-lldb-essentials", "access": "premium" },
+    { "title": "Binary analysis (nm/objdump/readelf/ldd)", "slug": "binary-analysis-tools", "access": "premium" },
+    { "title": "Packaging & distribution (rpath, RUNPATH)", "slug": "rpath-runpath", "access": "premium" }
   ]
 }
 
@@ -122,25 +247,75 @@ description: "A deep, systems-first C++ mastery track for cracking EDA, HFT, and
   "access": "premium",
   "children": [
     { "title": "Virtual Memory & Paging", "slug": "virtual-memory", "access": "premium" },
+    { "title": "TLB, page faults (minor/major), huge pages", "slug": "tlb-pagefaults-hugepages", "access": "premium" },
+    { "title": "mmap/munmap, mprotect, madvise", "slug": "mmap-mprotect-madvise", "access": "premium" },
+
     { "title": "Syscalls & Context Switch", "slug": "syscalls", "access": "premium" },
-    { "title": "File Systems Internals", "slug": "filesystem-internals", "access": "premium" },
     { "title": "Process vs Thread", "slug": "process-vs-thread", "access": "premium" },
-    { "title": "epoll & io_uring", "slug": "epoll-io-uring", "access": "premium" }
+    { "title": "Signals, timers, interruption model", "slug": "signals-timers", "access": "premium" },
+
+    { "title": "Schedulers (CFS basics), runqueues, affinity", "slug": "linux-scheduler-cfs", "access": "premium" },
+    { "title": "IPC basics (pipes, shared memory, futex)", "slug": "ipc-basics", "access": "premium" },
+
+    { "title": "File Systems Internals (VFS, inode, dentry)", "slug": "filesystem-internals", "access": "premium" },
+    { "title": "Disk I/O & page cache", "slug": "disk-io-pagecache", "access": "premium" },
+
+    { "title": "Networking basics (sockets, TCP, Nagle, corking)", "slug": "networking-sockets-tcp", "access": "premium" },
+    { "title": "epoll fundamentals (edge vs level)", "slug": "epoll-fundamentals", "access": "premium" },
+    { "title": "io_uring model (SQ/CQ, submission batching)", "slug": "io-uring", "access": "premium" },
+
+    { "title": "Time sources (clock_gettime, TSC, rdtsc)", "slug": "time-sources-tsc", "access": "premium" },
+    { "title": "Perf counters & observability basics", "slug": "perf-counters-observability", "access": "premium" }
   ]
 }
 
 ---
 
-### Week 10: Architecture, Interviews & System Design
+### Week 10: Architecture, Interviews & System Design (EDA/HFT Applied)
 - {
   "title": "Interview Mastery",
   "access": "premium",
   "children": [
     { "title": "EDA Simulation Kernel Design", "slug": "simulation-kernel", "access": "premium" },
+    { "title": "Event-Driven Simulation (timing wheel, delta cycles)", "slug": "event-driven-sim-delta-cycles", "access": "premium" },
+    { "title": "Compiled Simulation vs Interpretive (tradeoffs)", "slug": "compiled-vs-interpretive-sim", "access": "premium" },
+    { "title": "Parallel/Distributed Simulation Concepts", "slug": "parallel-distributed-simulation", "access": "premium" },
+    { "title": "Determinism, Reproducibility & Debugging in Sim", "slug": "sim-determinism-debug", "access": "premium" },
+
     { "title": "Low Latency Engine Design", "slug": "low-latency-engine", "access": "premium" },
+    { "title": "Market Data Pipeline (SPSC rings, batching)", "slug": "market-data-pipeline", "access": "premium" },
+    { "title": "Order Router & Risk Checks (latency budget)", "slug": "order-router-risk", "access": "premium" },
+    { "title": "Backpressure & overload control", "slug": "backpressure-overload", "access": "premium" },
+
     { "title": "Memory Pool Design", "slug": "memory-pools", "access": "premium" },
+    { "title": "Object Pools, arena allocators, fragmentation control", "slug": "pool-fragmentation-control", "access": "premium" },
+
     { "title": "Thread Pool & Scheduler Design", "slug": "thread-pools", "access": "premium" },
-    { "title": "Mock Interviews & Review", "slug": "mock-interviews", "access": "premium" }
+    { "title": "Work stealing vs work sharing", "slug": "work-stealing", "access": "premium" },
+    { "title": "Per-core sharding & actor-like designs", "slug": "per-core-sharding", "access": "premium" },
+
+    { "title": "Debugging Performance Regressions", "slug": "perf-regressions", "access": "premium" },
+    { "title": "Interview drills: explain past Cadence/Xcelium porting work architect-style", "slug": "cadence-porting-storytelling", "access": "premium" },
+
+    { "title": "Mock Interviews & Review", "slug": "mock-interviews", "access": "premium" },
+    { "title": "C++ Systems Round: 50 rapid-fire questions", "slug": "cpp-systems-rapid-fire", "access": "premium" },
+    { "title": "Behavioral: STAR stories for EDA/HFT/BigTech", "slug": "behavioral-star-stories", "access": "premium" }
   ]
 }
 
+---
+
+## Bonus Tracks (Optional but High ROI)
+- {
+  "title": "Bonus: C++ Deep Cuts (for Staff-level confidence)",
+  "access": "premium",
+  "children": [
+    { "title": "Undefined Behavior Catalog (strict aliasing, lifetime, OOB)", "slug": "ub-catalog", "access": "premium" },
+    { "title": "C++ Standard Library Performance Model (vector/string/map)", "slug": "stl-performance-model", "access": "premium" },
+    { "title": "Allocator-aware containers & PMR end-to-end", "slug": "allocator-aware-pmr", "access": "premium" },
+    { "title": "Exception vs error-code tradeoffs in low-latency", "slug": "exceptions-vs-errorcodes", "access": "premium" },
+    { "title": "Serialization formats (flatbuffers/capnproto overview)", "slug": "serialization-lowlat", "access": "premium" },
+    { "title": "Testing: fuzzing, sanitizers, property-based tests", "slug": "testing-fuzz-sanitizers", "access": "premium" }
+  ]
+}
+```

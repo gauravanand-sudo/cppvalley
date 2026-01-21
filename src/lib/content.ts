@@ -4,22 +4,14 @@ import matter from "gray-matter";
 import { notFound } from "next/navigation";
 
 export type Access = "free" | "premium" | "paid";
-export type ContentSection = "learn" | "interviews" | "conferences" | "blog";
+export type ContentSection =
+  | "learn"
+  | "interviews"
+  | "conferences"
+  | "blog"
+  | "tracks";
 
-
-
-
-
-
-export type TrackSection = {
-  title: string;
-  items: {
-    title: string;
-    slug: string;
-    access: "free" | "premium" | "paid";
-  }[];
-};
-
+/** -------------------- Generic Content -------------------- */
 
 export type ContentMeta = {
   slug: string;
@@ -41,7 +33,8 @@ function getDir(section: ContentSection) {
 }
 
 /**
- * Finds an MDX or MD file for a given slug
+ * Finds an MDX or MD file for a given slug.
+ * IMPORTANT: slug can include subpaths like "60-day-cpp-interview/abi-object-layout"
  */
 function findFilePath(section: ContentSection, slug: string) {
   const dir = getDir(section);
@@ -56,20 +49,44 @@ function findFilePath(section: ContentSection, slug: string) {
 }
 
 /**
+ * Recursively list all .mdx/.md files under a directory.
+ * Returns slugs relative to section dir, including subfolders.
+ */
+function listFilesRecursive(rootDir: string, currentDir = rootDir): string[] {
+  if (!fs.existsSync(currentDir)) return [];
+  const entries = fs.readdirSync(currentDir, { withFileTypes: true });
+
+  const out: string[] = [];
+  for (const e of entries) {
+    const full = path.join(currentDir, e.name);
+    if (e.isDirectory()) {
+      out.push(...listFilesRecursive(rootDir, full));
+      continue;
+    }
+    if (e.isFile() && (e.name.endsWith(".mdx") || e.name.endsWith(".md"))) {
+      const rel = path.relative(rootDir, full); // e.g. "track/lesson.mdx"
+      out.push(rel);
+    }
+  }
+  return out;
+}
+
+/**
  * Returns list of content metadata for a section
  * Used by index pages like /learn, /blog, etc.
+ * Supports nested folders (e.g. learn/<trackSlug>/<lessonSlug>.mdx)
  */
 export function listContent(section: ContentSection): ContentMeta[] {
   const dir = getDir(section);
   if (!fs.existsSync(dir)) return [];
 
-  const files = fs
-    .readdirSync(dir)
-    .filter((f) => f.endsWith(".mdx") || f.endsWith(".md"));
+  const filesRel = listFilesRecursive(dir).filter(
+    (f) => f.endsWith(".mdx") || f.endsWith(".md")
+  );
 
-  const items = files.map((file) => {
-    const slug = file.replace(/\.(mdx|md)$/, "");
-    const fullPath = path.join(dir, file);
+  const items = filesRel.map((relFile) => {
+    const slug = relFile.replace(/\.(mdx|md)$/, "").replaceAll("\\", "/"); // windows safe
+    const fullPath = path.join(dir, relFile);
     const raw = fs.readFileSync(fullPath, "utf8");
     const { data } = matter(raw);
 
@@ -82,7 +99,7 @@ export function listContent(section: ContentSection): ContentMeta[] {
       tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
       description: data.description ? String(data.description) : undefined,
       date: data.date ? String(data.date) : undefined,
-    };
+    } satisfies ContentMeta;
   });
 
   // Sort newest first (if date exists)
@@ -95,7 +112,7 @@ export function listContent(section: ContentSection): ContentMeta[] {
 }
 
 /**
- * Loads full content (meta + MDX body) by slug
+ * Loads full content (meta + body) by slug
  */
 export function getContentBySlug(section: ContentSection, slug: string) {
   const filePath = findFilePath(section, slug);
@@ -125,14 +142,20 @@ export function getContentBySlug(section: ContentSection, slug: string) {
 export function requireContent(section: ContentSection, slug: string) {
   const item = getContentBySlug(section, slug);
 
+  // dev debug (safe)
+  // console.log("LOOKING FOR:", {
+  //   section,
+  //   slug,
+  //   path: path.join(process.cwd(), "src", "content", section, `${slug}.mdx`),
+  // });
+
   if (!item) {
-    // Helpful debug output during development
     const dir = getDir(section);
-    const files = fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+    const files = fs.existsSync(dir) ? listFilesRecursive(dir) : [];
     console.error(
-      `[cppvalley] Content not found → section=${section}, slug=${slug}, files=[${files.join(
-        ", "
-      )}]`
+      `[cppvalley] Content not found → section=${section}, slug=${slug}, files=[${files
+        .slice(0, 60)
+        .join(", ")}${files.length > 60 ? ", ..." : ""}]`
     );
     notFound();
   }
@@ -140,31 +163,58 @@ export function requireContent(section: ContentSection, slug: string) {
   return item;
 }
 
+/** -------------------- Tracks -------------------- */
 
-// -------------------- TRACKS --------------------
 export type TrackMeta = {
   slug: string;
   title: string;
   access: Access;
+  live: boolean;
   duration?: string;
   level?: string;
   description?: string;
+  lessonCount?: number;
+  tags?: string[];
+  price?: number; // per-track price (frontmatter: price: 1999)
 };
+
+// Item can be a leaf lesson OR a parent module with children
+export type TrackSyllabusItem =
+  | { title: string; slug: string; access: Access }
+  | {
+      title: string;
+      access: Access;
+      children: { title: string; slug: string; access: Access }[];
+    };
 
 export type TrackSection = {
   title: string;
-  items: { title: string; slug: string; access: Access }[];
+  items: TrackSyllabusItem[];
 };
 
 function getTracksDir() {
   return path.join(process.cwd(), "src", "content", "tracks");
 }
 
+function parsePrice(raw: any): number | undefined {
+  if (raw === undefined || raw === null || raw === "") return undefined;
+  if (typeof raw === "number") return Number.isFinite(raw) ? raw : undefined;
+
+  const s = String(raw).trim();
+  const digits = s.replace(/[^\d.]/g, "");
+  if (!digits) return undefined;
+
+  const n = Number(digits);
+  return Number.isFinite(n) ? n : undefined;
+}
+
 export function listTracks(): TrackMeta[] {
   const dir = getTracksDir();
   if (!fs.existsSync(dir)) return [];
 
-  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".mdx") || f.endsWith(".md"));
+  const files = fs
+    .readdirSync(dir)
+    .filter((f) => f.endsWith(".mdx") || f.endsWith(".md"));
 
   const tracks = files.map((file) => {
     const raw = fs.readFileSync(path.join(dir, file), "utf8");
@@ -175,9 +225,13 @@ export function listTracks(): TrackMeta[] {
       slug,
       title: String(data.title ?? slug),
       access: (data.access ?? "free") as Access,
+      live: data.live !== false,
       duration: data.duration ? String(data.duration) : undefined,
       level: data.level ? String(data.level) : undefined,
       description: data.description ? String(data.description) : undefined,
+      lessonCount: data.lessonCount ? Number(data.lessonCount) : undefined,
+      tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
+      price: parsePrice((data as any).price),
     } satisfies TrackMeta;
   });
 
@@ -188,7 +242,12 @@ export function getTrackBySlug(trackSlug: string) {
   const dir = getTracksDir();
   const mdxPath = path.join(dir, `${trackSlug}.mdx`);
   const mdPath = path.join(dir, `${trackSlug}.md`);
-  const filePath = fs.existsSync(mdxPath) ? mdxPath : fs.existsSync(mdPath) ? mdPath : null;
+  const filePath = fs.existsSync(mdxPath)
+    ? mdxPath
+    : fs.existsSync(mdPath)
+    ? mdPath
+    : null;
+
   if (!filePath) return null;
 
   const raw = fs.readFileSync(filePath, "utf8");
@@ -198,14 +257,28 @@ export function getTrackBySlug(trackSlug: string) {
     slug: String(data.slug ?? trackSlug),
     title: String(data.title ?? trackSlug),
     access: (data.access ?? "free") as Access,
+    live: data.live !== false,
     duration: data.duration ? String(data.duration) : undefined,
     level: data.level ? String(data.level) : undefined,
     description: data.description ? String(data.description) : undefined,
+    lessonCount: data.lessonCount ? Number(data.lessonCount) : undefined,
+    tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
+    price: parsePrice((data as any).price),
   };
 
   return { meta, content };
 }
 
+/**
+ * Robust parser for syllabus JSON blocks inside the track MDX.
+ * Supports:
+ * - leaf lesson: { title, slug, access }
+ * - module with children: { title, access, children:[{title,slug,access}] }
+ *
+ * This version is resilient to:
+ * - extra blank lines
+ * - a markdown separator `---` after a JSON block
+ */
 export function parseTrackSyllabus(trackContent: string): TrackSection[] {
   const lines = trackContent.split("\n");
 
@@ -216,33 +289,54 @@ export function parseTrackSyllabus(trackContent: string): TrackSection[] {
   let jsonBuf: string[] = [];
   let braceBalance = 0;
 
+  const countBraces = (s: string) => {
+    let open = 0;
+    let close = 0;
+    for (const ch of s) {
+      if (ch === "{") open++;
+      else if (ch === "}") close++;
+    }
+    return open - close;
+  };
+
+  const cleanJsonText = (raw: string) => {
+    // If a block accidentally captured trailing `---`, strip it.
+    // Also remove Windows CR.
+    return raw.replace(/\r/g, "").replace(/\n---\s*$/g, "").trim();
+  };
+
   const flushJson = () => {
     if (!current) return;
 
-    const raw = jsonBuf.join("\n").trim();
+    const raw0 = jsonBuf.join("\n").trim();
     jsonBuf = [];
     collecting = false;
     braceBalance = 0;
 
+    const raw = cleanJsonText(raw0);
+
     try {
       const obj = JSON.parse(raw);
 
-      // parent/module with children
-      if (Array.isArray(obj.children)) {
+      // module with children
+      if (obj && Array.isArray(obj.children)) {
+        const parentAccess = (obj.access ?? "free") as Access;
+
         current.items.push({
           title: String(obj.title ?? "Untitled"),
-          access: (obj.access ?? "free") as Access,
+          access: parentAccess,
           children: obj.children.map((c: any) => ({
             title: String(c.title ?? "Untitled"),
             slug: String(c.slug ?? ""),
-            access: (c.access ?? "free") as Access,
+            // child access wins; else inherit parent access; else free
+            access: (c.access ?? parentAccess ?? "free") as Access,
           })),
         });
         return;
       }
 
       // single lesson
-      if (obj.slug) {
+      if (obj && obj.slug) {
         current.items.push({
           title: String(obj.title ?? obj.slug),
           slug: String(obj.slug),
@@ -251,19 +345,8 @@ export function parseTrackSyllabus(trackContent: string): TrackSection[] {
       }
     } catch {
       // ignore malformed JSON blocks
+      return;
     }
-  };
-
-  const countBraces = (s: string) => {
-    // Simple brace counting (good enough for our syllabus JSON)
-    // Assumes braces not used inside strings in a tricky way.
-    let open = 0;
-    let close = 0;
-    for (const ch of s) {
-      if (ch === "{") open++;
-      else if (ch === "}") close++;
-    }
-    return open - close;
   };
 
   for (const line of lines) {
@@ -275,7 +358,6 @@ export function parseTrackSyllabus(trackContent: string): TrackSection[] {
       const title = heading[1].trim();
       if (title.toLowerCase() === "syllabus") continue;
 
-      // if a JSON block was half-collected and a new heading comes, flush safely
       if (collecting) flushJson();
 
       current = { title, items: [] };
@@ -291,32 +373,36 @@ export function parseTrackSyllabus(trackContent: string): TrackSection[] {
       const first = trimmed.replace(/^- /, ""); // remove "- "
       jsonBuf.push(first);
       braceBalance += countBraces(first);
-      // if it was a one-liner (balance 0), flush immediately
+
       if (braceBalance === 0) flushJson();
       continue;
     }
 
     // keep collecting until braces balance to 0
     if (collecting) {
+      // stop capturing if line is exactly '---' AND we already closed braces (safety)
+      if (trimmed === "---" && braceBalance === 0) {
+        flushJson();
+        continue;
+      }
+
       jsonBuf.push(trimmed);
       braceBalance += countBraces(trimmed);
+
       if (braceBalance === 0) flushJson();
     }
   }
 
-  // flush at end if still collecting
   if (collecting) flushJson();
-
   return sections;
 }
-
 
 export function flattenTrackLessonSlugs(sections: TrackSection[]): string[] {
   const slugs: string[] = [];
 
   for (const sec of sections) {
     for (const it of sec.items as any[]) {
-      if ("children" in it && Array.isArray(it.children)) {
+      if (it && Array.isArray(it.children)) {
         for (const child of it.children) {
           if (child?.slug) slugs.push(child.slug);
         }
@@ -326,7 +412,5 @@ export function flattenTrackLessonSlugs(sections: TrackSection[]): string[] {
     }
   }
 
-  // remove duplicates while preserving order
   return Array.from(new Set(slugs));
 }
-

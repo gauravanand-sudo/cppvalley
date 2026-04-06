@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 function isInternalNavigation(anchor: HTMLAnchorElement) {
@@ -19,7 +19,6 @@ function isInternalNavigation(anchor: HTMLAnchorElement) {
 
 export default function RouteLoadingProvider() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const hideTimer = useRef<number | null>(null);
 
@@ -62,7 +61,7 @@ export default function RouteLoadingProvider() {
         window.clearTimeout(hideTimer.current);
       }
     };
-  }, [pathname, searchParams]);
+  }, [pathname]);
 
   return (
     <>

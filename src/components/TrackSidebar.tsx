@@ -9,6 +9,7 @@ import {
   emitProgressUpdate,
   getProgressAuthHeaders,
   loadLocalProgress,
+  normalizeCompletedLessons,
   PROGRESS_EVENT,
   saveLocalProgress,
 } from "@/lib/browserProgress";
@@ -60,17 +61,26 @@ export default function TrackSidebar({
   const pathname = usePathname();
   const currentSlug = pathname.split("/").pop() || "";
   const [q, setQ] = useState("");
-  const [completedLessons, setCompletedLessons] = useState<string[]>(() => {
-    const local = loadLocalProgress(trackSlug);
-    return local.completedLessons.length > 0 ? local.completedLessons : initialCompletedLessons;
-  });
-  const [lastLessonSlug, setLastLessonSlug] = useState<string | null>(() => {
-    const local = loadLocalProgress(trackSlug);
-    return local.lastLessonSlug ?? initialLastLessonSlug ?? null;
-  });
+  const [completedLessons, setCompletedLessons] = useState<string[]>(
+    () => normalizeCompletedLessons(initialCompletedLessons)
+  );
+  const [lastLessonSlug, setLastLessonSlug] = useState<string | null>(
+    () => initialLastLessonSlug ?? null
+  );
 
   useEffect(() => {
     let active = true;
+    let localSyncFrame: number | null = null;
+
+    localSyncFrame = window.requestAnimationFrame(() => {
+      const local = loadLocalProgress(trackSlug);
+      if (local.completedLessons.length > 0) {
+        setCompletedLessons(local.completedLessons);
+      }
+      if (local.lastLessonSlug) {
+        setLastLessonSlug(local.lastLessonSlug);
+      }
+    });
 
     async function syncFromServer() {
       try {
@@ -126,6 +136,9 @@ export default function TrackSidebar({
     window.addEventListener("focus", syncFromServer);
     return () => {
       active = false;
+      if (localSyncFrame !== null) {
+        window.cancelAnimationFrame(localSyncFrame);
+      }
       window.removeEventListener(PROGRESS_EVENT, sync);
       window.removeEventListener("focus", syncFromServer);
     };

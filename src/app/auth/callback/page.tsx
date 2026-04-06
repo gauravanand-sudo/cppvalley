@@ -1,9 +1,17 @@
 import { Suspense } from "react";
 import CallbackClient from "./CallbackClient";
+import AppLoadingScreen from "@/components/AppLoadingScreen";
 
 export default function AuthCallbackPage() {
   return (
-    <Suspense fallback={<div className="p-6">Signing you in…</div>}>
+    <Suspense
+      fallback={
+        <AppLoadingScreen
+          label="cppvalley loading"
+          caption="Signing you in with cppvalley."
+        />
+      }
+    >
       <CallbackClient />
     </Suspense>
   );

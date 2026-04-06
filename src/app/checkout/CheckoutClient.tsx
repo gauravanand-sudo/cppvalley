@@ -5,6 +5,7 @@ import Script from "next/script";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import CppvalleyLoading from "@/components/CppvalleyLoading";
 
 declare global {
   interface Window {
@@ -36,6 +37,7 @@ export default function CheckoutPage() {
   const [err, setErr] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [paid, setPaid] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
   async function startPayment() {
     setErr(null);
@@ -76,6 +78,9 @@ export default function CheckoutPage() {
           razorpay_order_id: string;
           razorpay_signature: string;
         }) => {
+          setVerifying(true);
+          setErr(null);
+
           const verifyRes = await fetch("/api/razorpay/verify-payment", {
             method: "POST",
             headers: {
@@ -90,6 +95,7 @@ export default function CheckoutPage() {
 
           const verifyData = await verifyRes.json();
           if (!verifyRes.ok) {
+            setVerifying(false);
             setErr(verifyData?.error || "Payment succeeded, but verification failed.");
             return;
           }
@@ -114,8 +120,29 @@ export default function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  if (verifying || paid) {
+    return (
+      <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#592332,_#33161f_42%,_#160f13_100%)] text-[#f7eef1]">
+        <div className="mx-auto flex min-h-screen max-w-5xl items-center justify-center px-6 py-12">
+          <div className="w-full rounded-[2rem] border border-[#ffffff1f] bg-[#ffffff0b] p-10 shadow-[0_30px_90px_rgba(18,8,12,0.42)] backdrop-blur">
+            <CppvalleyLoading
+              tone="dark"
+              label="cppvalley loading"
+              caption={
+                paid
+                  ? "Unlocking your course and sending you to your reader."
+                  : "Payment received. Verifying securely with cppvalley."
+              }
+              className="min-h-[280px]"
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#fcf4f6,_#f5f0f1_45%,_#ede7e8_100%)] text-[#2f2327]">
+    <div className="page-glide min-h-screen bg-[radial-gradient(circle_at_top,_#fcf4f6,_#f5f0f1_45%,_#ede7e8_100%)] text-[#2f2327]">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
 
       <div className="mx-auto flex min-h-screen max-w-6xl items-center px-6 py-12 lg:px-8">

@@ -1,0 +1,1373 @@
+# Custom Allocators
+### From malloc Internals to Production Arena Allocators — Every Layer
+
+---
+
+## Before We Write A Single Line — The Question That Anchors Everything
+
+Here is a rendering loop. Runs 60 times per second. Each frame allocates thousands of small objects — draw commands, transform matrices, material descriptors.
+
+```cpp
+void render_frame(Scene& scene) {
+    for (auto& node : scene.nodes) {
+        DrawCommand* cmd = new DrawCommand(node);  // allocate
+        command_buffer.push(cmd);
+    }
+    gpu.submit(command_buffer);
+    
+    for (auto* cmd : command_buffer) {
+        delete cmd;  // deallocate
+    }
+    command_buffer.clear();
+}
+```
+
+This runs fine. Ships to customers. Then a performance engineer profiles it and finds that **40% of frame time is spent in `new` and `delete`.**
+
+Not in rendering. Not in GPU submission. In the allocator.
+
+By the end of this lecture you will know exactly why this happens, what the allocator is doing behind every `new`, why that is catastrophically slow in concurrent systems, and how to build allocators that reduce allocation cost to **single-digit nanoseconds** — from hundreds.
+
+---
+
+## Chapter 1: What `new` Actually Does — The Full Story
+
+Most engineers think `new` is a simple syscall that asks the OS for memory. It is not. It is a complex piece of software with its own data structures, locking, and heuristics. Understanding it explains why it fails in concurrent rendering loops.
+
+### The Memory Hierarchy for a Process
+
+```text
+┌─────────────────────────────────────────────────┐
+│                  Your Process                    │
+│                                                  │
+│  ┌─────────────┐  ┌─────────────┐               │
+│  │    Stack    │  │    Heap     │               │
+│  │ (per thread)│  │  (shared)   │               │
+│  │ grows down  │  │ grows up    │               │
+│  └─────────────┘  └──────┬──────┘               │
+│                           │                      │
+│               ┌───────────┴──────────┐           │
+│               │   malloc/free        │           │
+│               │  (ptmalloc2/jemalloc │           │
+│               │   /tcmalloc)         │           │
+│               └───────────┬──────────┘           │
+│                           │                      │
+│               ┌───────────┴──────────┐           │
+│               │  sbrk() / mmap()     │           │
+│               │  (OS syscall)        │           │
+│               └───────────┬──────────┘           │
+└───────────────────────────┼─────────────────────┘
+                            │
+                     ┌──────┴──────┐
+                     │  OS Kernel  │
+                     │ (physical   │
+                     │  memory)    │
+                     └─────────────┘
+```
+
+`new` calls `operator new` which calls `malloc`. `malloc` is implemented by your C runtime (ptmalloc2 on Linux glibc, jemalloc on FreeBSD, tcmalloc in Chrome/many production systems). When `malloc` needs more memory from the OS, it calls `sbrk()` or `mmap()` — actual syscalls.
+
+### The ptmalloc2 Internals — What malloc Does On Every Call
+
+ptmalloc2 (the default on Linux) organizes free memory into **bins** — doubly-linked lists of free chunks, organized by size.
+
+```
+Small bins (size 16-512 bytes, 62 bins, 8-byte increments):
+  bin[0]:  16-byte chunks  → [chunk] → [chunk] → [chunk] → null
+  bin[1]:  24-byte chunks  → [chunk] → null
+  bin[2]:  32-byte chunks  → [chunk] → [chunk] → null
+  ...
+  bin[61]: 504-byte chunks
+
+Large bins (size 512+ bytes, ~63 bins, varying increments):
+  bin[62]: 512-576 bytes
+  ...
+
+Unsorted bin: recently freed chunks, not yet sorted
+Fastbins: small chunks (≤128 bytes), singly-linked, no coalescing
+```
+
+**What `malloc(size)` does:**
+
+```
+1. Round size up to alignment boundary (typically 16 bytes)
+2. Check fastbins for exact size match
+   → If found: return immediately (fast path, ~50 cycles)
+3. Check small bins for exact size match
+   → If found: return (medium path, ~100 cycles)
+4. Check unsorted bin — sort chunks into correct bins
+   → This is O(unsorted bin length) — can be hundreds of chunks
+5. Check large bins for best fit
+6. If nothing fits: call sbrk()/mmap() for more memory from OS
+   → syscall: ~1000-3000 cycles
+7. Return chunk, update metadata
+```
+
+**What `free(ptr)` does:**
+
+```
+1. Check if adjacent chunks are free → coalesce (merge) them
+   → This requires reading and writing adjacent chunk headers
+2. If chunk is small: add to fastbin (fast, no coalescing)
+3. Otherwise: add to unsorted bin
+4. If heap is largely free: return memory to OS with sbrk(-n)
+   → syscall: ~1000-3000 cycles
+```
+
+The critical point: **every malloc and free touches metadata structures that are shared across all threads.** The heap is a global resource.
+
+### The Global Lock Problem
+
+ptmalloc2 uses a **global mutex** (or per-arena mutex) to protect its bin data structures. In a single-threaded program, this is fine — lock is never contended. In a multithreaded program:
+
+```
+Thread 1: new DrawCommand()  → acquire heap lock → ... → release
+Thread 2: new Material()     → acquire heap lock → BLOCKED waiting for Thread 1
+Thread 3: new Transform()    → acquire heap lock → BLOCKED waiting for Thread 1
+Thread 4: delete old_cmd     → acquire heap lock → BLOCKED waiting for Thread 1
+```
+
+16 rendering threads all allocating and deallocating thousands of objects per frame. The heap lock is the single most contended resource in the system. Every allocation serializes.
+
+ptmalloc2 tries to mitigate this with **arenas** — multiple heap regions, each with its own lock. By default, it creates up to `8 * num_cores` arenas. Threads are assigned to arenas, reducing contention. But for truly high-frequency allocation (60fps rendering, HFT order processing), even per-arena locking is too slow.
+
+### The Cache-Unfriendly Metadata
+
+Each malloc chunk has a header:
+
+```
+malloc chunk layout:
+┌─────────────────────────────────────────────────┐
+│  prev_size (8 bytes) — size of previous chunk   │
+│  if previous is free                             │
+├─────────────────────────────────────────────────┤
+│  size (8 bytes) — size of this chunk            │
+│  + flags: PREV_INUSE, IS_MMAPPED, NON_MAIN_ARENA│
+├─────────────────────────────────────────────────┤
+│                                                  │
+│  User data (what new returns)                    │
+│                                                  │
+├─────────────────────────────────────────────────┤
+│  (next chunk header starts here)                 │
+└─────────────────────────────────────────────────┘
+```
+
+The 16-byte header is adjacent to the user data. When you `delete` an object, `free` reads the header immediately before the pointer — which is on the same or adjacent cache line as your object's data. Every deletion is also a read of adjacent memory — causing cache pollution.
+
+More critically: the free list pointers (fd, bk for forward/backward in the bin doubly-linked list) are stored **inside** the free chunk, reusing the user data area. This means:
+
+- Walking the free list = random memory accesses to previously-freed objects
+- These objects' cache lines are cold (they were freed and potentially overwritten)
+- Every malloc that searches bins = cache misses
+
+**The result:** In a high-frequency allocation pattern:
+
+```
+new (100-500 ns per call):
+  Lock acquisition: 20-200 ns (contended)
+  Bin search: 50-200 ns (cache misses in free list)
+  Metadata update: 20-50 ns
+
+delete (100-500 ns per call):
+  Lock acquisition: 20-200 ns
+  Coalescing: 50-100 ns (read adjacent chunks)
+  Bin insertion: 20-50 ns
+```
+
+For a renderer allocating 10,000 objects per frame at 60fps: **600,000 allocations/second × 300ns average = 180ms per second spent in the allocator.** For a 16ms frame budget, that's unacceptable.
+
+---
+
+## Chapter 2: The Solution Space — A Taxonomy of Custom Allocators
+
+Before implementing, understand the design space:
+
+```
+Custom Allocators
+│
+├── Pool Allocator
+│   Same-size objects only
+│   O(1) alloc and free
+│   No fragmentation
+│   → Use for: particles, nodes, commands, events
+│
+├── Arena (Bump) Allocator
+│   Any size, pointer bumped forward
+│   O(1) alloc, O(1) bulk free (entire arena)
+│   No individual free
+│   → Use for: per-frame data, per-request data, parse trees
+│
+├── Stack Allocator
+│   LIFO free order only
+│   O(1) alloc, O(1) free
+│   → Use for: nested scopes, recursive algorithms
+│
+├── Slab Allocator (Linux kernel style)
+│   Fixed-size objects, pre-constructed
+│   O(1) alloc and free
+│   Objects never destroyed between uses
+│   → Use for: kernel objects, frequently-created/destroyed objects
+│
+└── Tlsf Allocator (Two-Level Segregated Fit)
+    General-purpose, O(1) alloc and free
+    Low fragmentation
+    → Use for: general replacement of malloc in embedded/HFT
+```
+
+We'll implement Pool and Arena in full depth, then cover Slab and the thread-local optimization pattern.
+
+---
+
+## Chapter 3: The Pool Allocator — From First Principles
+
+### The Core Insight
+
+If you know all allocations are the same size, you don't need bin searching, coalescing, or metadata headers. You pre-allocate a large block of memory, divide it into same-size slots, and maintain a free list of available slots.
+
+```
+Pool of 64-byte slots:
+┌────────┬────────┬────────┬────────┬────────┬────────┐
+│ slot 0 │ slot 1 │ slot 2 │ slot 3 │ slot 4 │ slot 5 │
+└────────┴────────┴────────┴────────┴────────┴────────┘
+
+Free list (embedded in free slots):
+slot 0 → slot 2 → slot 4 → null
+
+Allocated: slot 1, slot 3, slot 5
+```
+
+The free list pointers are stored **inside** the free slots themselves — no separate metadata needed. When a slot is free, its first 8 bytes hold the pointer to the next free slot. When allocated, those bytes belong to the user.
+
+This is the same trick malloc uses for its bins — but here it's clean and predictable because all slots are the same size.
+
+### Implementation — Building It Layer By Layer
+
+**Layer 1: The basic structure**
+
+```cpp
+template<typename T, size_t BlockSize = 4096>
+class PoolAllocator {
+private:
+    // Free list node — lives inside free slots
+    // A free slot's memory is reinterpreted as this struct
+    struct FreeNode {
+        FreeNode* next;
+    };
+    
+    // One block of memory containing many slots
+    struct Block {
+        // Ensure slots are properly aligned for T
+        // and for FreeNode (which needs pointer alignment)
+        static constexpr size_t SlotSize = 
+            std::max(sizeof(T), sizeof(FreeNode));
+        static constexpr size_t Alignment = 
+            std::max(alignof(T), alignof(FreeNode));
+        static constexpr size_t SlotsPerBlock = 
+            (BlockSize - sizeof(Block*)) / SlotSize;
+        
+        Block* next_block;  // linked list of blocks
+        alignas(Alignment) 
+        char slots[SlotsPerBlock * SlotSize];
+    };
+    
+    Block* current_block = nullptr;
+    FreeNode* free_list = nullptr;
+    size_t slots_used_in_current_block = 0;
+```
+
+**Layer 2: Block allocation from the OS**
+
+```cpp
+    void allocate_block() {
+        // Get a fresh block from the system allocator
+        // (we use system malloc for bulk allocation only)
+        Block* new_block = static_cast<Block*>(
+            ::operator new(sizeof(Block))
+        );
+        new_block->next_block = current_block;
+        current_block = new_block;
+        slots_used_in_current_block = 0;
+        
+        // Note: we do NOT add block slots to free_list here
+        // We use the block directly until it's full (bump pointer style)
+        // Only when we need to go back to freed slots do we use free_list
+    }
+```
+
+**Layer 3: The allocate path**
+
+```cpp
+public:
+    T* allocate() {
+        // Fast path 1: there's something on the free list
+        if (free_list != nullptr) {
+            FreeNode* node = free_list;
+            free_list = node->next;
+            // Reinterpret the free node memory as T*
+            return reinterpret_cast<T*>(node);
+        }
+        
+        // Fast path 2: current block has unused slots
+        if (current_block != nullptr && 
+            slots_used_in_current_block < Block::SlotsPerBlock) {
+            char* slot = current_block->slots + 
+                         slots_used_in_current_block * Block::SlotSize;
+            slots_used_in_current_block++;
+            return reinterpret_cast<T*>(slot);
+        }
+        
+        // Slow path: need a new block
+        allocate_block();
+        
+        char* slot = current_block->slots;
+        slots_used_in_current_block = 1;
+        return reinterpret_cast<T*>(slot);
+    }
+```
+
+**Layer 4: The deallocate path**
+
+```cpp
+    void deallocate(T* ptr) {
+        // Don't call T's destructor here — that's the caller's job
+        // Just return the slot to the free list
+        
+        // Reinterpret the T* as a FreeNode* 
+        // This is valid because the slot is large enough for FreeNode
+        FreeNode* node = reinterpret_cast<FreeNode*>(ptr);
+        node->next = free_list;
+        free_list = node;
+        // O(1). No locking. No searching. No coalescing.
+    }
+```
+
+**Layer 5: Making it work with `new` and `delete`**
+
+```cpp
+    // Construct T in a pool slot
+    template<typename... Args>
+    T* construct(Args&&... args) {
+        T* slot = allocate();
+        // Placement new — constructs T in the already-allocated slot
+        return new(slot) T(std::forward<Args>(args)...);
+    }
+    
+    // Destruct T and return slot to pool
+    void destroy(T* ptr) {
+        ptr->~T();        // explicit destructor call
+        deallocate(ptr);  // return slot to free list
+    }
+```
+
+### Visualizing The Free List
+
+```
+Initial state (empty pool, first block allocated):
+Block: [slot0][slot1][slot2][slot3]...[slot63]
+free_list = null
+slots_used = 0
+
+After construct(A), construct(B), construct(C):
+Block: [  A  ][  B  ][  C  ][    ]...[    ]
+free_list = null
+slots_used = 3
+Returned: ptr_A, ptr_B, ptr_C
+
+After destroy(ptr_B):
+Block: [  A  ][next→][  C  ][    ]...[    ]
+              ↑ FreeNode stored here
+free_list = &slot1
+slots_used = 3 (doesn't decrease — we use free_list instead)
+
+After construct(D):
+  free_list != null → take slot1
+Block: [  A  ][  D  ][  C  ][    ]...[    ]
+free_list = null
+Returned: ptr_D (same address as old ptr_B)
+
+After destroy(ptr_A), destroy(ptr_C):
+Block: [next→][  D  ][next→][    ]...[    ]
+       ↑ →null        ↑ →slot0
+free_list = &slot2 → &slot0 → null
+```
+
+The free list threads through the free slots. No external memory. No allocator overhead.
+
+### The Alignment Problem — A Subtle Bug
+
+What if `sizeof(T) < sizeof(FreeNode*)`?
+
+```cpp
+// On 64-bit: sizeof(FreeNode*) == 8
+struct TinyObject {
+    int x;  // 4 bytes
+};
+// sizeof(TinyObject) == 4 < sizeof(FreeNode*) == 8
+```
+
+If we allocate 4-byte slots, we can't store an 8-byte pointer in a free slot. We'd overwrite adjacent memory.
+
+The fix is already in the code:
+
+```cpp
+static constexpr size_t SlotSize = 
+    std::max(sizeof(T), sizeof(FreeNode));
+```
+
+SlotSize is the maximum of the object size and the free node size. Every slot is at least as large as a pointer. Small objects get a little extra space — that's the price of the pool.
+
+### The Alignment Problem Part 2 — Pointer Alignment
+
+What if `alignof(T) > alignof(FreeNode*)`?
+
+```cpp
+struct AlignedObject {
+    alignas(64) double data[8];  // 64-byte aligned
+};
+```
+
+If slots are not 64-byte aligned, accessing `data` produces undefined behavior (misaligned access on ARM, performance penalty on x86).
+
+The fix:
+
+```cpp
+static constexpr size_t Alignment = 
+    std::max(alignof(T), alignof(FreeNode));
+
+alignas(Alignment) char slots[SlotsPerBlock * SlotSize];
+```
+
+The slots array starts at the required alignment. But does slot 1 start at the right alignment? Only if `SlotSize` is a multiple of `Alignment`.
+
+```cpp
+// Round SlotSize up to a multiple of Alignment
+static constexpr size_t SlotSize = 
+    ((std::max(sizeof(T), sizeof(FreeNode)) + Alignment - 1) 
+     / Alignment) * Alignment;
+```
+
+Now every slot starts at an alignment boundary. This is the correct version.
+
+### Thread Safety — The Full Solution
+
+The basic pool above is not thread-safe. Adding a mutex makes it safe but slow. The production solution: **thread-local pools.**
+
+```cpp
+template<typename T, size_t BlockSize = 65536>
+class ThreadSafePool {
+private:
+    // Per-thread pool — no locking needed
+    thread_local static PoolAllocator<T, BlockSize> local_pool;
+    
+    // Global pool for overflow — protected by mutex
+    std::mutex global_mutex;
+    PoolAllocator<T, BlockSize> global_pool;
+    
+    // When local pool needs a new block, get from global
+    // When local pool has too many free slots, return to global
+
+public:
+    T* allocate() {
+        // Fast path: thread-local, no lock
+        return local_pool.allocate();
+        // local_pool handles the slow path (new block) internally
+        // If we wanted to return excess to global: add threshold check
+    }
+    
+    void deallocate(T* ptr) {
+        local_pool.deallocate(ptr);
+    }
+};
+
+template<typename T, size_t BlockSize>
+thread_local PoolAllocator<T, BlockSize> 
+    ThreadSafePool<T, BlockSize>::local_pool;
+```
+
+Thread-local pool: allocation is completely lock-free on the fast path. Each thread manages its own pool. The global pool is only touched when a thread's local pool exhausts a block — a rare event.
+
+**The steal-on-empty pattern (advanced):**
+
+When a thread's local free list is empty and it needs to allocate, instead of going to the global allocator, it can **steal** a batch of free slots from another thread's local pool. This requires a per-thread "public" free list (accessible to other threads, protected by a lightweight lock) and a "private" free list (thread-local, lock-free). This is the pattern used by jemalloc and tcmalloc.
+
+---
+
+## Chapter 4: The Arena Allocator — Maximum Speed, Minimum Complexity
+
+### The Core Insight
+
+For data that has a well-defined lifetime — all allocated together, all freed together — you don't need individual deallocation. You allocate by bumping a pointer forward, and free by resetting the pointer to the start.
+
+This is the fastest possible allocator because:
+- Allocation: one pointer comparison + one pointer increment + one store = **3-5 ns**
+- Deallocation: one store (reset pointer) = **1-2 ns**
+- No metadata. No free list. No coalescing. No locking (per-thread arena).
+
+### Where This Pattern Appears
+
+- **Per-frame renderer:** All draw commands, transforms, material instances allocated at frame start, freed at frame end
+- **Per-request web server:** All request parsing data, response buffers, allocated at request start, freed at request end  
+- **Per-query database:** All intermediate join results, sort buffers, allocated at query start, freed at query end
+- **Parse trees:** Entire AST allocated in an arena, freed when compilation unit is done
+
+Adobe's rendering pipeline uses per-frame arenas extensively. The render graph, command lists, and intermediate representations are all arena-allocated.
+
+### Implementation — Every Detail
+
+```cpp
+class Arena {
+private:
+    struct Block {
+        Block* prev;         // linked list of blocks
+        size_t size;         // usable size of this block
+        size_t used;         // bytes used so far
+        
+        char* begin() { 
+            return reinterpret_cast<char*>(this + 1); 
+        }
+        char* current() { return begin() + used; }
+        char* end() { return begin() + size; }
+        size_t remaining() { return size - used; }
+    };
+    
+    Block* current_block = nullptr;
+    size_t default_block_size;
+    size_t total_allocated = 0;  // for diagnostics
+    size_t total_used = 0;
+    
+    // Marker for rewinding (stack allocator behavior)
+    struct Marker {
+        Block* block;
+        size_t used;
+    };
+
+public:
+    explicit Arena(size_t block_size = 1024 * 1024)  // 1MB default
+        : default_block_size(block_size) {
+        // Pre-allocate first block
+        allocate_block(block_size);
+    }
+    
+    ~Arena() {
+        // Free all blocks
+        Block* block = current_block;
+        while (block != nullptr) {
+            Block* prev = block->prev;
+            ::operator delete(block);
+            block = prev;
+        }
+    }
+    
+    // Non-copyable (owns memory)
+    Arena(const Arena&) = delete;
+    Arena& operator=(const Arena&) = delete;
+    
+    // Movable
+    Arena(Arena&& other) noexcept
+        : current_block(other.current_block)
+        , default_block_size(other.default_block_size)
+        , total_allocated(other.total_allocated)
+        , total_used(other.total_used) {
+        other.current_block = nullptr;
+    }
+
+private:
+    void allocate_block(size_t min_size) {
+        size_t block_size = std::max(min_size, default_block_size);
+        
+        // Allocate block header + data in one allocation
+        void* mem = ::operator new(sizeof(Block) + block_size);
+        Block* block = new(mem) Block{};
+        block->prev = current_block;
+        block->size = block_size;
+        block->used = 0;
+        
+        current_block = block;
+        total_allocated += block_size;
+    }
+
+public:
+    // ── The Core: Aligned Bump Allocation ────────────────────────
+    void* allocate(size_t size, size_t alignment = alignof(std::max_align_t)) {
+        // Alignment must be a power of two
+        assert((alignment & (alignment - 1)) == 0);
+        
+        // Align the current pointer up to required alignment
+        // This is the key arithmetic:
+        char* ptr = current_block->current();
+        
+        // How many bytes of padding do we need?
+        // ptr & (alignment - 1) gives offset within alignment boundary
+        // We need (alignment - offset) % alignment bytes of padding
+        size_t offset = reinterpret_cast<uintptr_t>(ptr) & (alignment - 1);
+        size_t padding = (offset == 0) ? 0 : (alignment - offset);
+        
+        size_t total_needed = size + padding;
+        
+        if (total_needed > current_block->remaining()) {
+            // Current block is full — allocate new block
+            // Make it large enough for this allocation
+            allocate_block(std::max(total_needed, default_block_size));
+            
+            // New block starts aligned (block header is aligned)
+            // Recalculate for new block
+            ptr = current_block->current();
+            offset = reinterpret_cast<uintptr_t>(ptr) & (alignment - 1);
+            padding = (offset == 0) ? 0 : (alignment - offset);
+            total_needed = size + padding;
+        }
+        
+        current_block->used += total_needed;
+        total_used += total_needed;
+        
+        return ptr + padding;  // Return aligned pointer, skip padding
+    }
+    
+    // ── Typed Allocation ─────────────────────────────────────────
+    template<typename T, typename... Args>
+    T* make(Args&&... args) {
+        void* mem = allocate(sizeof(T), alignof(T));
+        return new(mem) T(std::forward<Args>(args)...);
+        // Note: destructor is NOT called when arena is reset/destroyed
+        // Use only for trivially-destructible types or manage manually
+    }
+    
+    // ── Array Allocation ─────────────────────────────────────────
+    template<typename T>
+    T* make_array(size_t count) {
+        void* mem = allocate(sizeof(T) * count, alignof(T));
+        return new(mem) T[count];
+        // Again: destructors not called on reset
+    }
+    
+    // ── Markers for Partial Rewind ────────────────────────────────
+    Marker get_marker() const {
+        return {current_block, current_block ? current_block->used : 0};
+    }
+    
+    void rewind_to(Marker marker) {
+        // Free any blocks allocated after the marker
+        while (current_block != marker.block) {
+            Block* prev = current_block->prev;
+            total_allocated -= current_block->size;
+            ::operator delete(current_block);
+            current_block = prev;
+        }
+        
+        // Reset usage in the marker block
+        if (current_block) {
+            total_used -= (current_block->used - marker.used);
+            current_block->used = marker.used;
+        }
+    }
+    
+    // ── Full Reset — The "Free Everything" Operation ──────────────
+    void reset() {
+        // Walk all blocks back to the first
+        Block* block = current_block;
+        Block* first = nullptr;
+        while (block != nullptr) {
+            first = block;
+            block = block->prev;
+        }
+        
+        // Free all except the first (keep it for reuse)
+        if (first != current_block) {
+            Block* b = current_block;
+            while (b != first) {
+                Block* prev = b->prev;
+                ::operator delete(b);
+                b = prev;
+            }
+        }
+        
+        // Reset first block
+        if (first) {
+            first->prev = nullptr;
+            first->used = 0;
+            current_block = first;
+        }
+        
+        total_used = 0;
+    }
+    
+    // ── Diagnostics ───────────────────────────────────────────────
+    size_t bytes_allocated() const { return total_allocated; }
+    size_t bytes_used() const { return total_used; }
+    float utilization() const { 
+        return total_allocated > 0 
+            ? float(total_used) / total_allocated 
+            : 0.f; 
+    }
+};
+```
+
+### Visualizing The Bump Pointer
+
+```
+Initial block (1MB):
+┌──────────┬────────────────────────────────────────────────┐
+│  Header  │              Usable space (1MB)                 │
+│ prev=null│ ↑                                              │
+│ size=1MB │ current (bump pointer starts here)             │
+│ used=0   │                                                │
+└──────────┴────────────────────────────────────────────────┘
+
+After make<DrawCommand>(args):  // sizeof=48, alignof=8
+┌──────────┬────────┬────────────────────────────────────────┐
+│  Header  │  cmd0  │         remaining space                │
+│ used=48  │ 48bytes│ ↑ current                              │
+└──────────┴────────┴────────────────────────────────────────┘
+
+After make<Matrix4x4>(args):  // sizeof=64, alignof=16
+┌──────────┬────────┬────────┬───────────────────────────────┐
+│  Header  │  cmd0  │  mat0  │     remaining space           │
+│ used=112 │ 48bytes│ 64bytes│ ↑ current                     │
+└──────────┴────────┴────────┴───────────────────────────────┘
+
+After make<char>(3):  // sizeof=1, alignof=1 — but then next alloc needs align 8
+┌──────────┬────────┬────────┬───┬─────┬──────────────────────┐
+│  Header  │  cmd0  │  mat0  │ c │ pad │  remaining space      │
+│ used=121 │ 48b    │ 64b    │ 1b│ 7b  │ ↑ current             │
+└──────────┴────────┴────────┴───┴─────┴──────────────────────┘
+                                   ↑
+                              padding to align
+                              next allocation
+
+After reset():
+┌──────────┬────────────────────────────────────────────────┐
+│  Header  │              Reusable space (1MB)               │
+│ used=0   │ ↑ current (reset to beginning)                 │
+└──────────┴────────────────────────────────────────────────┘
+All objects are gone. No individual destructors called.
+Memory is ready for next frame.
+```
+
+### The Alignment Arithmetic — Derived From First Principles
+
+This is the most common source of bugs in custom allocators. Let's derive it carefully.
+
+```cpp
+// We want to find the next address >= ptr that is aligned to `alignment`
+// alignment must be a power of two
+
+// Current pointer as integer
+uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
+
+// How far past an alignment boundary are we?
+// Since alignment is power of two: alignment - 1 is a bitmask of low bits
+// addr & (alignment - 1) gives the offset within the current alignment block
+uintptr_t offset = addr & (alignment - 1);
+
+// If offset is 0, we're already aligned — no padding needed
+// If offset is non-zero, we need (alignment - offset) bytes to reach next boundary
+uintptr_t padding = (offset == 0) ? 0 : (alignment - offset);
+
+// Aligned address
+uintptr_t aligned_addr = addr + padding;
+
+// Verify: aligned_addr & (alignment - 1) == 0 always
+```
+
+Example with alignment = 16:
+
+```
+addr = 0x1005 (5 bytes past a 16-byte boundary)
+offset = 0x1005 & 0xF = 0x5
+padding = 16 - 5 = 11
+aligned_addr = 0x1005 + 11 = 0x1010 ✓ (0x1010 & 0xF == 0)
+
+addr = 0x1010 (exactly on a 16-byte boundary)
+offset = 0x1010 & 0xF = 0x0
+padding = 0
+aligned_addr = 0x1010 ✓ (no padding needed)
+
+addr = 0x1001 (1 byte past boundary)
+offset = 0x1001 & 0xF = 0x1
+padding = 16 - 1 = 15
+aligned_addr = 0x1010 ✓
+```
+
+The bitmask trick (`& (alignment - 1)`) works because power-of-two alignment means the low N bits (where 2^N = alignment) are the offset within an alignment block. This is a hardware-level property of binary representation.
+
+---
+
+## Chapter 5: The Slab Allocator — Object Caching
+
+The slab allocator, invented by Jeff Bonwick for the Solaris kernel in 1994, adds one more insight on top of the pool allocator: **objects are never destroyed between uses.** They're initialized once, returned to the pool when "freed," and given to the next requester in their already-initialized state.
+
+### The Insight
+
+Many objects have expensive construction:
+- A mutex inside an object must be initialized
+- A hash map's internal array must be allocated
+- A network socket's buffers must be set up
+
+If you're creating and destroying thousands of these per second, you pay the construction cost every time. The slab allocator pays it once — when the slab is created — and reuses objects indefinitely.
+
+```cpp
+template<typename T>
+class SlabAllocator {
+private:
+    struct Slab {
+        static constexpr size_t OBJECTS_PER_SLAB = 64;
+        
+        alignas(T) char storage[sizeof(T) * OBJECTS_PER_SLAB];
+        std::bitset<OBJECTS_PER_SLAB> in_use;
+        Slab* next;
+        size_t free_count = OBJECTS_PER_SLAB;
+        
+        Slab() : next(nullptr) {
+            // Construct ALL objects in this slab upfront
+            for (size_t i = 0; i < OBJECTS_PER_SLAB; i++) {
+                new(slot(i)) T();  // default construct
+            }
+        }
+        
+        ~Slab() {
+            // Destroy ALL objects (even those currently "in use" —
+            // slab destruction means the whole system is shutting down)
+            for (size_t i = 0; i < OBJECTS_PER_SLAB; i++) {
+                slot(i)->~T();
+            }
+        }
+        
+        T* slot(size_t i) {
+            return reinterpret_cast<T*>(storage + i * sizeof(T));
+        }
+        
+        T* acquire() {
+            for (size_t i = 0; i < OBJECTS_PER_SLAB; i++) {
+                if (!in_use[i]) {
+                    in_use[i] = true;
+                    free_count--;
+                    return slot(i);
+                    // Object is already constructed — caller gets it ready-to-use
+                    // Caller must reset/reinitialize the object's state
+                }
+            }
+            return nullptr;  // slab is full
+        }
+        
+        void release(T* obj) {
+            size_t i = (reinterpret_cast<char*>(obj) - storage) / sizeof(T);
+            assert(in_use[i]);
+            in_use[i] = false;
+            free_count++;
+            // Object is NOT destroyed — stays constructed for reuse
+            // Caller must have finished with obj before calling release
+        }
+    };
+    
+    Slab* slabs = nullptr;
+    
+    void add_slab() {
+        Slab* s = new Slab();
+        s->next = slabs;
+        slabs = s;
+    }
+
+public:
+    SlabAllocator() { add_slab(); }
+    
+    T* acquire() {
+        // Find a slab with space
+        for (Slab* s = slabs; s != nullptr; s = s->next) {
+            if (s->free_count > 0) {
+                T* obj = s->acquire();
+                if (obj) return obj;
+            }
+        }
+        // All slabs full — add a new one
+        add_slab();
+        return slabs->acquire();
+    }
+    
+    void release(T* obj) {
+        // Find which slab owns this object
+        for (Slab* s = slabs; s != nullptr; s = s->next) {
+            char* start = s->storage;
+            char* end = start + sizeof(T) * Slab::OBJECTS_PER_SLAB;
+            if (reinterpret_cast<char*>(obj) >= start &&
+                reinterpret_cast<char*>(obj) < end) {
+                s->release(obj);
+                return;
+            }
+        }
+        assert(false && "Object not from this allocator");
+    }
+};
+```
+
+### Why The Linux Kernel Uses Slabs
+
+The kernel creates and destroys `struct inode`, `struct task_struct`, `struct socket` millions of times per second. Each contains mutexes, spinlocks, wait queues — all requiring initialization. With slabs:
+
+- `kmem_cache_alloc(inode_cache)` → returns an already-initialized inode in ~50ns
+- `kmem_cache_free(inode_cache, inode)` → returns to slab, struct stays initialized, ~20ns
+
+Versus:
+- `kmalloc` + `inode_init()` → ~500ns
+- `kfree` + memory zeroing → ~200ns
+
+The kernel's `SLAB`, `SLUB`, and `SLOB` allocators are all variations of this concept.
+
+---
+
+## Chapter 6: The Thread-Local Allocator — Making It All Lock-Free
+
+The most powerful technique for high-frequency allocation in multithreaded systems. Used by tcmalloc, jemalloc, and every serious concurrent allocator.
+
+### The Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Thread 1                              │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │           Thread-Local Cache (TLC)               │   │
+│  │  Small pool: 8B, 16B, 32B, 64B, 128B...         │   │
+│  │  Each size class: ~256 objects pre-fetched       │   │
+│  │  Allocation: lock-free (no atomics even)         │   │
+│  └───────────────────────┬─────────────────────────┘   │
+└──────────────────────────┼──────────────────────────────┘
+                           │ when TLC exhausted or overflows
+                           ↓
+┌─────────────────────────────────────────────────────────┐
+│              Central Cache (shared)                      │
+│  Spans of 1-128 pages, protected by per-size spinlock   │
+│  Transfers batches to/from TLCs                         │
+└───────────────────────────┬─────────────────────────────┘
+                            │ when central cache needs memory
+                            ↓
+┌─────────────────────────────────────────────────────────┐
+│              Page Heap (shared)                          │
+│  Large blocks of pages from OS                          │
+│  Protected by global lock (rarely touched)              │
+└─────────────────────────────────────────────────────────┘
+```
+
+This is tcmalloc's architecture. The key insight: **the vast majority of allocations are served from the thread-local cache — no locking, no atomics, just a pointer check and pointer decrement.**
+
+### Implementing a Simplified TLC Pool
+
+```cpp
+template<size_t ObjectSize, size_t BatchSize = 256>
+class ThreadLocalPool {
+private:
+    // The batch: a slab of pre-allocated objects for this thread
+    struct alignas(64) LocalCache {
+        void* free_list[BatchSize];
+        int count = 0;  // number of available objects in free_list
+        
+        bool empty() const { return count == 0; }
+        bool full() const { return count == BatchSize; }
+        
+        void* pop() {
+            assert(!empty());
+            return free_list[--count];
+        }
+        
+        void push(void* ptr) {
+            assert(!full());
+            free_list[count++] = ptr;
+        }
+    };
+    
+    thread_local static LocalCache cache;
+    
+    // Central pool — fallback when local cache is empty/full
+    std::mutex central_mutex;
+    std::vector<void*> central_pool;
+    
+    static constexpr size_t REFILL_BATCH = BatchSize / 4;
+    static constexpr size_t TRIM_BATCH = BatchSize * 3 / 4;
+
+public:
+    void* allocate() {
+        LocalCache& lc = cache;
+        
+        if (!lc.empty()) {
+            // Fast path — no locking, no atomics
+            // Just a decrement and an array read
+            return lc.pop();
+        }
+        
+        // Slow path — refill from central pool
+        refill(lc);
+        return lc.pop();
+    }
+    
+    void deallocate(void* ptr) {
+        LocalCache& lc = cache;
+        
+        if (!lc.full()) {
+            // Fast path
+            lc.push(ptr);
+            return;
+        }
+        
+        // Slow path — return batch to central pool
+        trim(lc);
+        lc.push(ptr);
+    }
+
+private:
+    void refill(LocalCache& lc) {
+        std::lock_guard<std::mutex> lock(central_mutex);
+        
+        size_t count = std::min(REFILL_BATCH, central_pool.size());
+        if (count == 0) {
+            // Central pool empty — allocate from system
+            for (size_t i = 0; i < REFILL_BATCH; i++) {
+                void* mem = ::operator new(ObjectSize);
+                lc.push(mem);
+            }
+            return;
+        }
+        
+        // Transfer from central to local
+        for (size_t i = 0; i < count; i++) {
+            lc.push(central_pool.back());
+            central_pool.pop_back();
+        }
+    }
+    
+    void trim(LocalCache& lc) {
+        std::lock_guard<std::mutex> lock(central_mutex);
+        
+        // Return half the local cache to central
+        for (size_t i = 0; i < TRIM_BATCH; i++) {
+            central_pool.push_back(lc.pop());
+        }
+    }
+};
+
+template<size_t ObjectSize, size_t BatchSize>
+thread_local typename ThreadLocalPool<ObjectSize, BatchSize>::LocalCache
+    ThreadLocalPool<ObjectSize, BatchSize>::cache;
+```
+
+### Performance Profile
+
+```
+Fast path allocation (local cache hit):
+  Check count > 0:    1 instruction
+  Decrement count:    1 instruction  
+  Load free_list[]:   1 instruction (L1 cache hit — array is hot)
+  Total:              ~3-5 ns
+
+Fast path deallocation (local cache not full):
+  Check count < max:  1 instruction
+  Store to array:     1 instruction
+  Increment count:    1 instruction
+  Total:              ~2-3 ns
+
+Slow path (refill/trim):
+  Lock acquisition:   20-200 ns (rarely hit)
+  Batch transfer:     proportional to batch size
+  Amortized cost:     < 1 ns per allocation
+```
+
+Compare to system malloc: **100-500 ns per call.** The TLC pool is **50-150x faster** on the fast path.
+
+---
+
+## Chapter 7: Integrating With Adobe's Rendering Pipeline
+
+Let's put it all together in a realistic rendering context.
+
+### The Frame Allocator Pattern
+
+```cpp
+class FrameAllocator {
+private:
+    // Per-frame arena — reset every frame
+    Arena frame_arena;
+    
+    // Per-type pools for frequently-created objects
+    PoolAllocator<DrawCommand> command_pool;
+    PoolAllocator<RenderState> state_pool;
+    PoolAllocator<ShaderBinding> binding_pool;
+    
+    // Frame number for debugging
+    uint64_t frame_number = 0;
+
+public:
+    FrameAllocator()
+        : frame_arena(4 * 1024 * 1024)  // 4MB per frame
+    {}
+    
+    // Called at the start of each frame
+    void begin_frame() {
+        frame_number++;
+        
+        // Reset arena — O(1) regardless of how much was allocated
+        frame_arena.reset();
+        
+        // Pools are NOT reset — objects live until explicitly destroyed
+        // (or until pool is destroyed at end of session)
+    }
+    
+    // Allocate a draw command — from pool (O(1), reuses memory)
+    DrawCommand* alloc_command() {
+        return command_pool.allocate();
+    }
+    
+    void free_command(DrawCommand* cmd) {
+        cmd->~DrawCommand();
+        command_pool.deallocate(cmd);
+    }
+    
+    // Allocate transient data — from arena (O(1), freed on begin_frame)
+    template<typename T, typename... Args>
+    T* alloc_transient(Args&&... args) {
+        return frame_arena.make<T>(std::forward<Args>(args)...);
+    }
+    
+    // Allocate a transient array
+    template<typename T>
+    std::span<T> alloc_array(size_t count) {
+        T* ptr = frame_arena.make_array<T>(count);
+        return std::span<T>(ptr, count);
+    }
+};
+
+// Usage in render loop
+void render_frame(Scene& scene, FrameAllocator& alloc) {
+    alloc.begin_frame();  // reset arena, ~10ns
+    
+    // Transient data — intermediate scene representation
+    // Freed automatically on next begin_frame()
+    auto visible_nodes = alloc.alloc_array<SceneNode*>(scene.node_count());
+    auto transform_cache = alloc.alloc_array<Matrix4x4>(scene.node_count());
+    
+    // Cull scene
+    size_t visible_count = cull(scene, visible_nodes, transform_cache);
+    
+    // Build command buffer — draw commands are pooled
+    // They're explicitly freed after GPU submission
+    std::vector<DrawCommand*> commands;
+    for (size_t i = 0; i < visible_count; i++) {
+        DrawCommand* cmd = alloc.alloc_command();
+        cmd->setup(visible_nodes[i], transform_cache[i]);
+        commands.push_back(cmd);
+    }
+    
+    // Submit to GPU
+    gpu_submit(commands);
+    
+    // Free commands (pool, not arena — explicitly freed)
+    for (DrawCommand* cmd : commands) {
+        alloc.free_command(cmd);
+    }
+    
+    // transform_cache, visible_nodes freed automatically next frame
+}
+```
+
+### The Scope Allocator Pattern — Temporary Scratch Memory
+
+```cpp
+class ScopeAllocator {
+    Arena& arena;
+    Arena::Marker marker;
+
+public:
+    explicit ScopeAllocator(Arena& a) 
+        : arena(a), marker(a.get_marker()) {}
+    
+    ~ScopeAllocator() {
+        // All allocations made through this scope are freed
+        arena.rewind_to(marker);
+    }
+    
+    template<typename T, typename... Args>
+    T* make(Args&&... args) {
+        return arena.make<T>(std::forward<Args>(args)...);
+    }
+    
+    template<typename T>
+    std::span<T> make_array(size_t n) {
+        return {arena.make_array<T>(n), n};
+    }
+};
+
+// Usage: intermediate computations during render
+void build_shadow_map(Scene& scene, Arena& frame_arena) {
+    ScopeAllocator scope(frame_arena);
+    
+    // These allocations are all freed when scope goes out of scope
+    auto shadow_casters = scope.make_array<SceneNode*>(1000);
+    auto light_matrices = scope.make_array<Matrix4x4>(8);
+    auto depth_commands = scope.make_array<DrawCommand>(1000);
+    
+    // ... do shadow map work ...
+    
+}  // scope destructor rewinds arena — all memory freed
+   // even though individual objects weren't explicitly freed
+```
+
+---
+
+## Chapter 8: std::allocator — Making Custom Allocators Work With STL
+
+STL containers are parameterized on allocators. You can plug your pool or arena into `std::vector`, `std::list`, `std::unordered_map`.
+
+```cpp
+template<typename T>
+class ArenaAllocator {
+public:
+    using value_type = T;
+    
+    Arena* arena;
+    
+    explicit ArenaAllocator(Arena& a) : arena(&a) {}
+    
+    template<typename U>
+    ArenaAllocator(const ArenaAllocator<U>& other) 
+        : arena(other.arena) {}
+    
+    T* allocate(size_t n) {
+        return static_cast<T*>(
+            arena->allocate(n * sizeof(T), alignof(T))
+        );
+    }
+    
+    void deallocate(T* ptr, size_t n) {
+        // Arena allocator doesn't support individual deallocation
+        // This is a no-op — memory reclaimed when arena resets
+        (void)ptr; (void)n;
+    }
+    
+    // Required for some STL implementations
+    template<typename U>
+    bool operator==(const ArenaAllocator<U>& other) const {
+        return arena == other.arena;
+    }
+};
+
+// Usage with STL containers
+Arena frame_arena(1024 * 1024);
+ArenaAllocator<DrawCommand*> alloc(frame_arena);
+
+// Vector backed by arena — no heap allocations for vector data
+std::vector<DrawCommand*, ArenaAllocator<DrawCommand*>> 
+    commands(alloc);
+
+// Push_back allocates from arena
+commands.push_back(new_command);
+
+// At frame end: arena.reset() — vector's memory is gone
+// (vector destructor still runs — just the backing memory is already freed)
+```
+
+The key constraint: if the container tries to `deallocate` individual elements (e.g., on `erase`), the no-op deallocate means that memory is wasted until the arena resets. This is acceptable for short-lived arenas — the waste is bounded by the frame's total allocation.
+
+---
+
+## Chapter 9: Measuring — Proving Your Allocator Is Faster
+
+Never claim your allocator is faster without measurement. Here is the template:
+
+```cpp
+#include <benchmark/benchmark.h>
+
+// System allocator baseline
+static void BM_SystemAllocator(benchmark::State& state) {
+    for (auto _ : state) {
+        auto* p = new DrawCommand();
+        benchmark::DoNotOptimize(p);
+        delete p;
+    }
+}
+
+// Pool allocator
+static void BM_PoolAllocator(benchmark::State& state) {
+    PoolAllocator<DrawCommand> pool;
+    for (auto _ : state) {
+        auto* p = pool.allocate();
+        new(p) DrawCommand();
+        benchmark::DoNotOptimize(p);
+        p->~DrawCommand();
+        pool.deallocate(p);
+    }
+}
+
+// Arena allocator  
+static void BM_ArenaAllocator(benchmark::State& state) {
+    Arena arena(1024 * 1024);
+    for (auto _ : state) {
+        auto* p = arena.make<DrawCommand>();
+        benchmark::DoNotOptimize(p);
+        // No individual free — arena reset at end
+        state.PauseTiming();
+        arena.reset();
+        state.ResumeTiming();
+    }
+}
+
+BENCHMARK(BM_SystemAllocator);
+BENCHMARK(BM_PoolAllocator);
+BENCHMARK(BM_ArenaAllocator);
+BENCHMARK_MAIN();
+```
+
+Typical results on a modern x86-64:
+
+```
+BM_SystemAllocator:    150-500 ns/op  (varies with contention)
+BM_PoolAllocator:        5-15 ns/op
+BM_ArenaAllocator:       2-5  ns/op
+```
+
+The arena wins because it's literally one comparison, one add, one store. The pool wins because the free list is a hot cache line that's always in L1.
+
+---
+
+## Chapter 10: What An Architect Says In The Interview
+
+**Q: "Why would you write a custom allocator instead of using malloc?"**
+
+> "Three reasons, in order of importance. First, performance: malloc has to be correct for every possible allocation pattern — variable sizes, arbitrary lifetimes, thread safety, fragmentation management. That generality has cost. For specific patterns — fixed-size objects, per-frame lifetimes, single-threaded access — you can exploit the constraints and get 50-150x faster allocation. Second, locality: a pool allocator keeps all objects of the same type physically adjacent. When you iterate over all DrawCommands, they're all in the same memory region — cache lines are hot, prefetcher works perfectly. malloc scatters them across the heap. Third, fragmentation control: a long-running renderer that allocates and frees millions of objects accumulates heap fragmentation over hours. An arena allocator has zero fragmentation — it resets to a clean state every frame."
+
+---
+
+**Q: "How does a bump allocator work and what are its limitations?"**
+
+> "A bump allocator maintains a pointer into a pre-allocated block of memory. Each allocation rounds the pointer up to the required alignment, returns it, and advances the pointer by the allocation size. That's literally three arithmetic operations — it's as fast as allocation can possibly be.
+>
+> The limitations follow directly from the design. Individual deallocation is impossible — there's no metadata to track which regions are free. The only free operation is resetting the pointer to the beginning, which reclaims everything. This means it only works for data with uniform lifetime — per-frame data, per-request data, per-query data. You also can't resize allocations. And if an allocation is larger than the remaining block, you need to allocate a new block — the simple O(1) guarantee holds on average but not worst-case.
+>
+> In practice these limitations are rarely a problem because the use case — short-lived homogeneous lifetime data — is exactly what renderers, parsers, and request handlers deal with for the majority of their allocations."
+
+---
+
+**Q: "What is the ABA problem in a lock-free free list?"**
+
+> "A lock-free pool's free list is susceptible to the same ABA problem as any lock-free stack — because it is a lock-free stack. Thread 1 reads the free list head as node A. Thread 2 pops A, pops B, pushes A back. Thread 1's CAS sees the head is still A, succeeds, sets head to A's next — which was B, now freed. Corruption.
+>
+> The solution in a pool allocator specifically: since all objects are the same size and come from the same pre-allocated block, we can use tagged pointers with a version counter. Or, simpler: use the thread-local pattern. Each thread has its own free list — no concurrent CAS on the list head. The slow path (returning a batch to a central pool) uses a mutex, but it happens rarely and transfers many objects at once, so the per-object cost is amortized."
+
+---
+
+## The Insight That Ties Everything Together
+
+Every custom allocator is an exploitation of a constraint that the general allocator cannot assume.
+
+```
+Constraint:          Enables:
+─────────────────    ─────────────────────────────────────
+Same size objects  → Pool: O(1) free list, no size metadata
+Same lifetime      → Arena: O(1) bulk free, no free list at all
+Single thread      → No locking, no atomics
+Known max size     → Pre-allocation, no syscall during operation
+Homogeneous type   → Slab: pre-construction, no init cost
+```
+
+The moment you understand a constraint in your system, ask: does my allocator exploit this? If not, you're paying for generality you don't need.
+
+That is the allocator architect's mindset.
+
+---
+
+Ready for **#5 — Template Metaprogramming, SFINAE, and C++20 Concepts**? We'll start from what templates actually are at the compiler level, derive SFINAE from first principles, show why it's unreadable and unmaintainable, then build the same things with C++20 Concepts cleanly — every step justified from the layer below.

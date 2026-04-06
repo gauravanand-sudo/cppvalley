@@ -2,103 +2,223 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Lock, Search } from "lucide-react";
+import { Check, Lock, Search } from "lucide-react";
+import {
+  emitProgressUpdate,
+  getProgressAuthHeaders,
+  loadLocalProgress,
+  PROGRESS_EVENT,
+  saveLocalProgress,
+} from "@/lib/browserProgress";
 
 type Access = "free" | "premium" | "paid";
-
 type Leaf = { title: string; slug: string; access: Access };
 type Node = { title: string; access: Access; children: Leaf[] };
 type TrackItem = Leaf | Node;
 type TrackSection = { title: string; items: TrackItem[] };
 
 function isNode(it: TrackItem): it is Node {
-  return (it as any)?.children && Array.isArray((it as any).children);
+  return "children" in it && Array.isArray(it.children);
 }
 
 function normalize(s: string) {
   return s.toLowerCase().trim();
 }
 
+export function storageKey(trackSlug: string) {
+  return `cppvalley:progress:${trackSlug}`;
+}
+
+export function loadCompleted(trackSlug: string): Set<string> {
+  return new Set(loadLocalProgress(trackSlug).completedLessons);
+}
+
+export function saveCompleted(trackSlug: string, completed: Set<string>) {
+  const snapshot = {
+    completedLessons: [...completed],
+    lastLessonSlug: loadLocalProgress(trackSlug).lastLessonSlug,
+  };
+  saveLocalProgress(trackSlug, snapshot);
+  emitProgressUpdate(trackSlug, snapshot);
+}
+
 export default function TrackSidebar({
   trackSlug,
   sections,
+  canAccessTrack,
+  initialCompletedLessons = [],
+  initialLastLessonSlug = null,
 }: {
   trackSlug: string;
   sections: TrackSection[];
+  canAccessTrack: boolean;
+  initialCompletedLessons?: string[];
+  initialLastLessonSlug?: string | null;
 }) {
   const pathname = usePathname();
-  const currentLessonSlug = pathname.split("/").pop() || "";
+  const currentSlug = pathname.split("/").pop() || "";
   const [q, setQ] = useState("");
+  const [completedLessons, setCompletedLessons] = useState<string[]>(() => {
+    const local = loadLocalProgress(trackSlug);
+    return local.completedLessons.length > 0 ? local.completedLessons : initialCompletedLessons;
+  });
+  const [lastLessonSlug, setLastLessonSlug] = useState<string | null>(() => {
+    const local = loadLocalProgress(trackSlug);
+    return local.lastLessonSlug ?? initialLastLessonSlug ?? null;
+  });
+
+  useEffect(() => {
+    let active = true;
+
+    async function syncFromServer() {
+      try {
+        const headers = await getProgressAuthHeaders();
+        const res = await fetch(`/api/progress?trackSlug=${encodeURIComponent(trackSlug)}`, {
+          headers,
+          cache: "no-store",
+        });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+        if (!active || !data?.authenticated) return;
+
+        const snapshot = {
+          completedLessons: Array.isArray(data.completedLessons) ? data.completedLessons : [],
+          lastLessonSlug:
+            typeof data.lastLessonSlug === "string" && data.lastLessonSlug.trim().length > 0
+              ? data.lastLessonSlug
+              : null,
+        };
+
+        setCompletedLessons(snapshot.completedLessons);
+        setLastLessonSlug(snapshot.lastLessonSlug);
+        saveLocalProgress(trackSlug, snapshot);
+      } catch {}
+    }
+
+    syncFromServer();
+
+    const sync = (event: Event) => {
+      const detail =
+        event instanceof CustomEvent
+          ? (event.detail as { trackSlug?: string; completedLessons?: string[]; lastLessonSlug?: string | null } | undefined)
+          : undefined;
+
+      if (detail?.trackSlug && detail.trackSlug !== trackSlug) return;
+
+      if (detail?.completedLessons) {
+        setCompletedLessons(detail.completedLessons);
+      } else {
+        setCompletedLessons(loadLocalProgress(trackSlug).completedLessons);
+      }
+
+      if (detail && "lastLessonSlug" in detail) {
+        setLastLessonSlug(detail.lastLessonSlug ?? null);
+      } else {
+        setLastLessonSlug(loadLocalProgress(trackSlug).lastLessonSlug);
+      }
+    };
+
+    window.addEventListener(PROGRESS_EVENT, sync);
+    window.addEventListener("focus", syncFromServer);
+    return () => {
+      active = false;
+      window.removeEventListener(PROGRESS_EVENT, sync);
+      window.removeEventListener("focus", syncFromServer);
+    };
+  }, [trackSlug]);
+
+  const allSlugs = useMemo(() => {
+    const slugs: string[] = [];
+    for (const sec of sections || []) {
+      for (const it of sec.items || []) {
+        if (isNode(it)) it.children.forEach((c) => slugs.push(c.slug));
+        else if ((it as Leaf).slug) slugs.push((it as Leaf).slug);
+      }
+    }
+    return slugs;
+  }, [sections]);
+
+  const completed = new Set(completedLessons);
+  const completedCount = allSlugs.filter((s) => completed.has(s)).length;
+  const progressPct = allSlugs.length > 0
+    ? Math.round((completedCount / allSlugs.length) * 100)
+    : 0;
 
   const filtered = useMemo(() => {
     const query = normalize(q);
     if (!query) return sections;
-
     const out: TrackSection[] = [];
     for (const sec of sections || []) {
       const items: TrackItem[] = [];
-
       for (const it of sec.items || []) {
         if (isNode(it)) {
-          const kids = (it.children || []).filter((c) =>
-            normalize(c.title).includes(query)
-          );
-          if (normalize(it.title).includes(query) || kids.length > 0) {
+          const kids = it.children.filter((c) => normalize(c.title).includes(query));
+          if (normalize(it.title).includes(query) || kids.length > 0)
             items.push({ ...it, children: kids.length ? kids : it.children });
-          }
         } else {
           if (normalize(it.title).includes(query)) items.push(it);
         }
       }
-
       if (items.length) out.push({ ...sec, items });
     }
     return out;
   }, [sections, q]);
 
-  const Row = ({
-    title,
-    slug,
-    access,
-    indent = false,
-  }: {
-    title: string;
-    slug: string;
-    access: Access;
-    indent?: boolean;
+  const LessonRow = ({ title, slug, indent = false }: {
+    title: string; slug: string; indent?: boolean;
   }) => {
-    const active = slug === currentLessonSlug;
-    const locked = access !== "free";
-
-    const href = locked
-  ? `/pricing?track=${encodeURIComponent(trackSlug)}`
-  : `/learn/tracks/${trackSlug}/${slug}`;
+    const active = slug === currentSlug;
+    const done = completed.has(slug);
+    const isLastVisited = lastLessonSlug === slug;
 
     return (
       <Link
-        href={href}
+        href={canAccessTrack ? `/learn/tracks/${trackSlug}/${slug}` : `/checkout?track=${encodeURIComponent(trackSlug)}`}
         className={[
-          "group flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition",
-          indent ? "pl-7" : "",
-          active
-            ? "bg-cyan-50 border border-cyan-200 text-gray-900"
-            : "hover:bg-gray-50 text-gray-800",
+          "group flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors",
+          indent ? "pl-6" : "",
+          active ? "font-medium" : "",
         ].join(" ")}
+        style={{
+          backgroundColor: active ? "var(--reader-accent-soft)" : "transparent",
+          color: active ? "var(--reader-accent)" : "var(--reader-body)",
+        }}
       >
-        <div className="min-w-0 flex items-center gap-2">
+        {done ? (
+          <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: "var(--reader-accent)" }}>
+            <Check className="h-2.5 w-2.5 text-white" strokeWidth={3} />
+          </span>
+        ) : (
           <span
-            className={[
-              "h-2 w-2 rounded-full",
-              active ? "bg-cyan-600" : "bg-gray-300 group-hover:bg-gray-400",
-            ].join(" ")}
+            className="h-1.5 w-1.5 shrink-0 rounded-full transition-colors"
+            style={{
+              backgroundColor: active ? "var(--reader-accent)" : "color-mix(in srgb, var(--reader-border) 80%, transparent)",
+            }}
           />
-          <span className="truncate">{title}</span>
-        </div>
-
-        {locked ? (
-          <Lock className="h-4 w-4 text-amber-500 shrink-0" />
+        )}
+        <span className={[
+          "truncate leading-snug",
+          done && !active ? "opacity-75" : "",
+        ].join(" ")}>
+          {title}
+        </span>
+        {isLastVisited && !active ? (
+          <span
+            className="ml-auto rounded-full px-2 py-0.5 text-[10px] font-semibold"
+            style={{
+              backgroundColor: "var(--reader-accent-soft)",
+              color: "var(--reader-accent)",
+            }}
+          >
+            Resume
+          </span>
+        ) : null}
+        {!canAccessTrack ? (
+          <Lock className="ml-auto h-3.5 w-3.5 shrink-0" style={{ color: "var(--reader-accent)" }} />
         ) : null}
       </Link>
     );
@@ -106,63 +226,82 @@ export default function TrackSidebar({
 
   return (
     <div className="p-4">
-      {/* search */}
-      <div className="sticky top-0 z-10 bg-white pb-3">
+
+      {/* Progress */}
+      {allSlugs.length > 0 && (
+        <div
+          className="mb-5 rounded-2xl border p-4 shadow-sm"
+          style={{
+            borderColor: "var(--reader-border)",
+            backgroundColor: "var(--reader-surface)",
+          }}
+        >
+          <div className="mb-1.5 flex justify-between text-xs" style={{ color: "var(--reader-muted)" }}>
+            <span>{completedCount} / {allSlugs.length} completed</span>
+            <span>{progressPct}%</span>
+          </div>
+          <div
+            className="h-1.5 w-full rounded-full"
+            style={{ backgroundColor: "color-mix(in srgb, var(--reader-accent) 14%, var(--reader-surface))" }}
+          >
+            <div
+              className="h-1.5 rounded-full transition-all duration-500"
+              style={{ width: `${progressPct}%`, backgroundColor: "var(--reader-accent)" }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Search */}
+      <div className="sticky top-0 z-10 pb-3" style={{ backgroundColor: "var(--reader-surface-soft)" }}>
         <div className="relative">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-2.5 h-3.5 w-3.5" style={{ color: "var(--reader-muted)" }} />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search in this track…"
-            className="w-full rounded-xl border border-gray-200 bg-white pl-9 pr-3 py-2 text-sm outline-none focus:border-cyan-300 focus:ring-2 focus:ring-cyan-100"
+            placeholder="Search lessons…"
+            className="w-full rounded-xl border pl-8 pr-3 py-2 text-sm outline-none focus:ring-2"
+            style={{
+              borderColor: "var(--reader-border)",
+              backgroundColor: "var(--reader-surface)",
+              color: "var(--reader-heading)",
+            }}
           />
         </div>
       </div>
 
-      {/* syllabus */}
+      {/* Syllabus */}
       <div className="space-y-5">
         {(filtered || []).map((sec) => (
-          <div key={sec.title} className="space-y-2">
-            <div className="px-1 text-[11px] font-mono uppercase tracking-wider text-gray-500">
+          <div key={sec.title} className="space-y-1">
+            <div className="px-1 py-1 text-[10px] font-mono uppercase tracking-widest" style={{ color: "var(--reader-muted)" }}>
               {sec.title}
             </div>
-
-            <div className="space-y-1">
-              {(sec.items || []).map((it, idx) => {
-                if (isNode(it)) {
-                  return (
-                    <div key={it.title + idx} className="space-y-1">
-                      <div className="px-2 pt-2 text-xs font-semibold text-gray-700">
-                        {it.title}
-                      </div>
-                      <div className="space-y-1">
-                        {(it.children || []).map((c) => (
-                          <Row
-                            key={c.slug}
-                            title={c.title}
-                            slug={c.slug}
-                            access={c.access}
-                            indent
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  );
-                }
-
+            {(sec.items || []).map((it, idx) => {
+              if (isNode(it)) {
                 return (
-                  <Row
-                    key={(it as Leaf).slug}
-                    title={(it as Leaf).title}
-                    slug={(it as Leaf).slug}
-                    access={(it as Leaf).access}
-                  />
+                  <div key={it.title + idx} className="space-y-0.5">
+                    <div className="px-3 pt-2 pb-1 text-xs font-semibold" style={{ color: "var(--reader-muted)" }}>
+                      {it.title}
+                    </div>
+                    {it.children.map((c) => (
+                      <LessonRow key={c.slug} title={c.title} slug={c.slug} indent />
+                    ))}
+                  </div>
                 );
-              })}
-            </div>
+              }
+              return (
+                <LessonRow
+                  key={(it as Leaf).slug}
+                  title={(it as Leaf).title}
+                  slug={(it as Leaf).slug}
+                />
+              );
+            })}
           </div>
         ))}
       </div>
+
     </div>
   );
 }

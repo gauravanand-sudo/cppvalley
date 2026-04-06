@@ -1,19 +1,14 @@
-import { Suspense } from "react";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
-import { listTracks } from "@/lib/content";
-import PricingClient from "./PricingClient";
+import { redirect } from "next/navigation";
 
-export default function PricingPage() {
-  const tracks = listTracks();
+export default async function PricingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ track?: string }>;
+}) {
+  const params = await searchParams;
+  if (params.track) {
+    redirect(`/checkout?track=${encodeURIComponent(params.track)}`);
+  }
 
-  return (
-    <>
-      <SiteHeader />
-      <Suspense fallback={<div className="p-6">Loading pricing…</div>}>
-        <PricingClient tracks={tracks} />
-      </Suspense>
-      <SiteFooter />
-    </>
-  );
+  redirect("/learn/tracks");
 }

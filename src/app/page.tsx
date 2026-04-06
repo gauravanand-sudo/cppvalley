@@ -1,351 +1,255 @@
-// src/app/page.tsx - COMPLETE (Light theme, MDX-driven lists, moving companies ticker + terminal restored)
 import RegularPageLayout from "@/components/RegularPageLayout";
+import Image from "next/image";
 import Link from "next/link";
-import { listContent, listTracks } from "@/lib/content";
-import {
-  CompaniesTicker,
-  CodePreviewTerminal,
-  CppJargonsTicker,
-  SuccessMetrics,
-} from "@/components/home/HomeClientBits";
-import { ChevronRight, Play } from "lucide-react";
+import { listTracks } from "@/lib/content";
+import { getUserEntitlements } from "@/lib/entitlements";
+import { hasTrackAccess, trackRequiresPurchase } from "@/lib/trackAccess";
+import { ArrowRight, Clock3, PlayCircle, Sparkles } from "lucide-react";
 
-export default function HomePage() {
-  // MDX-driven (no hardcoding)
-  const tracks = listTracks().sort((a, b) => (a.title > b.title ? 1 : -1));
-  const conferences = listContent("conferences")
-    .slice(0, 6)
-    .sort((a, b) => (a.date && b.date ? (a.date < b.date ? 1 : -1) : 0));
-  const interviews = listContent("interviews").slice(0, 6);
+type TrackLike = {
+  slug: string;
+  title: string;
+  description?: string;
+  duration?: string;
+  live?: boolean;
+  access?: "free" | "paid" | string;
+  price?: number | string | null;
+  priceLabel?: string | null;
+  thumbnail?: string | null;
+  thumbnailTitle?: string | null;
+  cardMeta?: string[] | null;
+  badge?: string | null;
+  level?: string | null;
+};
+
+function getAccessLabel(track: TrackLike) {
+  const access = (track.access ?? "free").toLowerCase();
+
+  if (access === "paid") {
+    if (track.priceLabel && String(track.priceLabel).trim()) return String(track.priceLabel);
+    if (typeof track.price === "number") return `₹${track.price}`;
+    if (typeof track.price === "string" && track.price.trim()) return track.price;
+    return "Paid";
+  }
+
+  return "Free";
+}
+
+function getBadgeLabel(track: TrackLike, unlocked: boolean, requiresPurchase: boolean) {
+  if (requiresPurchase) return unlocked ? "Enrolled" : "Paid";
+  if (track.badge && track.badge.trim()) return track.badge;
+  return "Free";
+}
+
+function getCardMeta(track: TrackLike) {
+  if (Array.isArray(track.cardMeta) && track.cardMeta.length > 0) return track.cardMeta.slice(0, 2);
+  return [track.duration, track.level].filter((value): value is string => Boolean(value));
+}
+
+export default async function HomePage() {
+  const entitlements = await getUserEntitlements();
+
+  const allTracks = (listTracks() as TrackLike[]).sort((a, b) => a.title.localeCompare(b.title));
 
   return (
     <RegularPageLayout>
-      <div className="min-h-screen bg-white text-gray-900">
-        {/* Topics ticker (moving) */}
-        <CppJargonsTicker />
+      <main className="bg-[#130F12] text-[#F6EDF0]">
+        <section className="relative min-h-[calc(100vh-72px)] overflow-hidden bg-[radial-gradient(circle_at_top_left,#4A1F2C_0%,#181215_42%,#130F12_100%)]">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute left-[-6rem] top-[-5rem] h-72 w-72 rounded-full bg-[#D46886]/18 blur-3xl" />
+            <div className="absolute bottom-[-4rem] right-[-3rem] h-80 w-80 rounded-full bg-[#7B3148]/30 blur-3xl" />
+            <div
+              className="absolute inset-0 opacity-[0.06]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(255,255,255,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.16) 1px, transparent 1px)",
+                backgroundSize: "32px 32px",
+              }}
+            />
+          </div>
 
-        {/* Hero */}
-        <div className="relative">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-            <div className="grid lg:grid-cols-2 gap-10 items-center">
-              <div>
-                {/* USP Badge */}
-                <div className="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2 mb-8 shadow-sm">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-sm font-mono text-gray-700">
-                    CRASH ANY C++ SYSTEMS INTERVIEW
-                  </span>
+          <div className="relative mx-auto grid min-h-[calc(100vh-72px)] max-w-7xl gap-4 px-3 py-3 md:grid-cols-[0.88fr_1.12fr] md:overflow-hidden md:px-4 lg:px-6 lg:py-4">
+            <div className="flex min-h-0 flex-col justify-center rounded-[1.7rem] border border-white/10 bg-white/[0.04] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.25)] backdrop-blur md:p-6 lg:p-8">
+              <div className="max-w-xl">
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.22em] text-[#E8CED6]">
+                  <Sparkles className="h-3.5 w-3.5 text-[#D46886]" />
+                  structured · exhaustive · targeted
                 </div>
 
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight">
-                  <span className="text-gray-900">C++ Systems</span>
-                  <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-emerald-600 to-violet-600">
-                    Interview Mastery
-                  </span>
+                <h1 className="text-3xl font-semibold leading-[1] tracking-tight text-white sm:text-4xl lg:text-[3.15rem]">
+                  Structured, exhaustive, targeted C++ preparation, all at one place for interviews.
                 </h1>
 
-                <p className="text-xl text-gray-600 mb-8 max-w-2xl leading-relaxed">
-                  Master the C++ that actually matters in systems interviews.
-                  Virtual tables, memory models, concurrency, and performance
-                  optimizations that separate seniors from junior engineers.
+                <p className="mt-4 max-w-lg text-[13px] leading-6 text-[#CFB8C0] sm:text-sm sm:leading-7">
+                  Zero to architect level, with advanced C++ across <span className="font-semibold text-white">low latency</span>,{" "}
+                  <span className="font-semibold text-white">template metaprogramming</span>,{" "}
+                  <span className="font-semibold text-white">allocators</span>,{" "}
+                  <span className="font-semibold text-white">lock-free data structures</span>,{" "}
+                  <span className="font-semibold text-white">memory ordering</span>,{" "}
+                  <span className="font-semibold text-white">NUMA</span>,{" "}
+                  <span className="font-semibold text-white">cache locality</span>,{" "}
+                  <span className="font-semibold text-white">SIMD</span>,{" "}
+                  <span className="font-semibold text-white">GPU execution models</span>,{" "}
+                  <span className="font-semibold text-white">compilers</span>,{" "}
+                  <span className="font-semibold text-white">runtimes</span>,{" "}
+                  <span className="font-semibold text-white">kernels</span>,{" "}
+                  <span className="font-semibold text-white">HPC</span>, and{" "}
+                  <span className="font-semibold text-white">performance-critical systems</span>.
                 </p>
 
-                {/* Success metrics (restored) */}
-                <div className="mb-8">
-                  <SuccessMetrics />
-                </div>
+                <p className="mt-3 max-w-lg text-[12px] leading-6 text-[#B996A2] sm:text-[13px]">
+                  Built for interviews spanning <span className="font-semibold text-[#F2C8D5]">HFT</span>,{" "}
+                  <span className="font-semibold text-[#F2C8D5]">market data</span>,{" "}
+                  <span className="font-semibold text-[#F2C8D5]">matching engines</span>,{" "}
+                  <span className="font-semibold text-[#F2C8D5]">distributed systems</span>,{" "}
+                  <span className="font-semibold text-[#F2C8D5]">storage</span>,{" "}
+                  <span className="font-semibold text-[#F2C8D5]">networking</span>,{" "}
+                  <span className="font-semibold text-[#F2C8D5]">embedded systems</span>,{" "}
+                  <span className="font-semibold text-[#F2C8D5]">databases</span>,{" "}
+                  <span className="font-semibold text-[#F2C8D5]">browsers</span>,{" "}
+                  <span className="font-semibold text-[#F2C8D5]">GPU stacks</span>, and{" "}
+                  <span className="font-semibold text-[#F2C8D5]">cloud infrastructure</span> at places like{" "}
+                  <span className="font-semibold text-white">NVIDIA</span>,{" "}
+                  <span className="font-semibold text-white">AMD</span>,{" "}
+                  <span className="font-semibold text-white">Apple</span>,{" "}
+                  <span className="font-semibold text-white">Google</span>,{" "}
+                  <span className="font-semibold text-white">Meta</span>,{" "}
+                  <span className="font-semibold text-white">Microsoft</span>,{" "}
+                  <span className="font-semibold text-white">Adobe</span>,{" "}
+                  <span className="font-semibold text-white">Synopsys</span>,{" "}
+                  <span className="font-semibold text-white">Siemens</span>,{" "}
+                  <span className="font-semibold text-white">VMware</span>,{" "}
+                  <span className="font-semibold text-white">Bloomberg</span>,{" "}
+                  <span className="font-semibold text-white">Jane Street</span>,{" "}
+                  <span className="font-semibold text-white">Citadel</span>,{" "}
+                  <span className="font-semibold text-white">Jump Trading</span>,{" "}
+                  <span className="font-semibold text-white">Tower Research</span>,{" "}
+                  <span className="font-semibold text-white">Optiver</span>,{" "}
+                  <span className="font-semibold text-white">IMC</span>,{" "}
+                  <span className="font-semibold text-white">Qualcomm</span>,{" "}
+                  <span className="font-semibold text-white">Intel</span>,{" "}
+                  <span className="font-semibold text-white">Arm</span>, and{" "}
+                  <span className="font-semibold text-white">Cloudflare</span>.
+                </p>
 
-                {/* CTA */}
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link
-                    href="/learn/tracks/60-day-cpp-interview"
-                    className="group relative inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold hover:from-emerald-700 hover:to-cyan-700 transition-all rounded-lg border border-emerald-500/20 shadow-lg shadow-emerald-500/10 overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/18 to-emerald-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                    <Play className="w-5 h-5 mr-2 relative" />
-                    <span className="relative">START 60-DAY MASTERY</span>
-                  </Link>
-
+                <div className="mt-7 flex flex-wrap gap-3">
                   <Link
                     href="/learn/tracks"
-                    className="inline-flex items-center justify-center px-8 py-4 bg-white border border-gray-200 text-gray-900 font-semibold hover:bg-gray-50 transition rounded-lg shadow-sm"
+                    className="inline-flex items-center gap-2 rounded-full bg-[#9B1C3A] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#861733]"
                   >
-                    Browse tracks
+                    Explore advanced courses
+                    <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
               </div>
-
-              {/* Terminal (restored) */}
-              <CodePreviewTerminal />
-            </div>
-          </div>
-        </div>
-
-        {/* Companies ticker (moving like topic ticker) */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 shadow-sm">
-              <span className="text-sm text-gray-700 font-mono">
-                PLACEMENTS AT
-              </span>
-            </div>
-            <h2 className="mt-4 text-2xl font-bold text-gray-900">
-              Where You Will Land
-            </h2>
-            <p className="mt-2 text-gray-600 max-w-2xl mx-auto">
-              Companies glide just like the topics ticker.
-            </p>
-          </div>
-
-          <CompaniesTicker />
-        </div>
-
-        {/* Tracks (MDX-driven) */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-sm font-mono text-gray-600">
-                  SPECIALIZED TRACKS
-                </span>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Master Production-Grade C++
-              </h2>
             </div>
 
-            <Link
-              href="/learn/tracks"
-              className="text-cyan-700 hover:text-cyan-900 font-mono text-sm"
-            >
-              VIEW ALL →
-            </Link>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-6">
-            {tracks.slice(0, 4).map((t) => {
-              const live = (t as any).live !== false;
-
-              return live ? (
-                <Link
-                  key={t.slug}
-                  href={`/learn/tracks/${t.slug}`}
-                  className="bg-white border border-gray-200 rounded-xl p-6 hover:border-gray-300 transition-colors group cursor-pointer shadow-sm"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-xs font-mono text-gray-600">
-                          {t.duration ?? "track"}
-                        </span>
-                      </div>
-                      <h3 className="text-xl font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">
-                        {t.title}
-                      </h3>
-                    </div>
-
-                    <div className="px-3 py-1 rounded-full text-xs font-bold bg-gray-50 text-gray-700 border border-gray-200">
-                      {(t.access ?? "free").toUpperCase()}
-                    </div>
+            <div className="flex min-h-0 flex-col rounded-[1.7rem] border border-white/10 bg-[#171216]/85 p-3 shadow-[0_24px_80px_rgba(0,0,0,0.3)] backdrop-blur md:p-4">
+              <div className="mb-3 flex items-center justify-between gap-3 border-b border-white/10 pb-3">
+                <div>
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#B996A2]">
+                    Courses
                   </div>
-
-                  <p className="text-sm text-gray-600 leading-relaxed mb-6 line-clamp-3">
-                    {t.description ?? "Track overview → syllabus → start reading."}
-                  </p>
-
-                  <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-                    <div className="text-sm text-gray-600">
-                      {t.level ?? "All levels"} • Live
-                    </div>
-                    <div className="flex items-center gap-2 text-emerald-700 font-medium">
-                      <span>Open Track</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </div>
+                  <div className="mt-1 text-base font-semibold text-white sm:text-lg">
+                    All courses
                   </div>
+                </div>
+                <Link href="/learn/tracks" className="text-xs font-semibold text-[#D46886] hover:underline sm:text-sm">
+                  Open catalog
                 </Link>
-              ) : (
-                <div
-                  key={t.slug}
-                  className="bg-gray-50 border border-gray-200 rounded-xl p-6 cursor-not-allowed opacity-80 shadow-sm"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-2 h-2 rounded-full bg-gray-300" />
-                        <span className="text-xs font-mono text-gray-500">
-                          {t.duration ?? "track"}
-                        </span>
+              </div>
+
+              <div className="grid content-start gap-3 md:max-h-[calc(100vh-150px)] md:overflow-y-auto md:pr-1">
+                {allTracks.map((track) => {
+                  const isLive = track.live !== false;
+                  const cardMeta = getCardMeta(track);
+                  const requiresPurchase = trackRequiresPurchase({
+                    access: (track.access ?? "free") as "free" | "paid" | "premium",
+                    price: typeof track.price === "number" ? track.price : undefined,
+                  });
+                  const unlocked = hasTrackAccess(entitlements, {
+                    slug: track.slug,
+                    access: (track.access ?? "free") as "free" | "paid" | "premium",
+                    price: typeof track.price === "number" ? track.price : undefined,
+                  });
+                  const badgeLabel = isLive ? getBadgeLabel(track, unlocked, requiresPurchase) : "Soon";
+                  const actionHref = unlocked
+                    ? `/learn/tracks/${track.slug}`
+                    : `/checkout?track=${encodeURIComponent(track.slug)}`;
+
+                  return (
+                    <article
+                      key={track.slug}
+                      className={`grid overflow-hidden rounded-[1.3rem] border border-white/10 bg-[linear-gradient(135deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03))] sm:grid-cols-[190px_1fr] ${isLive ? "transition hover:border-white/20 hover:bg-[linear-gradient(135deg,rgba(255,255,255,0.10),rgba(255,255,255,0.05))]" : "opacity-75"}`}
+                    >
+                      <div className="relative min-h-[130px] bg-[linear-gradient(135deg,#2A1E24,#161114)]">
+                        {track.thumbnail ? (
+                          <Image src={track.thumbnail} alt={track.title} fill className="object-cover" />
+                        ) : (
+                          <div className="flex h-full items-center justify-center">
+                            <div className="rounded-full bg-[#9B1C3A] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white">
+                              cppvalley
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <h3 className="text-xl font-bold text-gray-700">
-                        {t.title}
-                      </h3>
-                    </div>
 
-                    <div className="px-3 py-1 rounded-full text-xs font-bold bg-white text-gray-600 border border-gray-200">
-                      COMING SOON
-                    </div>
-                  </div>
+                      <div className="flex flex-col p-4">
+                        <div className="mb-2 flex items-start justify-between gap-3">
+                          <h2 className="line-clamp-2 text-sm font-semibold leading-5 text-white sm:text-[15px]">
+                            {track.title}
+                          </h2>
+                          <span className="shrink-0 rounded-full border border-[#D46886]/25 bg-[#D46886]/12 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wide text-[#F2C8D5]">
+                            {badgeLabel}
+                          </span>
+                        </div>
 
-                  <p className="text-sm text-gray-600 leading-relaxed mb-6 line-clamp-3">
-                    {t.description ?? "Launching soon."}
-                  </p>
+                        <p className="mb-3 line-clamp-2 text-[11px] leading-5 text-[#CCB5BC] sm:text-xs">
+                          {track.description ?? ""}
+                        </p>
 
-                  <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-                    <div className="text-sm text-gray-600">
-                      {t.level ?? "All levels"} • Soon
-                    </div>
-                    <div className="text-gray-600 font-medium">Not clickable</div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+                        <div className="mb-3 flex flex-wrap gap-2 text-[10px] text-[#BA9CA5]">
+                          {cardMeta.map((item, index) => {
+                            const Icon = index === 0 ? PlayCircle : Clock3;
+                            return (
+                              <span
+                                key={item}
+                                className="inline-flex items-center gap-1 rounded-full border border-white/8 bg-white/[0.04] px-2.5 py-1"
+                              >
+                                <Icon className="h-3.5 w-3.5 text-[#D46886]" />
+                                {item}
+                              </span>
+                            );
+                          })}
+                        </div>
 
-        {/* Conferences (MDX-driven cards) */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-cyan-600 animate-pulse" />
-                <span className="text-sm font-mono text-gray-600">
-                  CONFERENCES
-                </span>
+                        <div className="mt-auto flex items-center justify-between gap-3 border-t border-white/10 pt-3">
+                          <div className="text-sm font-semibold text-white">
+                            {isLive ? getAccessLabel(track) : "Launching soon"}
+                          </div>
+                          {isLive ? (
+                            <Link
+                              href={actionHref}
+                              className="inline-flex items-center gap-1 rounded-full bg-[#9B1C3A] px-3.5 py-2 text-[10px] font-bold text-white transition hover:bg-[#861733]"
+                            >
+                              {unlocked ? "Open" : requiresPurchase ? "Buy" : "Start"}
+                              <ArrowRight className="h-3.5 w-3.5" />
+                            </Link>
+                          ) : (
+                            <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.05] px-3.5 py-2 text-[10px] font-bold uppercase tracking-wide text-[#D6BBC4]">
+                              Launching soon
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Keynotes, Talks, Takeaways
-              </h2>
-            </div>
-
-            <Link
-              href="/conferences"
-              className="text-cyan-700 hover:text-cyan-900 font-mono text-sm"
-            >
-              VIEW ALL →
-            </Link>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {conferences.slice(0, 3).map((c) => (
-              <Link
-                key={c.slug}
-                href={`/conferences/${c.slug}`}
-                className="bg-white border border-gray-200 rounded-xl p-6 hover:border-gray-300 transition-colors group shadow-sm"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="px-3 py-1 rounded-full text-xs font-bold bg-gray-50 text-gray-700 border border-gray-200">
-                    CONFERENCE
-                  </div>
-                  <div className="text-gray-400 group-hover:text-cyan-700 transition-colors">
-                    <ChevronRight className="w-4 h-4" />
-                  </div>
-                </div>
-
-                <h3 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-cyan-800 transition-colors line-clamp-2">
-                  {c.title}
-                </h3>
-
-                <p className="text-gray-600 text-sm line-clamp-3">
-                  {c.description ?? "Summary notes from the conference session."}
-                </p>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Interviews (MDX-driven cards) */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-cyan-600 animate-pulse" />
-                <span className="text-sm font-mono text-gray-600">
-                  INTERVIEWS
-                </span>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Real Interview Scenarios
-              </h2>
-            </div>
-            <Link
-              href="/interviews"
-              className="text-cyan-700 hover:text-cyan-900 font-mono text-sm"
-            >
-              VIEW ARCHIVE →
-            </Link>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {interviews.slice(0, 3).map((i) => (
-              <Link
-                key={i.slug}
-                href={`/interviews/${i.slug}`}
-                className="bg-white border border-gray-200 rounded-xl p-6 hover:border-gray-300 transition-colors group shadow-sm"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="px-3 py-1 rounded-full text-xs font-bold bg-gray-50 text-gray-700 border border-gray-200">
-                    INTERVIEW
-                  </div>
-                  <div className="text-gray-400 group-hover:text-cyan-700 transition-colors">
-                    <ChevronRight className="w-4 h-4" />
-                  </div>
-                </div>
-
-                <h3 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-cyan-800 transition-colors line-clamp-2">
-                  {i.title}
-                </h3>
-
-                <p className="text-gray-600 text-sm line-clamp-3">
-                  {i.description ?? "Real interview experience and breakdown."}
-                </p>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Final CTA */}
-        <div className="border-t border-gray-200 bg-gray-50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-            <div className="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-2 mb-6 shadow-sm">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-sm font-mono text-gray-700">
-                COHORT STARTS SOON
-              </span>
-            </div>
-
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              <span className="block">Master the C++ That Gets You</span>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-cyan-600">
-                Senior & Staff Level Offers
-              </span>
-            </h2>
-
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Join engineers who've cracked systems interviews at top companies
-              with our production-focused curriculum.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/learn/tracks/60-day-cpp-interview"
-                className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold hover:from-emerald-700 hover:to-cyan-700 transition-all rounded-lg border border-emerald-500/20 shadow-lg shadow-emerald-500/10"
-              >
-                <Play className="w-5 h-5 mr-2" />
-                ENROLL IN 60-DAY MASTERY
-              </Link>
-
-              <Link
-                href="/pricing"
-                className="inline-flex items-center justify-center px-8 py-4 bg-white border border-gray-200 text-gray-900 font-semibold hover:bg-gray-100 transition rounded-lg shadow-sm"
-              >
-                View pricing
-              </Link>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </RegularPageLayout>
   );
 }

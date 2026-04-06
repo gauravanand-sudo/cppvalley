@@ -1,0 +1,1468 @@
+# Lock-Free Data Structures
+### From Zero to Architect — Every Concept, Every Example, No Shortcuts
+
+---
+
+## Before We Write A Single Line — What Problem Are We Solving?
+
+Let me take you back to basics. Not C++ basics. **Thinking** basics.
+
+You have a program. Multiple threads. They share data. Something has to protect that data.
+
+You've used mutexes. You know how they work. But let's look at what a mutex *actually costs* — because that's why lock-free exists.
+
+---
+
+## Chapter 1: The True Cost of a Mutex — Why Lock-Free Exists
+
+### What Happens When You Lock A Mutex
+
+You think this is what happens:
+
+```
+Thread 1: lock() → do work → unlock()
+Thread 2: lock() → do work → unlock()
+```
+
+Here is what actually happens at the hardware level:
+
+```
+Thread 1 calls lock()
+  → executes LOCK CMPXCHG on the mutex's internal atomic
+  → wins the CAS, sets mutex to "locked"
+  → enters critical section
+  → does work
+
+Thread 2 calls lock() simultaneously
+  → executes LOCK CMPXCHG on the mutex
+  → loses — mutex is already locked
+  → enters a spin loop briefly (futex fast path)
+  → if still locked after spinning: syscall into kernel
+  → kernel descheduled Thread 2 — it goes to sleep
+  → Thread 2's cache lines are now cold
+  → Thread 2's register state is saved
+
+Thread 1 calls unlock()
+  → writes to the mutex atomic
+  → if anyone is waiting: syscall into kernel
+  → kernel wakes Thread 2
+  → Thread 2 is rescheduled
+  → Thread 2 reloads its register state
+  → Thread 2's cache lines are brought back in
+  → Thread 2 gets the lock
+  → Thread 2 does work
+```
+
+The syscall alone is **~1000-3000 nanoseconds**. The cache reload is another **200-500 nanoseconds**. The context switch overhead is **5000-10000 nanoseconds**.
+
+In an HFT system processing market data at nanosecond speed, a mutex in the hot path is a non-starter.
+
+But it's not just latency. There are deeper problems.
+
+---
+
+### Problem 1: Priority Inversion
+
+```
+Thread A: low priority, holds mutex
+Thread B: high priority, waiting for mutex
+Thread C: medium priority, running (not waiting for mutex)
+```
+
+Thread C is running. Thread A (low priority) can't run because Thread C has the CPU. Thread B (high priority) is stuck waiting for Thread A to release the mutex. **A high-priority thread is blocked by a low-priority thread, with a medium-priority thread running in between.**
+
+This caused the Mars Pathfinder spacecraft to reset itself repeatedly in 1997. Real problem. Mutexes create it structurally.
+
+---
+
+### Problem 2: Deadlock
+
+```
+Thread 1: lock(A) → lock(B) → unlock(B) → unlock(A)
+Thread 2: lock(B) → lock(A) → unlock(A) → unlock(B)
+```
+
+```
+Time 0: Thread 1 locks A. Thread 2 locks B.
+Time 1: Thread 1 tries to lock B. Blocked — Thread 2 has it.
+Time 2: Thread 2 tries to lock A. Blocked — Thread 1 has it.
+Time 3: Both blocked forever.
+```
+
+Draw this as a dependency graph:
+
+```
+Thread 1 ──holds──→ Lock A ←──wants── Thread 2
+Thread 1 ←──wants── Lock B ──holds──→ Thread 2
+```
+
+A cycle in the lock dependency graph = deadlock. With lock-free structures, there are no locks. No cycles possible.
+
+---
+
+### Problem 3: Convoying
+
+```
+10 threads all want the same mutex.
+Thread 1 gets it, does 1μs of work, releases.
+Thread 2 gets it, does 1μs of work, releases.
+...
+```
+
+Total time: 10μs of actual work + 9 × mutex handoff overhead.
+
+Each mutex handoff involves a kernel wakeup, a context switch, cache warming. Even if the critical section is tiny, the overhead dominates.
+
+---
+
+### The Lock-Free Promise
+
+A data structure is **lock-free** if at least one thread always makes progress regardless of what other threads do.
+
+A data structure is **wait-free** if every thread makes progress in a bounded number of steps regardless of other threads.
+
+Lock-free does not mean "fast in all cases." It means "no thread can be blocked indefinitely by another thread's failure or pause." A thread in lock-free code can retry many times — but it always eventually succeeds.
+
+This is the guarantee HFT systems need: no thread stalls waiting for another thread to wake up from a kernel sleep.
+
+---
+
+## Chapter 2: The Foundation — Compare-And-Swap
+
+Everything in lock-free programming builds on one hardware instruction.
+
+### What CAS Is
+
+```
+compare_exchange(address, expected, desired):
+    atomically:
+        current = *address
+        if current == expected:
+            *address = desired
+            return true
+        else:
+            expected = current
+            return false
+```
+
+**Atomically** means no other thread can observe the state between the read and the write. It either happens completely or not at all, from every other thread's perspective.
+
+On x86, this is `LOCK CMPXCHG`. On ARM, it's `LDAXR + STLXR` (Load-Acquire Exclusive + Store-Release Exclusive).
+
+### Visualizing CAS
+
+Imagine a box that can hold one number. You have a key that opens the box and changes the number — but only if the number matches what you expect.
+
+```
+Box contains: 5
+
+Thread 1: "If box has 5, change to 10"
+Thread 2: "If box has 5, change to 7"
+
+Both try simultaneously.
+Hardware arbitrates — one wins.
+
+Thread 1 wins:
+  Box: 5 → 10. Thread 1 returns true.
+  Thread 2: reads box, gets 10, not 5. Returns false. expected = 10.
+
+Thread 2 retries: "If box has 10, change to 7"
+  Box: 10 → 7. Returns true.
+```
+
+This retry loop is the heartbeat of every lock-free algorithm:
+
+```cpp
+T old_val = atomic_var.load(relaxed);
+while (true) {
+    T new_val = compute_new_value(old_val);
+    if (atomic_var.compare_exchange_weak(old_val, new_val, ...)) {
+        break;  // success
+    }
+    // old_val is now updated with the current value
+    // retry with fresh value
+}
+```
+
+The key insight: **CAS fails only when another thread made progress.** So retries are bounded by actual concurrent modifications, not arbitrary delays.
+
+---
+
+### strong vs weak — The ARM Reality
+
+```cpp
+// strong — never spuriously fails
+atomic.compare_exchange_strong(expected, desired);
+
+// weak — may spuriously fail even when expected == current
+atomic.compare_exchange_weak(expected, desired);
+```
+
+On x86, both compile to `LOCK CMPXCHG`. No spurious failures possible. `weak` and `strong` behave identically.
+
+On ARM, CAS is implemented with `LDAXR/STLXR`:
+
+```nasm
+retry:
+    LDAXR   x0, [addr]        ; Load-Acquire Exclusive — sets monitor
+    CMP     x0, expected
+    BNE     fail              ; values don't match — CAS fails
+    STLXR   w1, desired, [addr] ; Store-Release Exclusive
+    CBNZ    w1, retry         ; w1=1: store failed — monitor was cleared
+    ; success
+fail:
+    ; CAS failed
+```
+
+The exclusive monitor can be cleared by:
+- Another core writing to the same cache line
+- A context switch
+- A cache line eviction on some ARM implementations
+- An interrupt
+
+So `STLXR` can fail even when `expected == current`. This is `weak`'s spurious failure.
+
+**Why does this matter?**
+
+```cpp
+// In a retry loop — use weak (lets ARM use LL/SC naturally)
+while (!atomic.compare_exchange_weak(old_val, new_val, ...)) {
+    // retry — spurious failure just loops again, no cost
+}
+
+// Single attempt, no retry loop — use strong
+if (atomic.compare_exchange_strong(old_val, new_val, ...)) {
+    // do something
+} else {
+    // genuinely failed — handle it
+}
+```
+
+Using `strong` inside a retry loop on ARM causes the compiler to emit an internal retry loop inside the CAS — then your outer retry loop wraps that. Double retry. Use `weak` in loops, `strong` for single attempts.
+
+---
+
+## Chapter 3: Building A Lock-Free Stack — From Scratch
+
+Let's build the simplest meaningful lock-free data structure. Not because a stack is the most useful thing, but because it teaches every fundamental concept in the simplest possible context.
+
+### Step 1: The Naive Attempt
+
+```
+A stack is just a linked list where you always push/pop from the head.
+
+head → [node3] → [node2] → [node1] → nullptr
+```
+
+```cpp
+template<typename T>
+struct Node {
+    T data;
+    Node* next;
+    Node(T val) : data(val), next(nullptr) {}
+};
+
+template<typename T>
+class NaiveStack {
+    Node<T>* head = nullptr;
+
+public:
+    void push(T val) {
+        Node<T>* new_node = new Node<T>(val);
+        new_node->next = head;  // 1. point new node at current head
+        head = new_node;        // 2. make new node the head
+    }
+
+    bool pop(T& out) {
+        if (head == nullptr) return false;
+        out = head->data;       // 3. read data
+        head = head->next;      // 4. advance head
+        return true;
+    }
+};
+```
+
+Let me show you exactly why this fails with two threads:
+
+```
+Initial state: head → [A] → nullptr
+
+Thread 1 push(B):                   Thread 2 push(C):
+  new_node = Node(B)                  new_node = Node(C)
+  new_node->next = head  ← head=A
+                                      new_node->next = head  ← head=A
+  head = new_node (B)
+                                      head = new_node (C)
+
+Result: head → [C] → nullptr
+        [B] is lost — its next points to A but head doesn't point to B
+```
+
+Two pushes, one node lost. Classic write-write race.
+
+---
+
+### Step 2: Making It Lock-Free With CAS
+
+The key insight: **the only dangerous operation is changing `head`.** Reading it and computing the new value are safe as long as we validate our assumption (that head hasn't changed) at the moment we commit.
+
+CAS gives us exactly this:
+
+```cpp
+template<typename T>
+class LockFreeStack {
+    std::atomic<Node<T>*> head{nullptr};
+
+public:
+    void push(T val) {
+        Node<T>* new_node = new Node<T>(val);
+        
+        // Read current head
+        new_node->next = head.load(memory_order_relaxed);
+        
+        // CAS: "if head is still what I read, make new_node the head"
+        // If another thread changed head, CAS fails — retry with new head
+        while (!head.compare_exchange_weak(
+            new_node->next,      // expected (updated on failure)
+            new_node,            // desired
+            memory_order_release,  // success order
+            memory_order_relaxed   // failure order
+        ));
+        // On failure: new_node->next is updated to current head
+        // We don't need to reload — CAS does it for us
+    }
+
+    bool pop(T& out) {
+        Node<T>* old_head = head.load(memory_order_acquire);
+        
+        while (old_head != nullptr) {
+            Node<T>* new_head = old_head->next;
+            
+            if (head.compare_exchange_weak(
+                old_head,            // expected (updated on failure)
+                new_head,            // desired
+                memory_order_acquire,
+                memory_order_relaxed
+            )) {
+                out = old_head->data;
+                delete old_head;     // ← PROBLEM. We'll fix this.
+                return true;
+            }
+            // old_head updated to current head — retry
+        }
+        return false;  // stack was empty
+    }
+};
+```
+
+### Visualizing The Successful Push
+
+```
+Initial: head → [A] → nullptr
+
+Thread 1 push(B):                   Thread 2 push(C):
+  new_node = Node(B)                  new_node = Node(C)
+  new_node->next = A (current head)   new_node->next = A (current head)
+  
+  CAS(head, A, B)                     CAS(head, A, C)
+  Hardware arbitrates: Thread 1 wins
+  
+  head changes: A → B                 CAS fails — head is now B, not A
+  Thread 1 done                       new_node->next updated to B (by CAS)
+                                      
+                                      Retry: CAS(head, B, C)
+                                      head changes: B → C
+                                      Thread 2 done
+
+Result: head → [C] → [B] → [A] → nullptr
+        Both nodes present. Correct.
+```
+
+### Visualizing The Failed Pop — The Timing Problem
+
+```
+Initial: head → [A] → [B] → nullptr
+
+Thread 1 pop():
+  old_head = A (load head)
+  new_head = A->next = B
+  
+  [Thread 1 pauses here — context switch, cache miss, anything]
+  
+                                  Thread 2 pop():
+                                    old_head = A
+                                    new_head = B
+                                    CAS(head, A, B) — SUCCESS
+                                    delete A
+                                    head → [B] → nullptr
+  
+Thread 1 resumes:
+  CAS(head, A, B) — A is what Thread 1 expects
+  But A has been DELETED by Thread 2
+  A's memory may have been reused for something else
+  Thread 1 reads A->next from deleted memory
+  
+UNDEFINED BEHAVIOR. Use-after-free.
+```
+
+This is the **memory reclamation problem** — the hardest problem in lock-free programming. We'll solve it properly. First, let's introduce the monster hiding inside pop.
+
+---
+
+## Chapter 4: The ABA Problem — The Most Subtle Bug In Concurrent Programming
+
+### Setting The Scene
+
+The ABA problem doesn't arise in the simple push case. It arises when you have:
+1. A thread that reads a value (A)
+2. A pause
+3. Other threads that change the value to something else (B) and then back to A
+4. The original thread's CAS succeeds because it sees A — but A is not the same A
+
+### Concretely, On The Stack
+
+```
+Initial state: head → [A] → [B] → [C] → nullptr
+
+Thread 1 (pop):
+  old_head = A          (reads pointer to node A)
+  new_head = A->next = B
+  [PAUSED — right before CAS]
+```
+
+Now while Thread 1 is paused:
+
+```
+Thread 2 (pop):  removes A. Stack: head → [B] → [C] → nullptr
+Thread 2 (pop):  removes B. Stack: head → [C] → nullptr
+Thread 3 (push): allocates new node — allocator gives back A's memory (it was freed)
+                 new node has value X but lives at the same address as old A
+Thread 3 (push): pushes X. Stack: head → [A/X] → [C] → nullptr
+                 (A/X = same address as A, now holds X's data)
+```
+
+Now Thread 1 resumes:
+
+```
+Thread 1:
+  CAS(head, A, B)
+  head is currently pointing to address-of-A (which now holds X)
+  expected is A (address of A)
+  They match! CAS succeeds.
+  head = B
+```
+
+But B was already popped and freed! Thread 1 just set head to a freed pointer. And node A (now holding X) is lost — it was the actual current head but Thread 1 skipped it.
+
+**The stack is now corrupted.** head points to freed memory.
+
+### Why CAS Can't Detect This
+
+CAS compares pointer values. Both times Thread 1 looked at the head, it was the pointer value of A. CAS has no way to know that A was freed, reallocated, and refilled in between. It just sees the same bits.
+
+### Visualizing ABA
+
+```
+Time 0:  head = 0x1000 (→ node A, value=10)
+         Thread 1 reads head: 0x1000
+         Thread 1 reads A->next: 0x2000 (→ node B)
+         Thread 1 PAUSES
+
+Time 1:  Thread 2 pops A: head = 0x2000 (→ B), frees 0x1000
+Time 2:  Thread 2 pops B: head = 0x3000 (→ C), frees 0x2000
+Time 3:  Thread 3 pushes D: allocator returns 0x1000 (recycled!)
+         node at 0x1000 now holds D
+         head = 0x1000 (→ D)
+
+Time 4:  Thread 1 resumes
+         CAS(head, 0x1000, 0x2000)
+         head is 0x1000 ✓ — matches!
+         CAS succeeds
+         head = 0x2000 (freed memory!)
+         
+CATASTROPHE.
+```
+
+The address is the same. The content is different. CAS is blind to content.
+
+---
+
+## Chapter 5: Solving ABA — Three Production Approaches
+
+### Solution 1: Tagged Pointers
+
+**The idea:** Pack a version counter into the pointer itself. Every time you CAS a pointer, increment the version. ABA requires the version to also wrap around — astronomically unlikely.
+
+**The hardware reality on x86-64:**
+
+A virtual address on x86-64 is 64 bits, but only 48 bits are used for addressing (the rest must be sign-extended copies of bit 47). That means the top 16 bits are available for our version counter.
+
+```
+64-bit pointer:
+┌────────────────┬────────────────────────────────────────────────┐
+│   16 bits      │                  48 bits                       │
+│  version tag   │            actual pointer address              │
+└────────────────┴────────────────────────────────────────────────┘
+```
+
+With 16 bits of tag: version wraps after 65,536 increments. ABA requires:
+1. The pointer goes A → B → A
+2. The version counter wraps all the way around in the same window
+
+If each CAS takes 10ns and the window is microseconds, the counter would need to wrap 65,536 times in ~100 increments of actual pointer changes. Not going to happen.
+
+```cpp
+template<typename T>
+class TaggedPointer {
+    // Pack pointer + tag into a single 64-bit atomic
+    std::atomic<uint64_t> ptr_and_tag{0};
+    
+    static const uint64_t TAG_MASK = 0xFFFF000000000000ULL;
+    static const uint64_t PTR_MASK = 0x0000FFFFFFFFFFFFULL;
+    static const int TAG_SHIFT = 48;
+
+public:
+    struct Unpacked {
+        Node<T>* ptr;
+        uint16_t tag;
+    };
+
+    Unpacked load(std::memory_order order) const {
+        uint64_t raw = ptr_and_tag.load(order);
+        return {
+            reinterpret_cast<Node<T>*>(raw & PTR_MASK),
+            static_cast<uint16_t>((raw & TAG_MASK) >> TAG_SHIFT)
+        };
+    }
+
+    bool compare_exchange_weak(
+        Unpacked& expected,
+        Node<T>* new_ptr,
+        std::memory_order success,
+        std::memory_order failure
+    ) {
+        uint64_t exp_raw = 
+            (static_cast<uint64_t>(expected.tag) << TAG_SHIFT) |
+            reinterpret_cast<uint64_t>(expected.ptr);
+        
+        // New value: increment tag + new pointer
+        uint64_t new_raw = 
+            (static_cast<uint64_t>(expected.tag + 1) << TAG_SHIFT) |
+            reinterpret_cast<uint64_t>(new_ptr);
+        
+        bool success_flag = ptr_and_tag.compare_exchange_weak(
+            exp_raw, new_raw, success, failure
+        );
+        
+        if (!success_flag) {
+            // Unpack the current value back into expected
+            expected = {
+                reinterpret_cast<Node<T>*>(exp_raw & PTR_MASK),
+                static_cast<uint16_t>((exp_raw & TAG_MASK) >> TAG_SHIFT)
+            };
+        }
+        return success_flag;
+    }
+};
+```
+
+Now the stack using tagged pointers:
+
+```cpp
+template<typename T>
+class ABASafeStack {
+    TaggedPointer<T> head;
+
+public:
+    void push(T val) {
+        Node<T>* new_node = new Node<T>(val);
+        auto [ptr, tag] = head.load(memory_order_relaxed);
+        new_node->next = ptr;
+        
+        TaggedPointer<T>::Unpacked expected{ptr, tag};
+        while (!head.compare_exchange_weak(
+            expected, new_node,
+            memory_order_release,
+            memory_order_relaxed
+        )) {
+            new_node->next = expected.ptr;
+        }
+    }
+
+    bool pop(T& out) {
+        auto expected = head.load(memory_order_acquire);
+        
+        while (expected.ptr != nullptr) {
+            Node<T>* new_head = expected.ptr->next;
+            
+            if (head.compare_exchange_weak(
+                expected, new_head,
+                memory_order_acquire,
+                memory_order_relaxed
+            )) {
+                out = expected.ptr->data;
+                delete expected.ptr;  // still has reclamation problem!
+                return true;
+            }
+        }
+        return false;
+    }
+};
+```
+
+Tagged pointers solve ABA. They don't solve memory reclamation — `delete expected.ptr` is still dangerous.
+
+---
+
+### Solution 2: Hazard Pointers
+
+**The idea:** Before reading a node that might be deleted, publish a "hazard pointer" — a global announcement that says "I am using this node, don't free it." Before freeing a node, check all hazard pointers. If any thread has published a hazard for this node, defer freeing.
+
+**Mental model:**
+
+Imagine a whiteboard in the office. Before you use a document, you write your name and the document's ID on the whiteboard. Before anyone shreds (frees) a document, they check the whiteboard. If your name is there for that document — they wait or defer.
+
+```cpp
+// One hazard pointer slot per thread
+// In production: thread-local storage, or array indexed by thread ID
+
+struct HazardPointer {
+    std::atomic<std::thread::id> owner;
+    std::atomic<void*> ptr;
+};
+
+const int MAX_THREADS = 128;
+HazardPointer hazard_pointers[MAX_THREADS];
+
+// Per-thread retired list — nodes waiting to be freed
+thread_local std::vector<void*> retired_list;
+```
+
+```cpp
+template<typename T>
+class HazardPointerStack {
+    std::atomic<Node<T>*> head{nullptr};
+
+    // Acquire a hazard pointer slot for this thread
+    std::atomic<void*>& get_hazard_pointer() {
+        // Find slot owned by this thread, or claim a free one
+        thread_local static std::atomic<void*>* hp = [&] {
+            for (auto& h : hazard_pointers) {
+                std::thread::id empty;
+                if (h.owner.compare_exchange_strong(
+                    empty, std::this_thread::get_id())) {
+                    return &h.ptr;
+                }
+            }
+            throw std::runtime_error("Too many threads");
+        }();
+        return *hp;
+    }
+
+public:
+    bool pop(T& out) {
+        auto& hp = get_hazard_pointer();
+        Node<T>* old_head = head.load(memory_order_relaxed);
+        
+        do {
+            Node<T>* temp;
+            do {
+                temp = old_head;
+                // CRITICAL: publish hazard BEFORE reading next
+                // Another thread cannot free old_head after we publish
+                hp.store(old_head, memory_order_seq_cst);
+                old_head = head.load(memory_order_relaxed);
+                // Verify head didn't change between our load and hazard publish
+                // If it did, our hazard might protect the wrong node
+            } while (old_head != temp);
+            
+            if (old_head == nullptr) {
+                hp.store(nullptr, memory_order_relaxed);
+                return false;
+            }
+        } while (!head.compare_exchange_strong(
+            old_head, old_head->next,
+            memory_order_acquire,
+            memory_order_relaxed
+        ));
+        
+        // We own old_head now — clear hazard
+        hp.store(nullptr, memory_order_release);
+        out = old_head->data;
+        
+        // Don't delete immediately — add to retired list
+        retire(old_head);
+        return true;
+    }
+
+    void retire(Node<T>* node) {
+        retired_list.push_back(node);
+        
+        // When retired list is big enough, scan hazard pointers
+        if (retired_list.size() >= MAX_THREADS * 2) {
+            scan_and_reclaim();
+        }
+    }
+
+    void scan_and_reclaim() {
+        // Collect all currently active hazard pointers
+        std::vector<void*> active_hazards;
+        for (auto& hp : hazard_pointers) {
+            void* p = hp.ptr.load(memory_order_seq_cst);
+            if (p != nullptr) active_hazards.push_back(p);
+        }
+        std::sort(active_hazards.begin(), active_hazards.end());
+        
+        // Free nodes not in the hazard set
+        auto new_end = std::remove_if(retired_list.begin(), retired_list.end(),
+            [&](void* node) {
+                if (std::binary_search(active_hazards.begin(), 
+                                       active_hazards.end(), node)) {
+                    return false;  // still hazarded — keep in retired list
+                }
+                delete static_cast<Node<T>*>(node);
+                return true;  // freed — remove from retired list
+            });
+        retired_list.erase(new_end, retired_list.end());
+    }
+};
+```
+
+### Visualizing Hazard Pointer Protection
+
+```
+Thread 1 (popping):
+  Hazard[T1] = nullptr initially
+  
+  Loads head = node A
+  Sets Hazard[T1] = A     ← "I am using A, don't free it"
+  Verifies head still = A  ← race window closed
+  
+  [Thread 1 pauses]
+  
+Thread 2 (also popping):
+  Loads head = A
+  Sets Hazard[T2] = A
+  CAS(head, A, A->next) — succeeds
+  Thread 2 now owns A
+  Thread 2 calls retire(A)
+  
+  scan_and_reclaim():
+    active_hazards = [A]  ← Thread 1's hazard!
+    A is in hazard set — DEFER. Don't free.
+  
+Thread 1 resumes:
+  CAS(head, A, A->next) — FAILS, head changed
+  Thread 1 retries with new head
+  Clears Hazard[T1]
+  
+Later, Thread 2's retired list scanned again:
+  active_hazards = []  ← Thread 1 cleared its hazard
+  A not in hazard set — FREE A safely.
+```
+
+**The key insight:** The `seq_cst` on the hazard store and the scan is critical. You need a total order between "Thread 1 publishes hazard for A" and "Thread 2 scans hazard pointers." Without seq_cst, Thread 2's scan might not see Thread 1's hazard, leading to a premature free.
+
+---
+
+### Solution 3: Epoch-Based Reclamation (EBR)
+
+**The idea:** Divide time into epochs (0, 1, 2, ...). Every thread announces which epoch it's in when it starts an operation. Freed nodes are tagged with the epoch they were freed in. A node is safe to reclaim when all threads have advanced past the epoch in which it was freed.
+
+**Mental model:**
+
+Imagine a library. Books represent nodes. Readers (threads) sign in with the current date (epoch) when they enter. When a book is "retired" (removed from shelves), it's tagged with the date. You can shred a book when all readers who signed in on or before its retirement date have left the library.
+
+```cpp
+class EpochManager {
+    std::atomic<uint64_t> global_epoch{0};
+    
+    struct ThreadState {
+        std::atomic<uint64_t> local_epoch{UINT64_MAX}; // UINT64_MAX = not in operation
+        std::atomic<bool> active{false};
+    };
+    
+    ThreadState thread_states[MAX_THREADS];
+    
+    // Per-epoch retired lists
+    // retired[e] = nodes retired during epoch e
+    thread_local static std::vector<void*> retired[3]; // circular buffer of 3 epochs
+
+public:
+    // Call at the start of every lock-free operation
+    void enter() {
+        uint64_t epoch = global_epoch.load(memory_order_relaxed);
+        get_thread_state().local_epoch.store(epoch, memory_order_seq_cst);
+        get_thread_state().active.store(true, memory_order_seq_cst);
+    }
+    
+    // Call at the end of every lock-free operation
+    void exit() {
+        get_thread_state().active.store(false, memory_order_seq_cst);
+        get_thread_state().local_epoch.store(UINT64_MAX, memory_order_relaxed);
+        
+        // Try to advance global epoch
+        try_advance();
+        
+        // Try to reclaim nodes from old epochs
+        try_reclaim();
+    }
+    
+    void retire(void* node) {
+        uint64_t e = global_epoch.load(memory_order_relaxed) % 3;
+        retired[e].push_back(node);
+    }
+
+private:
+    void try_advance() {
+        uint64_t current = global_epoch.load(memory_order_relaxed);
+        
+        // Can advance if all active threads are in current epoch
+        for (auto& ts : thread_states) {
+            if (ts.active.load(memory_order_seq_cst)) {
+                uint64_t local = ts.local_epoch.load(memory_order_seq_cst);
+                if (local != current) return; // some thread is behind
+            }
+        }
+        
+        // All active threads are in current epoch — advance
+        global_epoch.compare_exchange_strong(
+            current, current + 1,
+            memory_order_seq_cst
+        );
+    }
+
+    void try_reclaim() {
+        uint64_t current = global_epoch.load(memory_order_relaxed);
+        // Epoch (current - 2) % 3 is safe to reclaim
+        // No active thread can be in an epoch 2 behind current
+        uint64_t safe_epoch = (current - 2 + 3) % 3;
+        
+        for (void* node : retired[safe_epoch]) {
+            operator delete(node);
+        }
+        retired[safe_epoch].clear();
+    }
+};
+```
+
+### Visualizing Epoch-Based Reclamation
+
+```
+Global epoch: 2
+
+Thread 1:  enter() → local_epoch = 2  [active]
+Thread 2:  enter() → local_epoch = 2  [active]
+
+Thread 2 pops node A:
+  retire(A) → retired[2 % 3] = retired[2] gets A
+  exit() → try_advance()
+    Thread 1 is in epoch 2 ✓
+    Thread 2 is in epoch 2 ✓
+    All in current epoch → global_epoch advances to 3
+  try_reclaim():
+    safe_epoch = (3-2+3)%3 = 1
+    retired[1] is empty — nothing to reclaim
+
+Thread 1 exits:
+  exit() → try_advance()
+    No active threads except Thread 1 (which is exiting)
+    global_epoch advances to 4
+  try_reclaim():
+    safe_epoch = (4-2+3)%3 = 2
+    retired[2] has node A
+    All threads are past epoch 2 — FREE A safely ✓
+```
+
+**EBR vs Hazard Pointers:**
+
+```
+                  Hazard Pointers     EBR
+Reclamation       Fine-grained        Epoch-grained (batch)
+Overhead          Per-access          Per-operation enter/exit
+Memory usage      Bounded (2P nodes)  Unbounded if threads stall
+Stall behavior    Safe (deferred)     Problematic (epoch won't advance)
+Implementation    Complex             Simpler
+Use in HFT        Common              Common (careful with stalls)
+```
+
+HFT systems use EBR when threads are always making progress (no blocking). They use hazard pointers when threads might stall (waiting for market data, for example).
+
+---
+
+## Chapter 6: The Complete Lock-Free Stack — Production Grade
+
+Now let's put everything together. Tagged pointers for ABA safety, hazard pointers for memory reclamation, correct memory ordering throughout.
+
+```cpp
+#include <atomic>
+#include <optional>
+#include <array>
+#include <vector>
+#include <algorithm>
+#include <thread>
+
+template<typename T>
+class ProductionLockFreeStack {
+private:
+    struct Node {
+        T data;
+        Node* next;
+        explicit Node(T val) : data(std::move(val)), next(nullptr) {}
+    };
+
+    // ── Tagged pointer (ABA prevention) ──────────────────────────────
+    struct TaggedPtr {
+        Node* ptr;
+        uintptr_t tag;
+        
+        TaggedPtr() : ptr(nullptr), tag(0) {}
+        TaggedPtr(Node* p, uintptr_t t) : ptr(p), tag(t) {}
+        
+        bool operator==(const TaggedPtr& o) const {
+            return ptr == o.ptr && tag == o.tag;
+        }
+    };
+
+    // Pack into 128-bit for atomic CAS on x86-64 (CMPXCHG16B)
+    // Alternative: use high bits of 64-bit pointer (platform-specific)
+    struct alignas(16) AtomicTaggedPtr {
+        std::atomic<Node*> ptr{nullptr};
+        std::atomic<uintptr_t> tag{0};
+        
+        TaggedPtr load(std::memory_order order) const {
+            // Load both — not truly atomic together without CMPXCHG16B
+            // For true atomicity, use platform intrinsics or std::atomic on struct
+            return {ptr.load(order), tag.load(memory_order_relaxed)};
+        }
+        
+        bool compare_exchange_weak(
+            TaggedPtr& expected,
+            TaggedPtr desired,
+            std::memory_order success,
+            std::memory_order failure
+        ) {
+            // In production: use __int128 atomic or platform-specific 128-bit CAS
+            // Shown here conceptually
+            Node* exp_ptr = expected.ptr;
+            if (ptr.compare_exchange_weak(exp_ptr, desired.ptr, success, failure)) {
+                tag.fetch_add(1, memory_order_relaxed);
+                return true;
+            }
+            expected.ptr = exp_ptr;
+            expected.tag = tag.load(memory_order_relaxed);
+            return false;
+        }
+    };
+
+    // ── Hazard Pointer System ────────────────────────────────────────
+    static constexpr int MAX_THREADS = 128;
+    static constexpr int RECLAIM_THRESHOLD = MAX_THREADS * 2;
+    
+    struct HazardSlot {
+        std::atomic<std::thread::id> owner{std::thread::id{}};
+        std::atomic<Node*> hazard{nullptr};
+    };
+    
+    inline static std::array<HazardSlot, MAX_THREADS> hazard_slots{};
+    
+    static HazardSlot& claim_slot() {
+        for (auto& slot : hazard_slots) {
+            std::thread::id empty{};
+            if (slot.owner.compare_exchange_strong(
+                    empty, std::this_thread::get_id(),
+                    std::memory_order_acq_rel,
+                    std::memory_order_relaxed)) {
+                return slot;
+            }
+        }
+        throw std::runtime_error("Too many threads");
+    }
+    
+    static HazardSlot& get_my_slot() {
+        thread_local HazardSlot& slot = claim_slot();
+        return slot;
+    }
+    
+    // Retire a node — defer its deletion
+    static void retire(Node* node) {
+        thread_local std::vector<Node*> retired_nodes;
+        retired_nodes.push_back(node);
+        
+        if (retired_nodes.size() >= RECLAIM_THRESHOLD) {
+            reclaim(retired_nodes);
+        }
+    }
+    
+    static void reclaim(std::vector<Node*>& retired_nodes) {
+        // Snapshot all active hazard pointers
+        std::vector<Node*> active;
+        active.reserve(MAX_THREADS);
+        for (auto& slot : hazard_slots) {
+            Node* p = slot.hazard.load(std::memory_order_seq_cst);
+            if (p != nullptr) active.push_back(p);
+        }
+        std::sort(active.begin(), active.end());
+        
+        // Free nodes not currently hazarded
+        auto it = std::remove_if(retired_nodes.begin(), retired_nodes.end(),
+            [&](Node* node) {
+                if (std::binary_search(active.begin(), active.end(), node)) {
+                    return false;  // still in use — keep
+                }
+                delete node;
+                return true;  // freed
+            });
+        retired_nodes.erase(it, retired_nodes.end());
+    }
+
+    // ── The Stack Head ───────────────────────────────────────────────
+    AtomicTaggedPtr head;
+
+public:
+    // ── Push ─────────────────────────────────────────────────────────
+    void push(T val) {
+        Node* new_node = new Node(std::move(val));
+        
+        TaggedPtr old_head = head.load(std::memory_order_relaxed);
+        new_node->next = old_head.ptr;
+        
+        while (!head.compare_exchange_weak(
+            old_head,
+            TaggedPtr{new_node, old_head.tag + 1},
+            std::memory_order_release,
+            std::memory_order_relaxed
+        )) {
+            new_node->next = old_head.ptr;
+        }
+        // Release: everything we wrote to new_node is visible
+        //          to anyone who acquires through head
+    }
+
+    // ── Pop ──────────────────────────────────────────────────────────
+    std::optional<T> pop() {
+        HazardSlot& my_slot = get_my_slot();
+        
+        TaggedPtr old_head;
+        
+        while (true) {
+            // Phase 1: Load head
+            old_head = head.load(std::memory_order_relaxed);
+            
+            if (old_head.ptr == nullptr) {
+                my_slot.hazard.store(nullptr, std::memory_order_relaxed);
+                return std::nullopt;
+            }
+            
+            // Phase 2: Publish hazard BEFORE reading old_head->next
+            // Critical window: between loading old_head and reading next,
+            // another thread could pop and free old_head
+            my_slot.hazard.store(old_head.ptr, std::memory_order_seq_cst);
+            
+            // Phase 3: Validate — head must still be old_head
+            // If it changed, our hazard might protect a stale (freed) node
+            TaggedPtr verify = head.load(std::memory_order_seq_cst);
+            if (verify.ptr != old_head.ptr || verify.tag != old_head.tag) {
+                // Head changed between our load and hazard publish
+                // Retry — our hazard is protecting the right node
+                // but old_head is stale, update it
+                old_head = verify;
+                continue;
+            }
+            
+            // Phase 4: Read next — safe because hazard is published
+            Node* new_head = old_head.ptr->next;
+            
+            // Phase 5: CAS — try to advance head
+            if (head.compare_exchange_weak(
+                old_head,
+                TaggedPtr{new_head, old_head.tag + 1},
+                std::memory_order_acquire,
+                std::memory_order_relaxed
+            )) {
+                break;  // We own old_head now
+            }
+            // CAS failed — another thread modified head, retry
+        }
+        
+        // We own old_head — clear hazard, extract data, retire node
+        my_slot.hazard.store(nullptr, std::memory_order_release);
+        T val = std::move(old_head.ptr->data);
+        retire(old_head.ptr);
+        
+        return val;
+    }
+};
+```
+
+---
+
+## Chapter 7: Correctness Analysis — Proving It Works
+
+Don't just write lock-free code. **Prove it.**
+
+### The Proof Template For Every Lock-Free Algorithm
+
+Ask these five questions for every shared data structure:
+
+**1. Is every shared variable access through an atomic?**
+Yes — `head` is `atomic`, `hazard` is `atomic`. ✓
+
+**2. Is there a happens-before relationship from every write to every read that depends on it?**
+
+Push writes node data → release store on head.
+Pop acquire loads head → reads node data.
+Release-acquire establishes happens-before. ✓
+
+**3. Can a thread read a freed node?**
+
+Only if another thread frees a node while this thread holds a pointer to it. Hazard pointers prevent this — we publish the hazard before reading `->next`, and validate that head hasn't changed. The scan in `reclaim` uses seq_cst to ensure the hazard is visible before we check for it. ✓
+
+**4. Is ABA possible?**
+
+Tagged pointers increment the tag on every CAS. For ABA to succeed, the tag must wrap around (65,536 times in the window between a thread loading head and retrying its CAS). Not possible in practice. ✓
+
+**5. Does at least one thread always make progress?**
+
+If N threads are all doing CAS on head simultaneously, exactly one wins each round. The winner makes progress. Losers retry. In the worst case, one thread succeeds per CAS attempt. The structure is lock-free (not wait-free). ✓
+
+---
+
+## Chapter 8: The Lock-Free Queue — Micheal-Scott Queue
+
+A stack is LIFO. Real systems need FIFO queues. The Michael-Scott queue (1996) is the canonical lock-free FIFO queue, used in Java's `ConcurrentLinkedQueue`, Rust's crossbeam, and countless production systems.
+
+### The Key Insight: Two Ends, Two Locks → Two CAS Operations
+
+A queue has a head (dequeue end) and a tail (enqueue end). With a mutex, one lock protects both. Lock-free: use separate atomics for head and tail, allow concurrent enqueue and dequeue.
+
+```
+head → [dummy] → [A] → [B] → [C] ← tail
+         ↑
+    sentinel node
+    (always present,
+     head->next is first real element)
+```
+
+The sentinel node simplifies edge cases. The queue is empty when `head->next == nullptr`.
+
+```cpp
+template<typename T>
+class MichaelScottQueue {
+    struct Node {
+        std::optional<T> data;  // nullopt for sentinel
+        std::atomic<Node*> next{nullptr};
+        
+        Node() = default;  // sentinel
+        explicit Node(T val) : data(std::move(val)) {}
+    };
+
+    std::atomic<Node*> head;
+    std::atomic<Node*> tail;
+
+public:
+    MichaelScottQueue() {
+        Node* sentinel = new Node();  // dummy node
+        head.store(sentinel, std::memory_order_relaxed);
+        tail.store(sentinel, std::memory_order_relaxed);
+    }
+
+    void enqueue(T val) {
+        Node* new_node = new Node(std::move(val));
+        
+        while (true) {
+            Node* t = tail.load(std::memory_order_acquire);
+            Node* next = t->next.load(std::memory_order_acquire);
+            
+            // Is tail still the last node?
+            if (t == tail.load(std::memory_order_relaxed)) {
+                
+                if (next == nullptr) {
+                    // Tail is truly the last node — try to link new node
+                    if (t->next.compare_exchange_weak(
+                        next, new_node,
+                        std::memory_order_release,
+                        std::memory_order_relaxed
+                    )) {
+                        // Try to advance tail — even if this fails,
+                        // another thread will fix it (helping)
+                        tail.compare_exchange_strong(
+                            t, new_node,
+                            std::memory_order_release,
+                            std::memory_order_relaxed
+                        );
+                        return;
+                    }
+                } else {
+                    // Tail is lagging — another thread added a node
+                    // but didn't advance tail yet. Help it along.
+                    tail.compare_exchange_weak(
+                        t, next,
+                        std::memory_order_release,
+                        std::memory_order_relaxed
+                    );
+                }
+            }
+        }
+    }
+
+    std::optional<T> dequeue() {
+        while (true) {
+            Node* h = head.load(std::memory_order_acquire);
+            Node* t = tail.load(std::memory_order_acquire);
+            Node* next = h->next.load(std::memory_order_acquire);
+            
+            if (h == head.load(std::memory_order_relaxed)) {
+                if (h == t) {
+                    // Head == tail
+                    if (next == nullptr) {
+                        return std::nullopt;  // queue is empty
+                    }
+                    // Tail is lagging — advance it
+                    tail.compare_exchange_weak(
+                        t, next,
+                        std::memory_order_release,
+                        std::memory_order_relaxed
+                    );
+                } else {
+                    // Read data BEFORE CAS — next might be freed after CAS
+                    T val = *next->data;
+                    
+                    // Try to advance head (next becomes new sentinel)
+                    if (head.compare_exchange_weak(
+                        h, next,
+                        std::memory_order_release,
+                        std::memory_order_relaxed
+                    )) {
+                        retire(h);  // old sentinel is now garbage
+                        return val;
+                    }
+                }
+            }
+        }
+    }
+};
+```
+
+### The Helping Pattern — Why This Is Brilliant
+
+Notice in enqueue: when we successfully link the new node (`t->next` CAS succeeds), we **try** to advance tail — but we don't require it to succeed. We just return.
+
+If we fail to advance tail, the **next thread that calls enqueue** will see `next != nullptr` (tail is lagging) and advance tail for us. This is the **helping** pattern:
+
+> Every thread, as it does its own work, also fixes up any incomplete operations left by other threads.
+
+This is what makes the queue lock-free. Even if a thread is paused right after linking a node but before advancing tail, every subsequent thread helps advance it. No thread is blocked waiting for the paused thread.
+
+### Visualizing a Concurrent Enqueue
+
+```
+Initial: head → [sentinel] ← tail
+
+Thread 1 enqueue(A):
+  t = sentinel, next = nullptr
+  CAS(sentinel->next, nullptr, nodeA) — SUCCESS
+  [Thread 1 pauses before advancing tail]
+
+Thread 2 enqueue(B):
+  t = sentinel (tail hasn't advanced)
+  next = nodeA (sentinel->next is now nodeA)
+  next != nullptr → tail is lagging!
+  
+  CAS(tail, sentinel, nodeA) — advances tail for Thread 1
+  
+  Retry:
+  t = nodeA, next = nullptr
+  CAS(nodeA->next, nullptr, nodeB) — SUCCESS
+  CAS(tail, nodeA, nodeB) — SUCCESS
+
+Thread 1 resumes:
+  CAS(tail, sentinel, nodeA) — FAILS (tail is already nodeB)
+  Thread 1 returns — enqueue complete
+
+Result: head → [sentinel] → [A] → [B] ← tail
+        Correct. Both enqueues completed.
+```
+
+---
+
+## Chapter 9: The SPSC Queue — The Fastest Lock-Free Structure
+
+Single-Producer Single-Consumer queue. The constraints allow an implementation with **zero atomic RMW operations** — just loads and stores with acquire-release.
+
+Used in: audio engines, game engines, Adobe's render pipelines, HFT tick-to-trade paths.
+
+```
+Producer                    Consumer
+   ↓                            ↓
+[write_pos]                [read_pos]
+   |                            |
+   ▼                            ▼
+[slot 0][slot 1][slot 2][slot 3][slot 4]...
+```
+
+The key insight: only the producer writes `write_pos`, only the consumer writes `read_pos`. No two threads write the same variable. No CAS needed — just loads and stores.
+
+```cpp
+template<typename T, size_t CAPACITY>
+class SPSCQueue {
+    // False sharing prevention — each on its own cache line
+    struct alignas(64) {
+        std::atomic<size_t> write_pos{0};
+    };
+    struct alignas(64) {
+        std::atomic<size_t> read_pos{0};
+    };
+    
+    // Ring buffer
+    std::array<T, CAPACITY> buffer;
+
+public:
+    // Called ONLY by producer thread
+    bool enqueue(T val) {
+        size_t wp = write_pos.load(memory_order_relaxed);
+        size_t next_wp = (wp + 1) % CAPACITY;
+        
+        // Check if full — read read_pos with acquire
+        // acquire: if we see read_pos = rp, we see all consumer's reads
+        // that happened before it set read_pos to rp
+        if (next_wp == read_pos.load(memory_order_acquire)) {
+            return false;  // full
+        }
+        
+        buffer[wp] = std::move(val);
+        
+        // Release: buffer[wp] write must be visible before write_pos advances
+        write_pos.store(next_wp, memory_order_release);
+        return true;
+    }
+
+    // Called ONLY by consumer thread
+    bool dequeue(T& out) {
+        size_t rp = read_pos.load(memory_order_relaxed);
+        
+        // Check if empty — acquire: see all producer writes before write_pos
+        if (rp == write_pos.load(memory_order_acquire)) {
+            return false;  // empty
+        }
+        
+        out = std::move(buffer[rp]);
+        
+        // Release: buffer[rp] read must complete before read_pos advances
+        read_pos.store((rp + 1) % CAPACITY, memory_order_release);
+        return true;
+    }
+};
+```
+
+### Why This Works — The Minimal Synchronization Proof
+
+**Producer's write path:**
+1. Write to `buffer[wp]` — non-atomic store
+2. Release store to `write_pos`
+
+**Consumer's read path:**
+1. Acquire load from `write_pos` — synchronizes-with producer's release store
+2. Read from `buffer[rp]` — happens-after the acquire load
+
+The happens-before chain: `buffer[wp] write → write_pos release ↔ write_pos acquire → buffer[rp] read`. The consumer always sees what the producer wrote. ✓
+
+**No CAS. No LOCK prefix. No DMB on x86.** Just regular loads and stores with ordering. On a modern x86, the entire hot path is:
+
+```nasm
+; Enqueue hot path (x86)
+MOV [buffer + wp * sizeof(T)], val   ; write data
+MOV [write_pos], next_wp              ; release store (free on x86)
+
+; Dequeue hot path (x86)
+MOV rp, [read_pos]                    ; relaxed load
+CMP rp, [write_pos]                   ; acquire load (free on x86)
+JE  empty
+MOV out, [buffer + rp * sizeof(T)]   ; read data
+MOV [read_pos], next_rp               ; release store (free on x86)
+```
+
+No barrier instructions on x86. Sub-10ns round trip latency. This is what Adobe uses in their render pipeline for passing frames between producer and consumer threads.
+
+---
+
+## Chapter 10: What An Architect Says That Surprises Interviewers
+
+---
+
+**Q: "Is lock-free always faster than mutex-based?"**
+
+> "No — and this is a common misconception I always correct. Lock-free structures have worse constant factors than mutex-based structures when there's low contention. A mutex is essentially free when uncontested — just a CAS on an uncontested cache line. Lock-free structures always pay CAS costs, always do more work per operation.
+>
+> Lock-free wins when: contention is high and sustained, latency percentiles matter (p99/p999 with mutexes includes kernel wakeup latency), or when one thread being paused must not block others.
+>
+> Mutex wins when: contention is low, the critical section is complex, or you need atomicity across multiple variables that a single CAS can't capture.
+>
+> I profile before choosing. The answer is never obvious from first principles."
+
+---
+
+**Q: "How do you test a lock-free data structure?"**
+
+> "Three layers. First, correctness under single-threaded use — standard unit tests. Second, stress testing: run N producer threads and M consumer threads simultaneously for millions of operations, verify count invariants hold (total pushed = total popped + items remaining). Third — and this is the one most teams skip — use ThreadSanitizer. TSAN instruments every memory access and detects actual data races at runtime. No lock-free structure ships without TSAN clean runs.
+>
+> Beyond that: test under artificial delays. Inject `std::this_thread::yield()` or `usleep(1)` at every interesting point in the algorithm — after the load, before the CAS, after a failed CAS. This exercises every interleaving that would normally be rare. Combined with a model checker like CDSChecker or Relacy, which exhaustively explore all valid memory orderings for small test cases, you can get high confidence before deploying."
+
+---
+
+**Q: "Explain the ABA problem without looking it up."**
+
+> "It's a class of bug specific to CAS-based algorithms where a pointer or value returns to a previously observed state after being changed, causing a CAS to incorrectly succeed.
+>
+> Concretely: Thread 1 reads head pointer as address X. Thread 1 pauses. Thread 2 pops X, frees it, pushes a new node — which the allocator places at address X because it was just freed. Thread 1 resumes, CAS sees head == X, thinks nothing changed, succeeds — but X is now a completely different node. The stack is now corrupted.
+>
+> The root cause: CAS compares bits, not identity. It cannot distinguish 'same address, same object' from 'same address, different object.'
+>
+> Solutions: tagged pointers pack a version counter into unused pointer bits — same address plus different tag makes ABA detectable. Hazard pointers prevent the free entirely — the allocator can't reuse X while Thread 1 has a hazard on it. Epoch-based reclamation defers all frees until no thread can possibly hold a stale pointer.
+>
+> In production I reach for EBR first — simpler to implement correctly than hazard pointers, lower overhead than tagged pointers when the reclamation window is bounded. Hazard pointers when thread stalls are possible."
+
+---
+
+**Q: "Why is the Michael-Scott queue's tail advancement optional?"**
+
+> "This is the helping mechanism that makes the algorithm lock-free. When a producer links a new node to the tail's next pointer, it tries to advance tail — but if that CAS fails, it just returns. The node is already linked; the next enqueuer will see the lagging tail and advance it.
+>
+> This means no operation is gated on another operation completing. Even if the first enqueuer is context-switched out after linking but before advancing tail, every subsequent enqueuer advances tail as a side effect of its own operation. The system makes global progress regardless of any individual thread's state.
+>
+> If tail advancement were required — if we looped until it succeeded — we'd have a livelock risk under specific scheduling patterns. The optional-but-helping design eliminates that."
+
+---
+
+## The Thread That Connects Everything
+
+Look at the journey we've taken:
+
+```
+Hardware (store buffer, invalidation queue)
+    ↓
+Memory ordering (acquire, release, fences)
+    ↓
+CAS instruction (the atomic primitive)
+    ↓
+ABA problem (the fundamental hazard of pointer reuse)
+    ↓
+Memory reclamation (the fundamental hazard of deallocation)
+    ↓
+Tagged pointers → solve ABA
+Hazard pointers / EBR → solve reclamation
+    ↓
+Lock-free stack (simplest structure, teaches all patterns)
+    ↓
+Michael-Scott queue (helping pattern, two-end structure)
+    ↓
+SPSC queue (zero CAS, maximum throughput, minimum latency)
+```
+
+Every concept is a response to a constraint imposed by the layer below it. You don't memorize lock-free algorithms — you derive them from the hardware realities that make naïve implementations wrong.
+
+That derivation ability is what makes an architect.
+
+---
+
+Ready for **#3 — False Sharing & Cache Line Awareness**? We'll go from transistors to cache geometry, build the mental model of how cores share data, show exactly why false sharing costs what it costs, and derive `alignas(64)` from first principles rather than cargo-culting it.

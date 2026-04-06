@@ -176,6 +176,8 @@ export type TrackMeta = {
   lessonCount?: number;
   tags?: string[];
   price?: number; // per-track price (frontmatter: price: 1999)
+  thumbnail?: string;
+  hero?: string;
 };
 
 // Item can be a leaf lesson OR a parent module with children
@@ -196,7 +198,24 @@ function getTracksDir() {
   return path.join(process.cwd(), "src", "content", "tracks");
 }
 
-function parsePrice(raw: any): number | undefined {
+function normalizeTrackAssetPath(trackSlug: string, raw: unknown): string | undefined {
+  if (!raw) return undefined;
+  const value = String(raw).trim();
+  if (!value) return undefined;
+
+  if (value.startsWith("/")) return value;
+
+  if (value.startsWith("../")) {
+    const resolved = path.normalize(path.join("tracks", value)).replaceAll("\\", "/");
+    if (resolved.startsWith("learn/")) {
+      return `/api/content-asset/${resolved}`;
+    }
+  }
+
+  return undefined;
+}
+
+function parsePrice(raw: unknown): number | undefined {
   if (raw === undefined || raw === null || raw === "") return undefined;
   if (typeof raw === "number") return Number.isFinite(raw) ? raw : undefined;
 
@@ -231,7 +250,9 @@ export function listTracks(): TrackMeta[] {
       description: data.description ? String(data.description) : undefined,
       lessonCount: data.lessonCount ? Number(data.lessonCount) : undefined,
       tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
-      price: parsePrice((data as any).price),
+      price: parsePrice((data as { price?: unknown }).price),
+      thumbnail: normalizeTrackAssetPath(slug, (data as { thumbnail?: unknown }).thumbnail),
+      hero: normalizeTrackAssetPath(slug, (data as { hero?: unknown }).hero),
     } satisfies TrackMeta;
   });
 
@@ -263,7 +284,9 @@ export function getTrackBySlug(trackSlug: string) {
     description: data.description ? String(data.description) : undefined,
     lessonCount: data.lessonCount ? Number(data.lessonCount) : undefined,
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
-    price: parsePrice((data as any).price),
+    price: parsePrice((data as { price?: unknown }).price),
+    thumbnail: normalizeTrackAssetPath(trackSlug, (data as { thumbnail?: unknown }).thumbnail),
+    hero: normalizeTrackAssetPath(trackSlug, (data as { hero?: unknown }).hero),
   };
 
   return { meta, content };
@@ -316,7 +339,18 @@ export function parseTrackSyllabus(trackContent: string): TrackSection[] {
     const raw = cleanJsonText(raw0);
 
     try {
-      const obj = JSON.parse(raw);
+      const obj = JSON.parse(raw) as
+        | {
+            title?: unknown;
+            slug?: unknown;
+            access?: unknown;
+            children?: Array<{
+              title?: unknown;
+              slug?: unknown;
+              access?: unknown;
+            }>;
+          }
+        | null;
 
       // module with children
       if (obj && Array.isArray(obj.children)) {
@@ -325,7 +359,7 @@ export function parseTrackSyllabus(trackContent: string): TrackSection[] {
         current.items.push({
           title: String(obj.title ?? "Untitled"),
           access: parentAccess,
-          children: obj.children.map((c: any) => ({
+          children: obj.children.map((c) => ({
             title: String(c.title ?? "Untitled"),
             slug: String(c.slug ?? ""),
             // child access wins; else inherit parent access; else free
@@ -401,12 +435,12 @@ export function flattenTrackLessonSlugs(sections: TrackSection[]): string[] {
   const slugs: string[] = [];
 
   for (const sec of sections) {
-    for (const it of sec.items as any[]) {
-      if (it && Array.isArray(it.children)) {
+    for (const it of sec.items) {
+      if ("children" in it && Array.isArray(it.children)) {
         for (const child of it.children) {
           if (child?.slug) slugs.push(child.slug);
         }
-      } else if (it?.slug) {
+      } else if ("slug" in it && it.slug) {
         slugs.push(it.slug);
       }
     }

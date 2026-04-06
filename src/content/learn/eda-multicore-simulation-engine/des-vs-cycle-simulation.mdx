@@ -1,0 +1,351 @@
+---
+title: "Discrete-Event Simulation vs Cycle-Based Simulation"
+slug: "des-vs-cycle-simulation"
+access: "free"
+level: "Zero → Principal"
+phase: "Phase 0: Mental Model"
+description: >
+  A foundational deep-dive into why HDL simulators (Xcelium, VCS, Questa) are built
+  as discrete-event simulators instead of cycle-based engines. Covers conceptual,
+  architectural, performance, and correctness tradeoffs from first principles.
+---
+
+# Discrete-Event Simulation vs Cycle-Based Simulation
+
+> **This page is critical.**  
+> If you understand this deeply, everything about simulation kernels, event queues,
+> delta cycles, regions, and multicore scalability will feel *inevitable* — not magical.
+
+---
+
+## Table of Contents
+
+1. [What Does It Mean to Simulate Hardware?](#what-is-a-simulator)
+2. [Cycle-Based Simulation: The Naive Mental Model](#cycle-based-simulation)
+3. [Why Cycle-Based Simulation Breaks Down](#cycle-breakdown)
+4. [Discrete-Event Simulation: The Core Idea](#discrete-event-simulation)
+5. [Events, Not Cycles, Drive Execution](#events-not-cycles)
+6. [Zero-Delay Logic and Delta Cycles](#delta-cycles)
+7. [Performance Characteristics](#performance-characteristics)
+8. [Correctness and Language Semantics](#correctness-semantics)
+9. [Why HDL Simulators Use DES](#why-des)
+10. [Where Cycle-Based Simulation Fits](#where-cycle-fits)
+11. [Principal-Level Takeaway](#principal-takeaway)
+
+
+---
+## <span id="what-is-a-simulator">What Does It Mean to Simulate Hardware?</span>
+
+Before comparing approaches, we must define **what simulation actually is**.
+
+Hardware simulation means:
+- Executing a *behavioral description* of hardware
+- Preserving **HDL language semantics**
+- Producing **correct logical behavior**, not physical voltages
+
+Key constraints:
+- Multiple things happen “at the same time”
+- Order matters, but not in a simple sequential way
+- Some changes take *zero time*
+- Some changes are delayed
+
+This already hints that a simple “clock loop” is insufficient.
+
+---
+
+## <span id="cycle-based-simulation">Cycle-Based Simulation: The Naive Mental Model</span>
+
+### The intuitive idea
+
+Most people start with this idea:
+
+> “Hardware runs on clocks, so let’s simulate **one clock cycle at a time**.”
+
+Pseudo-code:
+
+```text
+for cycle = 0 to N:
+  evaluate all logic
+  update all registers
+````
+
+This is called **cycle-based simulation**.
+
+### Why it feels attractive
+
+* Simple to understand
+* Easy to implement
+* Deterministic by construction
+* Very fast *if* design fits assumptions
+
+Many first-time engineers (and students) assume *all simulators work this way*.
+
+They do not.
+
+---
+
+## <span id="cycle-breakdown">Why Cycle-Based Simulation Breaks Down</span>
+
+Cycle-based simulation **only works under very strict assumptions**.
+
+Let’s break them.
+
+---
+
+### ❌ Assumption 1: Everything is clocked
+
+Real HDLs allow:
+
+```verilog
+always @(a or b or c)
+  y = a & b | c;
+```
+
+This logic:
+
+* Is **not clocked**
+* Must react immediately when any input changes
+* Has **zero delay**
+
+Cycle-based engines struggle here.
+
+---
+
+### ❌ Assumption 2: All updates happen on clock edges
+
+Consider:
+
+```verilog
+assign y = a & b;
+```
+
+If `a` changes at time `t = 12.3ns`, `y` must update **at the same time**.
+
+No clock edge.
+No cycle boundary.
+No “wait until next tick”.
+
+---
+
+### ❌ Assumption 3: Order inside a cycle doesn’t matter
+
+This fails badly in HDLs.
+
+Example:
+
+```verilog
+always @(posedge clk) a <= b;
+always @(posedge clk) b <= a;
+```
+
+Correct semantics:
+
+* Both read **old** values
+* Both update simultaneously
+
+A naive cycle-based execution order would corrupt behavior.
+
+---
+
+### ❌ Assumption 4: Evaluating everything every cycle is affordable
+
+Modern SoCs:
+
+* Millions of gates
+* Most signals don’t change in most cycles
+
+Evaluating *everything* every cycle is massive wasted work.
+
+---
+
+## <span id="discrete-event-simulation">Discrete-Event Simulation: The Core Idea</span>
+
+**Discrete-Event Simulation (DES)** flips the model completely.
+
+Instead of:
+
+> “Every cycle, evaluate everything”
+
+It says:
+
+> “Only do work **when something changes**.”
+
+Key principle:
+
+* Time advances **only when events are scheduled**
+* Execution is driven by **value changes**, not clocks
+
+This matches how hardware *logically* behaves.
+
+---
+
+## <span id="events-not-cycles">Events, Not Cycles, Drive Execution</span>
+
+In DES, the basic unit is an **event**.
+
+An event means:
+
+> “At time `t`, something happens that may cause work.”
+
+Examples:
+
+* A signal changes value
+* A process wakes up
+* A delayed assignment expires
+
+There may be:
+
+* 10,000 events at time `t = 100`
+* Or zero events for long stretches
+
+The simulator doesn’t care about empty time.
+
+---
+
+## <span id="delta-cycles">Zero-Delay Logic and the Need for Delta Cycles</span>
+
+Here’s the killer reason DES is mandatory.
+
+Consider:
+
+```verilog
+always @(a) b = a;
+always @(b) c = b;
+```
+
+If `a` changes:
+
+* `b` must update
+* then `c` must update
+* **without advancing time**
+
+DES introduces:
+
+* **Delta cycles** (logical steps at same time)
+
+At `t = 10`:
+
+* delta 0: `a` changes → schedule `b`
+* delta 1: `b` changes → schedule `c`
+* delta 2: no new changes → fixpoint reached
+
+Cycle-based simulators **cannot model this cleanly**.
+
+---
+
+## <span id="performance-characteristics">Performance Characteristics: Where the Time Goes</span>
+
+### Cycle-Based Simulation
+
+* Work per cycle: **O(total design size)**
+* Time complexity: `cycles × design_size`
+* Terrible for sparse activity
+
+### Discrete-Event Simulation
+
+* Work per event: **O(affected logic)**
+* Time complexity: `number_of_events × fanout`
+* Excellent locality when activity is sparse
+
+This is why DES scales to:
+
+* Large RTL designs
+* Long simulation times
+* Complex testbenches
+
+---
+
+## <span id="correctness-semantics">Correctness and Language Semantics</span>
+
+HDLs (Verilog/SystemVerilog/VHDL) define **event ordering rules**, not cycle rules.
+
+Examples:
+
+* Nonblocking assignments
+* Zero-delay assigns
+* Sensitivity lists
+* Always blocks
+* Multiple drivers
+
+DES naturally maps to these semantics.
+
+Cycle-based simulation must **approximate** them — often incorrectly.
+
+---
+
+## <span id="why-des">Why All General-Purpose HDL Simulators Use DES</span>
+
+All mainstream simulators:
+
+* Xcelium
+* VCS
+* Questa
+* Riviera
+
+Are fundamentally:
+
+> **Discrete-event simulation kernels with heavy optimization**
+
+Even “multicore” simulators:
+
+* Do **not** parallelize cycles
+* They parallelize **events within the same time/delta/region**
+
+This is a key interview insight.
+
+---
+
+## <span id="where-cycle-fits">Where Cycle-Based Simulation Does Make Sense</span>
+
+Cycle-based simulation is not “bad”. It’s just **specialized**.
+
+Used when:
+
+* Design is fully synchronous
+* No zero-delay logic
+* No complex testbench
+* Often post-synthesis
+
+Examples:
+
+* Emulators
+* FPGA prototyping
+* Formal bounded engines
+* Certain power/performance models
+
+But:
+
+> **General-purpose HDL simulation must be event-driven.**
+
+---
+
+## <span id="principal-takeaway">Mental Model Summary (Principal-Level Takeaway)</span>
+
+A principal-level explanation:
+
+> “Cycle-based simulation assumes uniform time progression and full evaluation,
+> which breaks down in the presence of zero-delay logic and complex HDL semantics.
+> Discrete-event simulation instead advances time only when necessary and evaluates
+> only logic affected by value changes. Delta cycles allow fixpoint convergence at
+> the same simulation time, and region-based scheduling preserves language semantics.
+> This model is mandatory for correctness and scalability in general-purpose simulators.”
+
+If you can say that confidently, you **belong in a simulation team**.
+
+---
+
+## What Comes Next
+
+Next subtopic in Phase 0:
+
+```json
+{ "title": "Simulation time, delta cycles, and fixpoint semantics" }
+```
+
+That’s where we:
+
+* Draw timelines
+* Build intuition for infinite delta loops
+* Introduce “why kernels must detect non-convergence”
+
+---

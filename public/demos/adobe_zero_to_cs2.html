@@ -1,0 +1,325 @@
+
+<style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-sans);color:var(--color-text-primary);background:var(--color-background-primary)}
+    .crimson{color:#9B1C3A}
+    .pill{display:inline-block;font-size:11px;font-weight:500;padding:3px 10px;border-radius:999px;border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);background:var(--color-background-secondary)}
+    .pill-done{background:#9B1C3A;color:#fff;border-color:#9B1C3A}
+    input[type=text],select{background:var(--color-background-secondary);color:var(--color-text-primary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:8px 12px;font-size:13px;font-family:var(--font-sans);outline:none;width:100%}
+    input[type=text]:focus,select:focus{border-color:#9B1C3A}
+    .phase-wrap{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:12px}
+    .phase-hdr{padding:14px 16px;background:var(--color-background-secondary);cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;user-select:none}
+    .phase-hdr:hover{background:var(--color-background-tertiary)}
+    .phase-meta{min-width:0}
+    .phase-title{font-size:14px;font-weight:500;margin-bottom:2px}
+    .phase-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
+    .phase-stat{font-size:12px;color:var(--color-text-secondary);white-space:nowrap;text-align:right}
+    .phase-bar{height:2px;background:var(--color-background-tertiary);margin:0 16px 0}
+    .phase-fill{height:2px;background:#9B1C3A;transition:width 0.4s}
+    .day-card{border-top:0.5px solid var(--color-border-tertiary);padding:14px 16px;transition:background 0.15s}
+    .day-card.done{background:rgba(155,28,58,0.03)}
+    .day-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+    .day-num{font-size:11px;font-family:var(--font-mono);color:var(--color-text-secondary);margin-bottom:3px}
+    .day-title{font-size:14px;font-weight:500}
+    .check-btn{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:5px 12px;border-radius:999px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all 0.15s}
+    .check-btn:hover{border-color:#9B1C3A;color:#9B1C3A}
+    .check-btn.done{background:#9B1C3A;color:#fff;border-color:#9B1C3A}
+    .check-icon{width:12px;height:12px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .check-icon svg{display:none}
+    .check-btn.done .check-icon{background:#fff}
+    .check-btn.done .check-icon svg{display:block}
+    .sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .sec{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 12px;background:var(--color-background-primary)}
+    .sec-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-secondary);margin-bottom:6px;font-family:var(--font-mono)}
+    .sec-label.crimson{color:#9B1C3A}
+    .sec ul{padding-left:14px;list-style:disc}
+    .sec li{font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:2px}
+    .sec p{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+    .reset-btn{font-size:12px;color:var(--color-text-secondary);background:none;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 12px;cursor:pointer;font-family:var(--font-sans)}
+    .reset-btn:hover{color:#9B1C3A;border-color:#9B1C3A}
+    .chevron{font-size:10px;color:var(--color-text-secondary);transition:transform 0.2s;flex-shrink:0}
+    .chevron.open{transform:rotate(180deg)}
+    .empty{padding:32px 16px;text-align:center;font-size:13px;color:var(--color-text-secondary)}
+    </style>
+    
+    <div style="padding:1rem 0">
+    
+    <div style="margin-bottom:16px">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">
+        <span style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:#9B1C3A;font-family:var(--font-mono)">Adobe CS1/CS2</span>
+      </div>
+      <div style="font-size:22px;font-weight:500;margin-bottom:6px">Preparation plan</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:14px">70 structured days · DSA, LLD, C++ internals, concurrency, OS, system design. Progress saved in browser.</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px" id="stat-pills"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input type="text" id="search" placeholder="Search topics, problems, concepts…" style="max-width:320px">
+        <select id="phase-filter" style="width:auto">
+          <option value="all">All phases</option>
+          <option value="0">Phase 1 — DSA + C++ Foundations</option>
+          <option value="1">Phase 2 — Concurrency + Memory</option>
+          <option value="2">Phase 3 — LLD + System Design</option>
+          <option value="3">Phase 4 — Polish + Mocks</option>
+        </select>
+        <select id="status-filter" style="width:auto">
+          <option value="all">All days</option>
+          <option value="pending">Pending</option>
+          <option value="done">Completed</option>
+        </select>
+        <button class="reset-btn" id="reset">Reset progress</button>
+      </div>
+    </div>
+    
+    <div id="phases"></div>
+    </div>
+    
+    <script>
+    const STORAGE_KEY = 'cppvalley:adobe-plan:v2';
+    const ACCENT = '#9B1C3A';
+    
+    const phases = [
+      {title:'Phase 1 — Weeks 1–6 — DSA + C++ Foundations',desc:'Arrays, sliding window, trees, graphs, DP, templates, allocators, memory model, foundational LLD.',days:[
+        {day:'Day 1',topic:'Arrays + Prefix sum',hard:['Maximum Subarray (LC 53)','Subarray Sum Equals K (LC 560)','Trapping Rain Water (LC 42)','Maximum Product Subarray (LC 152)'],medium:['Best Time to Buy/Sell Stock (LC 121)','Product of Array Except Self (LC 238)'],lld:'Design and implement a circular buffer — fixed-size, templated, no dynamic allocation',core:'Prefix sum pattern — derive from scratch, prove correctness, analyze space tradeoffs'},
+        {day:'Day 2',topic:'Two pointers',hard:['Trapping Rain Water (LC 42)','3Sum (LC 15)','4Sum (LC 18)','Remove Duplicates from Sorted Array II (LC 80)'],medium:['Container With Most Water (LC 11)','Two Sum II (LC 167)'],lld:'Design a fixed-size stack with min() in O(1) — implement fully in C++ with templates',core:'C++ value categories: lvalue, rvalue, xvalue — what each means and when they matter'},
+        {day:'Day 3',topic:'Sliding window',hard:['Minimum Window Substring (LC 76)','Sliding Window Maximum (LC 239)','Longest Repeating Character Replacement (LC 424)','Shortest Subarray with Sum ≥ K (LC 862)'],medium:['Longest Substring Without Repeating Characters (LC 3)','Fruit Into Baskets (LC 904)'],lld:'Design a rate limiter (token bucket) — implement in C++ with thread safety',core:'Move semantics deep dive — what std::move does at assembly level, when compiler elides moves (RVO/NRVO)'},
+        {day:'Day 4',topic:'Binary search',hard:['Median of Two Sorted Arrays (LC 4)','Find in Mountain Array (LC 1095)','Count of Range Sum (LC 327)','Search in Rotated Sorted Array II (LC 81)'],medium:['Find Minimum in Rotated Sorted Array (LC 153)','Kth Smallest Element in Sorted Matrix (LC 378)'],lld:'Design an order book (bid/ask) — sorted containers, O(log n) insert/match',core:'Rule of 5 — write a String class from scratch with all 5, verify no leaks under AddressSanitizer'},
+        {day:'Day 5',topic:'Monotonic stack',hard:['Largest Rectangle in Histogram (LC 84)','Maximal Rectangle (LC 85)','Trapping Rain Water (LC 42) via stack','Number of Visible People in Queue (LC 1944)'],medium:['Daily Temperatures (LC 739)','Next Greater Element II (LC 503)'],lld:'Design a generic event dispatcher — subscribe, unsubscribe, publish, thread-safe',core:'Smart pointers internals — implement shared_ptr with control block from scratch, handle weak_ptr cycles'},
+        {day:'Day 6',topic:'Heap / priority queue',hard:['Find Median from Data Stream (LC 295)','Merge K Sorted Lists (LC 23)','Minimum Cost to Hire K Workers (LC 857)','IPO (LC 502)'],medium:['Task Scheduler (LC 621)','Reorganize String (LC 767)'],lld:'Design a priority task queue with cancellation — std::priority_queue + lazy deletion',core:'Heap internals — heapify up/down, complexity proof, why std::priority_queue has no decrease-key'},
+        {day:'Day 7',topic:'Revision + mock',hard:['Pick 3 problems you struggled with (days 1–6), redo timed 20 min each','Maximum Frequency Stack (LC 895)'],medium:['Online Stock Span (LC 901)','Design Hit Counter (LC 362)'],lld:'Redo circular buffer from Day 1, add iterator support',core:'Answer without notes: What is object slicing? What is the most vexing parse? What does explicit do?'},
+        {day:'Day 8',topic:'HashMap + LRU',hard:['LFU Cache (LC 460)',"All O'one Data Structure (LC 432)",'Substring with Concatenation of All Words (LC 30)','Maximum Sum of Two Non-Overlapping Subarrays (LC 1031)'],medium:['LRU Cache (LC 146)','Insert Delete GetRandom O(1) (LC 380)'],lld:'Implement LRU Cache: O(1) get/put, intrusive doubly linked list + unordered_map, then add thread safety',core:'How std::unordered_map works — buckets, chaining, load factor, rehashing, worst case O(n) and how to avoid it'},
+        {day:'Day 9',topic:'Intervals + sweep line',hard:['My Calendar III (LC 732)','Meeting Rooms III (LC 2402)','Minimum Number of Arrows to Burst Balloons (LC 452)','Employee Free Time (LC 759)'],medium:['Merge Intervals (LC 56)','Insert Interval (LC 57)'],lld:'Design a calendar/booking system — no double booking, find next available slot, O(log n)',core:'Virtual dispatch internals — draw vtable layout for diamond inheritance, explain virtual base class pointers'},
+        {day:'Day 10',topic:'Trie',hard:['Word Search II (LC 212)','Stream of Characters (LC 1032)','Palindrome Pairs (LC 336)','Maximum XOR of Two Numbers (LC 421)'],medium:['Design Add and Search Words (LC 211)','Replace Words (LC 648)'],lld:'Design an autocomplete system — Trie with frequency ranking, top-k suggestions',core:'Template metaprogramming — write compile-time type list, implement tuple with variadic templates'},
+        {day:'Day 11',topic:'Binary tree DP',hard:['Binary Tree Maximum Path Sum (LC 124)','Serialize/Deserialize Binary Tree (LC 297)','Binary Tree Cameras (LC 968)','Vertical Order Traversal (LC 987)'],medium:['House Robber III (LC 337)','All Nodes Distance K (LC 863)'],lld:'Design a document tree (PDF page content stream) — operators/operands, visitor pattern renderer',core:'SFINAE and std::enable_if — write 3 examples: integral types, iterators, trivially copyable types'},
+        {day:'Day 12',topic:'BST + segment tree',hard:['Count of Smaller Numbers After Self (LC 315)','Range Sum Query 2D Mutable (LC 308)','Reverse Pairs (LC 493)','My Calendar III (LC 732)'],medium:['Kth Smallest in BST (LC 230)','Range Sum Query Mutable (LC 307)'],lld:'Implement a segment tree with lazy propagation — range update, range query, templated value type',core:'C++20 Concepts — rewrite Day 10 templates using requires clauses, compare readability and error messages'},
+        {day:'Day 13',topic:'Graph BFS/DFS',hard:['Word Ladder II (LC 126)','Shortest Path to Get All Keys (LC 864)','Bus Routes (LC 815)','Cut Off Trees for Golf Event (LC 675)'],medium:['Number of Islands (LC 200)','Pacific Atlantic Water Flow (LC 417)'],lld:'Design a graph library — adjacency list, BFS, DFS, Dijkstra, pluggable edge weight via templates',core:'Memory model: happens-before, synchronizes-with — draw happens-before graph for producer-consumer using mutex'},
+        {day:'Day 14',topic:'Revision + mock',hard:['Alien Dictionary (LC 269)','Critical Connections (LC 1192)','Swim in Rising Water (LC 778)'],medium:['Reconstruct Itinerary (LC 332)','Accounts Merge (LC 721)'],lld:'Redo event dispatcher from Day 5 — add priority levels, async dispatch on thread pool',core:'Answer: What is the ABI of a C++ class with virtual functions? How does dynamic_cast work at runtime?'},
+        {day:'Day 15',topic:'Topological sort + union find',hard:['Largest Color Value in Directed Graph (LC 1857)','Making a Large Island (LC 827)','Sequence Reconstruction (LC 444)','Minimum Cost to Connect All Points (LC 1584)'],medium:['Course Schedule II (LC 210)','Redundant Connection (LC 684)'],lld:'Implement Union-Find with union by rank + path compression — use it for online connectivity queries in a graph editor',core:'std::atomic memory ordering — write correct spinlock using acquire/release, explain why relaxed is wrong, seq_cst cost on ARM vs x86'},
+        {day:'Day 16',topic:'Shortest paths',hard:['Cheapest Flights Within K Stops (LC 787)','Find the Safest Path in Grid (LC 2812)','Path with Maximum Probability (LC 1514)','Minimum Obstacle Removal to Reach Corner (LC 2290)'],medium:[],lld:'Design a navigation system — Dijkstra with recompute on edge change, observer notification on route change',core:'Lock-free stack — implement using compare_exchange_weak, explain ABA problem, fix with tagged pointer'},
+        {day:'Day 17',topic:'DP I — 1D',hard:['Decode Ways II (LC 639)','Student Attendance Record II (LC 552)','Count Vowels Permutation (LC 1220)'],medium:['Coin Change (LC 322)','House Robber (LC 198)'],lld:'Design a plugin registry — plugins register capabilities, system queries by capability, versioning and priority',core:'Coroutines (C++20) — implement generator<T> from scratch using promise_type, coroutine_handle, co_yield'},
+        {day:'Day 18',topic:'DP II — 2D/grid',hard:['Dungeon Game (LC 174)','Cherry Pickup II (LC 1463)','Minimum Falling Path Sum II (LC 1289)','Out of Boundary Paths (LC 576)'],medium:['Unique Paths II (LC 63)','Maximal Square (LC 221)'],lld:'Design an undo/redo system — command pattern, composite commands, memory-bounded history',core:'Thread pool — fixed workers, task queue, graceful shutdown, std::future/std::promise for return values'},
+        {day:'Day 19',topic:'DP III — string',hard:['Edit Distance (LC 72)','Distinct Subsequences (LC 115)','Regular Expression Matching (LC 10)','Wildcard Matching (LC 44)'],medium:['Longest Common Subsequence (LC 1143)','Palindromic Substrings (LC 647)'],lld:'Design a diff engine (like Acrobat document diff) — LCS-based, highlights insertions/deletions, structured change list',core:'Arena allocator — implement from scratch using mmap, support reset(), bump pointer allocation, analyze fragmentation'},
+        {day:'Day 20',topic:'DP IV — knapsack',hard:['Profitable Schemes (LC 879)','Tallest Billboard (LC 956)','Freedom Trail (LC 514)','Strange Printer (LC 664)'],medium:['Last Stone Weight II (LC 1049)','Ones and Zeroes (LC 474)'],lld:"Design a memory pool allocator — fixed block size, free list, thread-local caching layer (like tcmalloc's thread cache)",core:"jemalloc internals — size classes, arenas, thread caching, how it reduces lock contention vs ptmalloc"},
+        {day:'Day 21',topic:'Revision + mock',hard:['Russian Doll Envelopes (LC 354)','Maximum Profit in Job Scheduling (LC 1235)','Burst Balloons (LC 312)'],medium:['Target Sum (LC 494)','Stone Game (LC 877)'],lld:'Full timed LLD: thread-safe LRU Cache with TTL expiry — design + implement in 45 min',core:'Answer: How does std::vector grow? What is iterator invalidation? When does std::deque not invalidate iterators?'},
+        {day:'Day 22',topic:'Backtracking',hard:['N-Queens (LC 51)','Sudoku Solver (LC 37)','Expression Add Operators (LC 282)','Remove Boxes (LC 546)'],medium:['Combination Sum II (LC 40)','Subsets II (LC 90)'],lld:'Design a constraint solver — variables, domains, constraints, backtracking with arc consistency pruning',core:'False sharing — benchmark on shared array, fix with padding, measure with perf stat'},
+        {day:'Day 23',topic:'Advanced graph',hard:['Critical Connections (LC 1192)',"Tarjan's SCC from scratch","Kruskal's and Prim's MST from scratch"],medium:["Is Graph Bipartite (LC 785)","Find Eventual Safe States (LC 802)"],lld:'Design a dependency injection container — register types with factories, resolve by type, detect circular dependencies',core:'mmap deep dive — anonymous vs file-backed, MAP_SHARED vs MAP_PRIVATE, memory-mapped PDF cross-reference table'},
+        {day:'Day 24',topic:'Divide & conquer + sorting',hard:['Count of Range Sum (LC 327)','Reverse Pairs (LC 493)','Median of Two Sorted Arrays (LC 4)','Kth Largest (LC 215) via quickselect'],medium:['Sort Colors (LC 75)','Wiggle Sort II (LC 324)'],lld:'Design a parallel merge sort — divide work across thread pool, collect results with std::future',core:'Cache efficiency — naive vs cache-friendly matrix multiplication, profile with cachegrind, observe L1/L2 miss difference'},
+        {day:'Day 25',topic:'Bit manipulation + math',hard:['Maximum XOR of Two Numbers (LC 421) via trie','Maximum AND Sum of Array (LC 2172)','Number of Valid Words for Each Puzzle (LC 1178)','Maximize Score After N Operations (LC 1799)'],medium:[],lld:'Design a bitset class from scratch — set, reset, flip, count, operator|, operator&, templated on size',core:'CPU branch prediction — sorted vs unsorted loop, profile mispredictions with perf stat, explain result'},
+        {day:'Day 26',topic:'Mixed hard session',hard:['Minimum Window Substring (LC 76)','Trapping Rain Water II (LC 407)','Maximum Rectangle (LC 85)','Longest Increasing Path in Matrix (LC 329)'],medium:['Course Schedule (LC 207)','Partition Labels (LC 763)'],lld:'Design a file watcher — monitor directory, notify subscribers, debounce rapid changes with background thread',core:'Condition variables — bounded blocking queue, why you always need while not if for wait(), spurious wakeup'},
+        {day:'Day 27',topic:'String algorithms',hard:['Shortest Palindrome (LC 214)','Concatenated Words (LC 472)','Implement suffix array for distinct substring count'],medium:['Group Anagrams (LC 49)','Decode String (LC 394)'],lld:'Implement string interning system — deduplicate equal strings, stable const char*, thread-safe, for PDF name objects',core:'KMP algorithm — derive failure function from scratch, prove O(n) complexity, implement and test'},
+        {day:'Day 28',topic:'Revision + full mock',hard:['4 problems timed 20 min each, picked from weakest areas'],medium:[],lld:'Full timed: event-driven PDF page renderer with tile-based parallelism — 45 min',core:'Full C++ quiz: rule of 5, vtable layout, memory ordering, template instantiation, UB sources — no notes'}
+      ]},
+      {title:'Phase 2 — Weeks 5–8 — Concurrency + Memory Depth',desc:'Mutexes, atomics, lock-free structures, thread pools, sanitizers, coroutines, allocators, thread-local caches.',days:[
+        {day:'Day 29',topic:'Mutex, condition variables, RAII locks',hard:['Design Bounded Blocking Queue (LC 1188)','Print in Order (LC 1114) — implement 3 ways','The Dining Philosophers (LC 1226)','Implement readers-writer lock from scratch','Implement semaphore using mutex + condition variable'],medium:[],lld:'Design a connection pool — fixed connections, borrow/return, timeout, thread-safe',core:'std::unique_lock vs std::lock_guard vs std::scoped_lock — when each is appropriate, what unique_lock enables that lock_guard cannot'},
+        {day:'Day 30',topic:'Atomic memory ordering',hard:["Implement spinlock — 3 versions: seq_cst, acquire/release, relaxed (find the bug)",'Implement seqlock for read-heavy workloads',"Implement reference counter using atomics (like shared_ptr's refcount)",'Implement Peterson\'s algorithm using atomics'],medium:[],lld:'Design a metrics collector — lock-free per-thread counters, periodic aggregation, no contention on hot path',core:'Memory ordering on ARM vs x86 — TSO vs weakly ordered, what extra barriers ARM needs, why seq_cst costs more on ARM'},
+        {day:'Day 31',topic:'Lock-free data structures',hard:['Implement lock-free stack using CAS','Implement lock-free SPSC queue','Implement lock-free MPMC queue','Implement hazard pointers for safe memory reclamation'],medium:[],lld:'Design a lock-free work-stealing deque — push/pop from own end, steal from other',core:'ABA problem — construct a concrete example causing corruption in lock-free stack, fix with tagged pointer'},
+        {day:'Day 32',topic:'Thread pool + work stealing',hard:['Implement thread pool from scratch — task queue, worker threads, std::future return','Implement work-stealing thread pool','Implement parallel for_each using thread pool','Implement parallel reduce'],medium:[],lld:'Design a job scheduler — recurring + one-shot jobs, cancellation, priority, thread pool + priority queue',core:'False sharing in thread pools — show how per-thread task counts cause false sharing, fix with alignas(64), measure with perf c2c'},
+        {day:'Day 33',topic:'Concurrency bugs + debugging',hard:['Write 5 programs with deliberate concurrency bugs (data race, deadlock, livelock, priority inversion, UAF)','Find and fix each using TSan/ASan','Implement a deadlock detector using resource allocation graph'],medium:[],lld:'Design a concurrent hash map — stripe locking (N mutexes for N bucket groups), compare vs single lock under contention',core:'How ThreadSanitizer works — shadow memory, happens-before tracking, why it has false negatives on lock-free code'},
+        {day:'Day 34',topic:'C++20 concurrency',hard:['Implement producer-consumer using std::latch','Implement phased pipeline using std::barrier','Implement a coroutine-based async task type','Implement a coroutine generator<T>'],medium:[],lld:'Design an async file I/O system using coroutines — co_await read/write, integrates with thread pool executor',core:'Coroutine internals — what the compiler generates for co_await: suspension point, coroutine frame, promise_type protocol'},
+        {day:'Day 35',topic:'Memory allocators I',hard:['Implement malloc/free using mmap (sbrk-free)','Implement bump/arena allocator','Implement pool allocator for fixed-size objects','Implement slab allocator with multiple size classes'],medium:[],lld:'Design a memory allocator for a PDF object store — variable size, frequently allocated/freed, supports arena reset',core:"Heap fragmentation — internal vs external, how buddy allocator reduces external fragmentation, what jemalloc does differently"},
+        {day:'Day 36',topic:'Memory allocators II',hard:['Implement free list allocator with coalescing','Implement segregated free list (like jemalloc size classes)','Implement thread-local cache layer (like tcmalloc thread cache)','Benchmark: custom allocator vs malloc on 10M alloc/free cycles'],medium:[],lld:'Design a string pool / intern table — deduplicate strings, O(1) equality via pointer equality, thread-safe insertion',core:"tcmalloc architecture — thread cache → central free list → page heap. Why this eliminates lock contention for small allocations"},
+        {day:'Day 37',topic:'Revision + mock',hard:['Redo 4 hardest concurrency/memory problems from the week, timed'],medium:[],lld:'Full timed: thread-safe memory pool with thread-local caches and global fallback — 45 min',core:'Full quiz: spinlock correctness, ABA problem, coroutine frame layout, arena vs pool vs slab — when to use each'}
+      ]},
+      {title:'Phase 3 — Weeks 9–11 — LLD Depth + System Design',desc:'Type erasure, plugin systems, PDF models, rendering, ABI stability, microservices, OS internals, performance, SIMD.',days:[
+        {day:'Day 38',topic:'Design patterns in C++',hard:['Implement CRTP-based static polymorphism — replace virtual with CRTP, benchmark the difference','Implement policy-based design — sorting class where comparison and swap are policies','Implement type erasure (like std::function) from scratch','Implement std::variant from scratch using union + type index'],medium:[],lld:'Design a plugin system — abstract plugin interface, dlopen-based dynamic loading, plugin registry, version checking',core:'Type erasure deep dive — how std::function avoids virtual, small buffer optimization for small callables'},
+        {day:'Day 39',topic:'LLD: PDF document model',hard:['Implement lazy-loading indirect object store','Implement copy-on-write document','Implement cross-reference table parser (linearized PDF)','Implement stream filter chain (FlateDecode → DCTDecode)'],medium:[],lld:'Full PDF document model — Document, Page, ContentStream, XObject, Font, IndirectObject, Visitor renderer',core:'PDF cross-reference table vs xref stream — binary format, compressed object streams (PDF 1.5), linearization'},
+        {day:'Day 40',topic:'LLD: Undo/redo + observer',hard:['Implement command pattern with undo/redo','Implement composite command (macro command)','Implement memory-bounded history (evict oldest when over limit)','Implement transactional document model (all-or-nothing multi-step edits)'],medium:[],lld:'Design Acrobat-style annotation system — add/edit/delete, full undo/redo, observer notifications, serialization to PDF',core:'Observer pattern pitfalls in C++ — std::weak_ptr for observers, notification during mutation (reentrancy), unsubscribe during notification'},
+        {day:'Day 41',topic:'LLD: Cross-platform library design',hard:['Design platform abstraction layer for file I/O — same API on Windows/macOS/Linux/WASM','Design platform abstraction for threading','Design ABI-stable C++ interface — pImpl, opaque pointer, stable vtable','Design versioned API with backward compatibility guarantees'],medium:[],lld:'Design Adobe-style Core Library API — stable C interface wrapping C++, version negotiation, capability query, client SDK design',core:'ABI stability — what breaks ABI, how pImpl solves it, how to ship a C++ library without exposing implementation headers'},
+        {day:'Day 42',topic:'LLD: Rendering pipeline',hard:['Design tile-based renderer — divide page into tiles, render in parallel, composite results','Implement a graphics state machine (PDF graphics state: CTM, color, line width, clip)','Implement display list — record draw calls, replay, cache','Implement dirty-region tracking — only re-render changed tiles'],medium:[],lld:'Full rendering pipeline — ContentStream parser → display list builder → tile scheduler → rasterizer → compositor',core:'Lock-free tile work queue — work-stealing queue where each worker owns a deque of tile jobs, all using atomics'},
+        {day:'Day 43',topic:'System design I',hard:['Design a document processing service (text extraction + page rendering) — whiteboard'],medium:[],lld:'Design a PDF processing microservice — REST API, job queue, worker pool, result cache, storage layer',core:'How to scale a document rendering service to 10k concurrent PDFs — horizontal scaling, stateless workers, S3, Redis, CDN'},
+        {day:'Day 44',topic:'System design II',hard:['Design Google Docs (collaborative editing) — CRDT vs OT, conflict resolution'],medium:[],lld:'Design a collaborative PDF annotation system — multiple users, conflict-free merging, real-time sync',core:'CRDT vs Operational Transform — what Adobe uses for collaborative features, how conflict-free merging works for annotations'},
+        {day:'Day 45',topic:'System design III',hard:['Design a distributed cache — consistent hashing, replication, eviction'],medium:[],lld:'Design Adobe Creative Cloud asset sync — local cache, cloud store, conflict resolution, offline support',core:'Consistent hashing — how it minimizes key remapping when nodes join/leave, virtual nodes for load balance'},
+        {day:'Day 46',topic:'OS internals I — virtual memory',hard:['Implement a memory-mapped file reader — open file, mmap, read without explicit read() calls','Implement copy-on-write buffer using mmap + mprotect + SIGSEGV handler','Implement memory-mapped cross-reference table'],medium:[],lld:'Design a memory-mapped document store — files mapped lazily, page fault drives loading, eviction via madvise',core:'Virtual memory internals — 4-level page table walk on x86-64, TLB, page fault handler, demand paging, how mmap avoids read() overhead'},
+        {day:'Day 47',topic:'OS internals II — scheduling + I/O',hard:['Implement an epoll-based event loop','Implement async I/O using io_uring','Implement a timer wheel for timeout management'],medium:[],lld:'Design a non-blocking PDF stream reader — epoll/io_uring backed, integrates with coroutine await, feeds into filter pipeline',core:'Linux CFS scheduler — vruntime, red-black tree, what happens when thread blocks on mutex vs spins. CPU affinity and NUMA'},
+        {day:'Day 48',topic:'Performance engineering',hard:['Profile CorePDF-Lite with perf record — flame graph, identify top 3 hotspots','Profile data structures library with cachegrind — identify cache misses','Optimize one hotspot and measure improvement'],medium:[],lld:'Design a performance regression test framework — run benchmarks, compare against baseline, flag regressions, CI integration',core:"Roofline model — compute arithmetic intensity of PDF stream decoder. Amdahl's law — 80% parallel tile renderer, max speedup with 16 cores"},
+        {day:'Day 49',topic:'SIMD + compiler optimizations',hard:['Implement SIMD dot product using SSE intrinsics','Implement SIMD byte search (find first occurrence of byte in buffer)','Write a loop, check compiler output at -O2 vs -O3 with Godbolt'],medium:[],lld:'Design a SIMD-accelerated image codec — DCT for JPEG decode using SSE, fall back to scalar',core:'Auto-vectorization — what patterns the compiler can vectorize, how __restrict__ and __builtin_assume_aligned help. LTO and PGO'},
+        {day:'Day 50',topic:'Revision + full mock interview day',hard:['DSA Mock: 2 hard problems, 20 min each, strictly timed','LLD Mock: thread-safe PDF object cache with LRU eviction and lazy loading — 45 min','System Design Mock: Acrobat rendering pipeline for web (WASM target) — 30 min'],medium:[],lld:"Full self-assessment — list 5 weakest areas, schedule extra time on them in remaining days",core:'C++ Quiz: vtable layout, ABA problem, coroutine frame, mmap vs read(), CFS scheduler, roofline model — no notes'}
+      ]},
+      {title:'Phase 4 — Weeks 12–14 — Resume Depth + Behavioral + Polish',desc:'Resume storytelling, weak-area reinforcement, mock interviews, behavioral prep, final taper week.',days:[
+        {day:'Day 51',topic:'Resume deep dive — Xcelium concurrency',hard:['Prepare exact answers for: synchronization strategy used, bug you found, how you used UNDO, performance improvement'],medium:[],lld:'Resume narrative drill',core:'Explain the debugging arc, concurrency choice, and measurable impact crisply and deeply'},
+        {day:'Day 52',topic:'Resume deep dive — cross-platform migration',hard:['Prepare: specific threading model differences, memory mapping issues hit, toolchain incompatibilities handled'],medium:[],lld:'Resume narrative drill',core:'Make migration, ABI, platform, and correctness tradeoffs interview-ready'},
+        {day:'Day 53',topic:'Resume deep dive — CorePDF-Lite',hard:["Prepare: every design decision and why. xref parser time complexity? COW store concurrent reads? What would you do differently?"],medium:[],lld:'Resume narrative drill',core:'Defend data structure, allocator, parser, and rendering choices'},
+        {day:'Day 54',topic:'Resume deep dive — lock-free data structures',hard:["Prepare: prove correctness of lock-free queue. Memory ordering used and why? ABA risk in implementation?"],medium:[],lld:'Resume narrative drill',core:'Tie correctness proof, tail latency, and contention to implementation choices'},
+        {day:'Day 55',topic:'Resume deep dive — compiler + ML',hard:['Prepare: How does LALR parsing work? Semantic validation implemented? XGBoost features? How did you handle class imbalance?'],medium:[],lld:'Resume narrative drill',core:'Connect compiler, systems, and ML work into a coherent senior-level story'},
+        {day:'Day 56',topic:'Weak area reinforcement',hard:['3–4 Hard LC from weakest topic areas'],medium:['1–2 Medium for confidence'],lld:'1 LLD from any topic you found hardest',core:'1 Core concept revision'},
+        {day:'Day 57',topic:'Weak area reinforcement',hard:['3–4 Hard LC from weakest topic areas'],medium:['1–2 Medium for confidence'],lld:'1 LLD from any topic you found hardest',core:'1 Core concept revision'},
+        {day:'Day 58',topic:'Weak area reinforcement',hard:['3–4 Hard LC from weakest topic areas'],medium:['1–2 Medium for confidence'],lld:'1 LLD from any topic you found hardest',core:'1 Core concept revision'},
+        {day:'Day 59',topic:'Weak area reinforcement',hard:['3–4 Hard LC from weakest topic areas'],medium:['1–2 Medium for confidence'],lld:'1 LLD from any topic you found hardest',core:'1 Core concept revision'},
+        {day:'Day 60',topic:'Weak area reinforcement',hard:['3–4 Hard LC from weakest topic areas'],medium:['1–2 Medium for confidence'],lld:'1 LLD from any topic you found hardest',core:'1 Core concept revision'},
+        {day:'Day 61',topic:'Full mock — DSA',hard:['DSA round mock — 2 hard problems, strict time'],medium:[],lld:'Mock review',core:'Pressure-handling, explanation clarity, edge-case discipline'},
+        {day:'Day 62',topic:'Full mock — C++ internals',hard:['C++ internals round — 45 min deep Q&A'],medium:[],lld:'Mock review',core:'vtable, ABI, memory model, templates, allocators, object model'},
+        {day:'Day 63',topic:'Full mock — LLD',hard:['LLD round — full design + code in 45 min'],medium:[],lld:'Timed LLD drill',core:'API shape, tradeoffs, code structure, thread safety, testing strategy'},
+        {day:'Day 64',topic:'Full mock — system design',hard:['System Design round — 45 min'],medium:[],lld:'Mock review',core:'Scale, storage, consistency, caching, observability, operational tradeoffs'},
+        {day:'Day 65',topic:'Full mock — behavioral',hard:['Prepare 10 STAR stories: ownership, debugging hard bugs, cross-team collaboration, mentoring, handling ambiguity'],medium:[],lld:'Behavioral narrative drill',core:'Keep answers crisp, structured, measurable, and engineering-focused'},
+        {day:'Day 66',topic:'Final week',hard:['Light LC — 2–3 medium per day, no new hard topics'],medium:[],lld:'Re-read resume line by line',core:'Sleep 8 hours, stay sharp, no panic learning'},
+        {day:'Day 67',topic:'Final week',hard:['Light LC — 2–3 medium per day'],medium:[],lld:"Re-read Adobe's C++ teams page and your resume",core:'Focus on recall, not expansion'},
+        {day:'Day 68',topic:'Final week',hard:['Light LC — 2–3 medium per day'],medium:[],lld:'Revise weak notes only',core:'Keep energy high and mind clear'},
+        {day:'Day 69',topic:'Final week',hard:['Light LC — 2–3 medium per day'],medium:[],lld:'Resume + project verbal recap',core:'Practice calm, confident explanation'},
+        {day:'Day 70',topic:'Final week',hard:['Light LC — 2–3 medium per day'],medium:[],lld:'Final skim only',core:'No cramming. Enter rested.'}
+      ]}
+    ];
+    
+    const SK = 'cppvalley:adobe:v2';
+    let prog = {};
+    try { prog = JSON.parse(localStorage.getItem(SK)||'{}'); } catch{}
+    
+    function save(){ try{ localStorage.setItem(SK, JSON.stringify(prog)); }catch{} }
+    
+    function dayId(pi,di){ return `${pi}-${di}`; }
+    
+    function totalDays(){ return phases.reduce((s,p)=>s+p.days.length,0); }
+    function doneDays(){ return Object.values(prog).filter(Boolean).length; }
+    
+    function renderStats(){
+      const total = totalDays(), done = doneDays();
+      const pct = total > 0 ? Math.round((done/total)*100) : 0;
+      document.getElementById('stat-pills').innerHTML = `
+        <span class="pill">${total} days total</span>
+        <span class="pill pill-done">${done} completed</span>
+        <span class="pill">${pct}% done</span>
+        <span class="pill">CS1 ready in ~10 weeks</span>
+        <span class="pill">CS2 confidence in ~14 weeks</span>
+      `;
+    }
+    
+    function render(){
+      const q = document.getElementById('search').value.trim().toLowerCase();
+      const pf = document.getElementById('phase-filter').value;
+      const sf = document.getElementById('status-filter').value;
+      const wrap = document.getElementById('phases');
+      wrap.innerHTML='';
+    
+      let anyVisible = false;
+    
+      phases.forEach((phase, pi)=>{
+        if(pf !== 'all' && pf !== String(pi)) return;
+    
+        const filteredDays = phase.days.filter((day,di)=>{
+          const id = dayId(pi,di);
+          const done = !!prog[id];
+          if(sf==='done' && !done) return false;
+          if(sf==='pending' && done) return false;
+          if(!q) return true;
+          const hay = [day.day,day.topic,day.lld,day.core,...(day.hard||[]),...(day.medium||[])].join(' ').toLowerCase();
+          return hay.includes(q);
+        });
+    
+        if(!filteredDays.length) return;
+        anyVisible = true;
+    
+        const doneInPhase = phase.days.filter((_,di)=>prog[dayId(pi,di)]).length;
+        const pct = Math.round((doneInPhase/phase.days.length)*100);
+    
+        const phaseEl = document.createElement('div');
+        phaseEl.className = 'phase-wrap';
+    
+        const hdrEl = document.createElement('div');
+        hdrEl.className = 'phase-hdr';
+        hdrEl.innerHTML = `
+          <div class="phase-meta">
+            <div class="phase-title">${phase.title}</div>
+            <div class="phase-desc">${phase.desc}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="phase-stat">${doneInPhase}/${phase.days.length}</div>
+            <div class="chevron" id="chev-${pi}">▼</div>
+          </div>
+        `;
+    
+        const barWrap = document.createElement('div');
+        barWrap.className = 'phase-bar';
+        const fill = document.createElement('div');
+        fill.className = 'phase-fill';
+        fill.style.width = pct+'%';
+        barWrap.appendChild(fill);
+    
+        const bodyEl = document.createElement('div');
+        bodyEl.id = `phase-body-${pi}`;
+    
+        filteredDays.forEach((day)=>{
+          const di = phase.days.indexOf(day);
+          const id = dayId(pi,di);
+          const done = !!prog[id];
+    
+          const card = document.createElement('div');
+          card.className = 'day-card' + (done?' done':'');
+    
+          const hasMed = day.medium && day.medium.length > 0;
+    
+          card.innerHTML = `
+            <div class="day-top">
+              <div>
+                <div class="day-num">${day.day}</div>
+                <div class="day-title">${day.topic}</div>
+              </div>
+              <button class="check-btn${done?' done':''}" data-id="${id}">
+                <span class="check-icon">
+                  <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1 4L3 6L7 2" stroke="#9B1C3A" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </span>
+                ${done ? 'Done' : 'Mark done'}
+              </button>
+            </div>
+            <div class="sections">
+              <div class="sec">
+                <div class="sec-label crimson">Hard / medium-hard</div>
+                <ul>${(day.hard||[]).map(h=>`<li>${h}</li>`).join('')}</ul>
+              </div>
+              ${hasMed ? `<div class="sec"><div class="sec-label">Medium / reinforcement</div><ul>${day.medium.map(m=>`<li>${m}</li>`).join('')}</ul></div>` : ''}
+              <div class="sec">
+                <div class="sec-label">LLD exercise</div>
+                <p>${day.lld}</p>
+              </div>
+              <div class="sec">
+                <div class="sec-label">Core concept</div>
+                <p>${day.core}</p>
+              </div>
+            </div>
+          `;
+          bodyEl.appendChild(card);
+        });
+    
+        let open = true;
+        hdrEl.addEventListener('click',()=>{
+          open = !open;
+          bodyEl.style.display = open ? '' : 'none';
+          barWrap.style.display = open ? '' : 'none';
+          const chev = document.getElementById(`chev-${pi}`);
+          if(chev) chev.className = 'chevron' + (open ? ' open':'');
+        });
+    
+        phaseEl.appendChild(hdrEl);
+        phaseEl.appendChild(barWrap);
+        phaseEl.appendChild(bodyEl);
+        wrap.appendChild(phaseEl);
+      });
+    
+      if(!anyVisible){
+        wrap.innerHTML = '<div class="empty">No days match your filters.</div>';
+      }
+    
+      bindButtons();
+      renderStats();
+    }
+    
+    function bindButtons(){
+      document.querySelectorAll('.check-btn[data-id]').forEach(btn=>{
+        btn.addEventListener('click',e=>{
+          e.stopPropagation();
+          const id = btn.dataset.id;
+          prog[id] = !prog[id];
+          save();
+          render();
+        });
+      });
+    }
+    
+    document.getElementById('search').addEventListener('input', render);
+    document.getElementById('phase-filter').addEventListener('change', render);
+    document.getElementById('status-filter').addEventListener('change', render);
+    document.getElementById('reset').addEventListener('click',()=>{
+      prog={};
+      save();
+      render();
+    });
+    
+    render();
+    </script>
+    

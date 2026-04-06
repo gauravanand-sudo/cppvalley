@@ -1,0 +1,99 @@
+---
+title: "Minimum Cost to Convert String"
+description: "Solve string conversion using Floyd–Warshall on 26-letter graph."
+difficulty: "Medium"
+tags: ["graph", "floyd-warshall", "shortest-path"]
+---
+
+## Problem
+
+You are given two strings `source` and `target` of the same length.
+
+You are also given rules:
+- `original[i] -> changed[i]` with cost `cost[i]`
+
+You can apply rules multiple times (chaining allowed).
+
+Return the **minimum total cost** to convert `source` to `target`.
+If impossible, return `-1`.
+
+---
+
+## Idea
+
+- Each letter is a node (`a`–`z`)
+- Each rule is a directed edge with weight = cost
+- We need cheapest conversion between **every pair of letters**
+
+Since there are only **26 letters**, we can use **Floyd–Warshall**.
+
+---
+
+## Algorithm
+
+1. Create a `26 x 26` distance matrix
+2. Initialize:
+   - `dist[i][i] = 0`
+   - `dist[u][v] = cost`
+3. Run Floyd–Warshall
+4. For each position `i`:
+   - add `dist[source[i]][target[i]]`
+   - if unreachable → return `-1`
+
+---
+
+## Code (C++)
+
+```cpp
+class Solution {
+public:
+    long long minimumCost(string source, string target,
+                          vector<char>& original, vector<char>& changed,
+                          vector<int>& cost) {
+
+        const long long INF = 1e18;
+        vector<vector<long long>> dist(26, vector<long long>(26, INF));
+
+        for (int i = 0; i < 26; i++) dist[i][i] = 0;
+
+        for (int i = 0; i < original.size(); i++) {
+            int u = original[i] - 'a';
+            int v = changed[i] - 'a';
+            dist[u][v] = min(dist[u][v], (long long)cost[i]);
+        }
+
+        for (int k = 0; k < 26; k++)
+            for (int i = 0; i < 26; i++)
+                for (int j = 0; j < 26; j++)
+                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+
+        long long ans = 0;
+        for (int i = 0; i < source.size(); i++) {
+            if (source[i] == target[i]) continue;
+            int s = source[i] - 'a';
+            int t = target[i] - 'a';
+            if (dist[s][t] >= INF) return -1;
+            ans += dist[s][t];
+        }
+        return ans;
+    }
+};
+````
+
+---
+
+## Complexity
+
+* Time: `O(26^3 + n)`
+* Space: `O(26^2)`
+
+---
+
+## Summary
+
+* Graph with 26 nodes
+* Floyd–Warshall finds cheapest letter conversions
+* Sum per character
+* Return `-1` if impossible
+
+If you want, I can also give a **super short interview-style explanation** version.

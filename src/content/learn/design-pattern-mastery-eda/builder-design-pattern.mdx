@@ -1,0 +1,373 @@
+---
+title: "Builder Design Pattern (EDA-grade)"
+slug: "builder-design-pattern"
+access: "free"
+---
+
+# 🧱 Builder Design Pattern — Zero to Hero (EDA Focus)
+
+<span style={{color:"#6b7280"}}>Creational Pattern • Cadence / Siemens / Synopsys style</span>
+
+---
+
+## 📌 Clickable Index
+
+1. [Why Builder exists (intuition)](#why-builder-exists)
+2. [Why Factory is NOT enough](#why-factory-is-not-enough)
+3. [The Core Idea (one sentence)](#the-core-idea)
+4. [Mental Model (lock this in brain)](#mental-model)
+5. [Naive C++ approach (what goes wrong)](#naive-cpp)
+6. [Builder Pattern – anatomy](#builder-anatomy)
+7. [Step-by-step minimal implementation](#step-by-step)
+8. [Real EDA / Xcelium-style example](#xcelium-example)
+9. [Thread-safety & immutability (EDA reality)](#thread-safety)
+10. [Interview framing (how to explain)](#interview-framing)
+
+---
+
+<a id="why-builder-exists"></a>
+## 1️⃣ Why Builder exists (intuition)
+
+<span style={{fontWeight:600}}>Builder exists because some objects are too complex to be created in one shot.</span>
+
+In EDA:
+- Simulation kernels
+- Waveform dump configs
+- Scheduler policies
+- Netlist elaboration options
+
+👉 These objects have:
+- **many optional parameters**
+- **constraints between parameters**
+- **invalid combinations**
+- **defaults that matter**
+
+You **cannot** safely say:
+```cpp
+createSimulationKernel(a, b, c, d, e, f, g, h);
+````
+
+That’s how silent bugs are born.
+
+---
+
+<a id="why-factory-is-not-enough"></a>
+## 2️⃣ Why Factory is NOT enough
+
+<span style={{color:"#ef4444"}}>Factory chooses *what* to create.
+Builder controls *how* it is built.</span>
+```text
+| Pattern | Strength                  | Weakness                  |
+| ------- | ------------------------- | ------------------------- |
+| Factory | Chooses concrete type     | Hard to pass many options |
+| Builder | Step-by-step construction | Slightly more code        |
+```
+👉 In EDA, **correctness greater than brevity** → Builder wins.
+
+---
+
+<a id="the-core-idea"></a>
+## 3️⃣ The Core Idea (one sentence)
+
+
+You:
+
+1. Collect configuration
+2. Validate rules
+3. Freeze object
+4. Use it safely forever
+
+---
+
+<a id="mental-model"></a>
+## 4️⃣ Mental Model (burn this in memory)
+
+### ❌ Bad
+
+> “Create object now, fix fields later”
+
+### ✅ Good (Builder)
+
+> “Accumulate intent → validate → build once → immutable”
+
+Think:
+
+* **Configuration phase**
+* **Finalization phase**
+
+EDA tools **love determinism** → Builder enforces it.
+
+---
+
+<a id="naive-cpp"></a>
+
+## 5️⃣ Naive C++ approach (what goes wrong)
+
+### Telescoping constructor hell
+
+```cpp
+WaveDumpConfig(
+  std::string format,
+  bool includeScopes,
+  int depth,
+  size_t bufferMB,
+  bool compress,
+  bool async,
+  int flushInterval,
+  bool hierarchical
+);
+```
+
+Problems:
+
+* Call sites unreadable
+* Parameter order bugs
+* Impossible to enforce rules
+
+Example bug:
+
+```cpp
+WaveDumpConfig("VCD", true, -1, 0, false, true, 10, true); // compiles, wrong
+```
+
+---
+
+<a id="builder-anatomy"></a>
+
+## 6️⃣ Builder Pattern — anatomy
+
+<span style={{fontWeight:600}}>Three actors</span>
+
+1. **Product** – final object (immutable)
+2. **Builder** – mutable configurator
+3. **build()** – validates & creates product
+
+---
+
+<a id="step-by-step"></a>
+
+## 7️⃣ Step-by-step minimal implementation
+
+### 🧩 Step 1: Product (final, immutable)
+
+```cpp
+struct WaveDumpConfig {
+  std::string format;
+  bool includeScopes;
+  int depth;
+  size_t bufferMB;
+
+  WaveDumpConfig(
+    std::string f,
+    bool scopes,
+    int d,
+    size_t buf
+  )
+  : format(std::move(f)),
+    includeScopes(scopes),
+    depth(d),
+    bufferMB(buf) {}
+};
+```
+
+🔒 No setters.
+Once created → **cannot be invalidated**.
+
+---
+
+### 🧩 Step 2: Builder (defaults + fluent API)
+
+```cpp
+class WaveDumpConfigBuilder {
+  std::string format_ = "FSDB";
+  bool includeScopes_ = true;
+  int depth_ = 0;
+  size_t bufferMB_ = 128;
+
+public:
+  WaveDumpConfigBuilder& format(std::string f) {
+    format_ = std::move(f);
+    return *this;
+  }
+
+  WaveDumpConfigBuilder& includeScopes(bool v) {
+    includeScopes_ = v;
+    return *this;
+  }
+
+  WaveDumpConfigBuilder& depth(int d) {
+    depth_ = d;
+    return *this;
+  }
+
+  WaveDumpConfigBuilder& bufferMB(size_t mb) {
+    bufferMB_ = mb;
+    return *this;
+  }
+```
+
+Notice:
+
+* Fluent chaining
+* Readable intent
+* Order does not matter
+
+---
+
+### 🧩 Step 3: Validation + build()
+
+```cpp
+  WaveDumpConfig build() {
+    if (depth_ < 0) {
+      throw std::logic_error("Wave depth cannot be negative");
+    }
+
+    if (format_ == "VCD" && bufferMB_ < 64) {
+      throw std::logic_error("VCD requires >=64MB buffer");
+    }
+
+    return WaveDumpConfig(
+      format_,
+      includeScopes_,
+      depth_,
+      bufferMB_
+    );
+  }
+};
+```
+
+🔥 This is where **EDA correctness lives**.
+
+---
+
+### 🧩 Step 4: Usage (clean call site)
+
+```cpp
+auto cfg = WaveDumpConfigBuilder{}
+  .format("FSDB")
+  .depth(5)
+  .bufferMB(256)
+  .build();
+```
+
+Readable.
+Safe.
+Self-documenting.
+
+---
+
+<a id="xcelium-example"></a>
+
+## 8️⃣ Real Xcelium-style example (simulation kernel)
+
+Imagine configuring **event scheduler**:
+
+Constraints:
+
+* Delta cycles optional
+* Parallel execution optional
+* Some flags incompatible
+
+```cpp
+struct SchedulerConfig {
+  bool deltaCycles;
+  bool parallel;
+  int workerThreads;
+
+  SchedulerConfig(bool d, bool p, int w)
+    : deltaCycles(d), parallel(p), workerThreads(w) {}
+};
+```
+
+### Builder
+
+```cpp
+class SchedulerConfigBuilder {
+  bool deltaCycles_ = true;
+  bool parallel_ = false;
+  int workers_ = 1;
+
+public:
+  SchedulerConfigBuilder& enableParallel(int workers) {
+    parallel_ = true;
+    workers_ = workers;
+    return *this;
+  }
+
+  SchedulerConfigBuilder& disableDeltaCycles() {
+    deltaCycles_ = false;
+    return *this;
+  }
+
+  SchedulerConfig build() {
+    if (parallel_ && workers_ <= 0)
+      throw std::logic_error("Parallel scheduler needs workers");
+
+    if (!deltaCycles_ && parallel_)
+      throw std::logic_error("Parallel requires delta cycles");
+
+    return SchedulerConfig(deltaCycles_, parallel_, workers_);
+  }
+};
+```
+
+### Usage inside kernel init
+
+```cpp
+auto schedCfg = SchedulerConfigBuilder{}
+  .enableParallel(8)
+  .build();
+```
+
+💡 This is **exactly** how real EDA kernels are protected from bad configs.
+
+---
+
+<a id="thread-safety"></a>
+
+## 9️⃣ Thread-safety & immutability (EDA reality)
+
+* Builder → **not thread-safe**
+* Product → **thread-safe by design**
+
+Pattern:
+
+* Build during init (single-thread)
+* Share immutable product across threads
+
+EDA rule:
+
+> *Configuration happens once. Execution happens forever.*
+
+---
+
+<a id="interview-framing"></a>
+
+## 🔟 Interview framing (Cadence / Siemens)
+
+### When asked:
+
+**“When would you use Builder over Factory?”**
+
+Answer:
+
+> When object construction is complex, has optional parameters, or requires validation before use. Builder improves readability, enforces invariants, and creates immutable objects—critical in EDA systems.
+
+### Bonus line (principal-level):
+
+> Builder localizes correctness rules at construction time instead of spreading them across runtime code paths.
+
+---
+
+## ✅ Brain Lock Summary
+
+<span style={{fontWeight:600}}>
+Builder = Safe configuration + deterministic construction
+</span>
+
+* Factory → choose type
+* Builder → enforce correctness
+* EDA → Builder everywhere
+
+---
+

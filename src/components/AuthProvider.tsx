@@ -1,13 +1,12 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import type { Session } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const [, setSession] = useState<Session | null>(null);
+  const [, setLoading] = useState(true);
   const supabase = createClient();
 
   useEffect(() => {
@@ -15,29 +14,22 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
     const initializeAuth = async () => {
       try {
-        console.log("🔄 Initializing auth...");
-        
-        // Get initial session
         const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error("❌ Session error:", error.message);
+
+        if (error && mounted) {
+          setLoading(false);
+          return;
         }
         
         if (mounted) {
-          console.log("📋 Initial session:", session?.user?.email);
           setSession(session);
           setLoading(false);
         }
 
-        // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-          (event, currentSession) => {
-            console.log(`🎯 Auth event: ${event}`, currentSession?.user?.email);
-            
+          (_event, currentSession) => {
             if (mounted) {
               setSession(currentSession);
-            
             }
           }
         );
@@ -45,8 +37,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         return () => {
           subscription.unsubscribe();
         };
-      } catch (error) {
-        console.error("❌ Auth initialization error:", error);
+      } catch {
         if (mounted) {
           setLoading(false);
         }
@@ -59,8 +50,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       mounted = false;
       cleanupPromise.then(cleanup => cleanup?.());
     };
-  }, [router, supabase]);
+  }, [supabase]);
 
-  // You can pass session to children via context if needed
   return <>{children}</>;
 }

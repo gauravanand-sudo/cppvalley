@@ -1,0 +1,685 @@
+---
+title: "C++ Design Patterns in EDA Industry — Factory Pattern (Basics → Senior/Staff Advanced)"
+access: "free"
+difficulty: "Hard"
+description: "An overly-explained, step-by-step Factory pattern guide for EDA tools (VCS/Xcelium/Questa style). Covers basics, jargon, RAII, plugins/registry, thread-safety, performance, and interview answers."
+tags: ["C++", "Design Patterns", "Factory", "Factory Method", "Abstract Factory", "OCP", "SOLID", "EDA", "Simulator", "Plugins", "Registry", "RAII", "unique_ptr", "shared_ptr", "Dependency Injection", "Thread Safety", "Performance", "Testing"]
+---
+
+## Index
+- [0. What this lesson will make you capable of](#i0)
+- [1. Before Factory: what problem are we solving?](#i1)
+- [2. Basic vocabulary (remove jargon)](#i2)
+- [3. The simplest “factory” (1 function)](#i3)
+- [4. Why the naïve simulator becomes spaghetti](#i4)
+- [5. Factory Method vs Abstract Factory (clear difference)](#i5)
+- [6. Step-by-step EDA design (what varies? what stays stable?)](#i6)
+- [7. Build the interfaces (Parser/Simulator/Reports/Debugger)](#i7)
+- [8. Build concrete implementations (Verilog/VHDL/SV)](#i8)
+- [9. Build factories (one place decides the concrete types)](#i9)
+- [10. Build a registry (plugin-ready)](#i10)
+- [11. Client code (Simulator) becomes clean](#i11)
+- [12. Ownership & RAII (the most important advanced part)](#i12)
+- [13. Thread-safety (real EDA workloads)](#i13)
+- [14. Performance (caching, pooling, object reuse)](#i14)
+- [15. Mixed-language & config selection](#i15)
+- [16. Testing (unit + integration + contract tests)](#i16)
+- [17. Common pitfalls (staff-level warnings)](#i17)
+- [18. Synopsys Senior/Staff interview answers](#i18)
+- [19. Final 30-second summary (memorize)](#i19)
+
+---
+
+<span id="i0"></span>
+## 0. What this lesson will make you capable of
+
+After reading this, you should be able to:
+
+- Explain **why factories exist** in real tools (not “because GoF said so”).
+- Implement a **clean EDA-style factory architecture**: Parser + Simulator + Reports + Debugger.
+- Add a new language (e.g., UPF, SVA) **without touching core simulation flow**.
+- Make ownership and lifetime **obvious and safe** using `std::unique_ptr`.
+- Discuss plugin systems, ABI concerns, and thread safety like a Senior/Staff engineer.
+- Answer interview questions with reasoning (not mugged-up definitions).
+
+---
+
+<span id="i1"></span>
+## 1. Before Factory: what problem are we solving?
+
+### 1.1 Real EDA situation (VCS/Xcelium type)
+
+You are building something like a simulator pipeline:
+
+1. Read HDL source files  
+2. Parse them into an internal representation (AST / IR)
+3. Validate and elaborate (connect modules, parameters, generate blocks)
+4. Simulate (event scheduling, delta cycles)
+5. Produce outputs (waveforms, coverage, reports)
+6. Debug (breakpoints, signal inspection)
+
+The hard part: you don’t support *one* language or *one* mode.
+
+You support many combinations:
+
+- Verilog `.v`
+- SystemVerilog `.sv`, `.svh`
+- VHDL `.vhd`
+- Power intent `.upf`
+- Assertions (SVA)
+- Coverage on/off
+- Fast mode vs debug mode
+- Multi-core vs single-core
+
+### 1.2 The core pain
+
+If the main simulator has code like:
+
+- “if Verilog then create VerilogParser”
+- “else if VHDL then create VHDLParser”
+- “else if …”
+
+then **every time** you add a new language or mode you must modify core code.
+
+That makes the codebase:
+
+- fragile
+- hard to test
+- hard to evolve
+- hard to merge (everyone edits the same central file)
+
+Factories exist to prevent this.
+
+---
+
+<span id="i2"></span>
+## 2. Basic vocabulary (remove jargon)
+
+### 2.1 What is an “object creation decision”?
+
+It means: deciding which concrete class to construct.
+
+Example:
+
+- Should we do `VerilogParser` or `VHDLParser`?
+- Should we use `FastSimulator` or `DebugSimulator`?
+
+That “decision” is the thing we want to isolate.
+
+### 2.2 What is “coupling”?
+
+Coupling means your code depends on specific concrete types.
+
+If `Simulator` directly writes:
+
+```cpp
+VerilogParser p;
+VerilogSimulator sim;
+````
+
+then Simulator is tightly coupled to Verilog-specific types.
+That becomes painful when you add new languages.
+
+### 2.3 What is “polymorphism” here?
+
+Polymorphism means: we program to an interface like `Parser`,
+but at runtime we can use `VerilogParser` or `VHDLParser`.
+
+### 2.4 What is OCP (Open/Closed Principle)?
+
+* Open for extension (you can add new behavior)
+* Closed for modification (you should not change old core code every time)
+
+Factories help achieve OCP.
+
+---
+
+<span id="i3"></span>
+
+## 3. The simplest “factory” (1 function)
+
+Before fancy patterns, here is the simplest factory:
+
+```cpp
+class Parser {
+public:
+  virtual ~Parser() = default;
+  virtual void parseFile(const std::string& filename) = 0;
+};
+
+class VerilogParser : public Parser {
+public:
+  void parseFile(const std::string&) override { /* ... */ }
+};
+
+class VHDLParser : public Parser {
+public:
+  void parseFile(const std::string&) override { /* ... */ }
+};
+
+std::unique_ptr<Parser> makeParserFromExt(const std::string& ext) {
+  if (ext == ".v") return std::make_unique<VerilogParser>();
+  if (ext == ".vhd") return std::make_unique<VHDLParser>();
+  throw std::runtime_error("unsupported extension");
+}
+```
+
+### Why this already helps
+
+Now the rest of the system depends only on `Parser`, not concrete types.
+
+But this is still limited:
+
+* You still have a central if/else for every addition.
+* You only create ONE product (Parser), but EDA needs families.
+
+So we go further.
+
+---
+
+<span id="i4"></span>
+
+## 4. Why the naïve simulator becomes spaghetti
+
+Here is the “bad” design:
+
+```cpp
+class Simulator {
+public:
+  void simulate(const std::string& file) {
+    auto ext = getExtension(file);
+
+    if (ext == ".v") {
+      VerilogParser p; p.parseFile(file);
+      VerilogSimulator s; s.run();
+    } else if (ext == ".vhd") {
+      VHDLParser p; p.parseFile(file);
+      VHDLSimulator s; s.run();
+    }
+  }
+};
+```
+
+### What breaks at scale?
+
+1. **Every new language** forces edits in `Simulator`.
+2. The `Simulator` must include headers of every language component.
+3. Unit testing becomes hard (you can’t easily swap with mocks).
+4. The core file becomes a merge-conflict magnet.
+5. Plugins become almost impossible (you can’t compile plugin types into core).
+
+So the goal is:
+
+> Make `Simulator` unaware of concrete languages.
+
+That’s exactly the Factory idea at scale.
+
+---
+
+<span id="i5"></span>
+
+## 5. Factory Method vs Abstract Factory (clear difference)
+
+### 5.1 Factory Method (creates one product)
+
+Example: only create a Parser.
+
+* Useful when you vary one thing
+* Too small for EDA
+
+### 5.2 Abstract Factory (creates a family of products)
+
+EDA needs multiple components that must match:
+
+* Parser + Simulator + Debugger + Reports
+
+If you mix them incorrectly, you get nonsense.
+Example: VerilogParser feeding a VHDLSimulator.
+
+Abstract Factory ensures a coherent family.
+
+---
+
+<span id="i6"></span>
+
+## 6. Step-by-step EDA design (what varies? what stays stable?)
+
+### 6.1 “What varies” (different per language/mode)
+
+* Grammar
+* AST/IR shape
+* Validation rules
+* Simulation engine semantics
+* Debugger hooks
+* Report formats
+
+### 6.2 “What stays stable” (the pipeline)
+
+The pipeline is stable:
+
+1. Parse
+2. Validate
+3. Simulate
+4. Report
+5. Debug (optional)
+
+So we build stable interfaces for each stage.
+
+---
+
+<span id="i7"></span>
+
+## 7. Build the interfaces (Parser/Simulator/Reports/Debugger)
+
+### Why interfaces?
+
+Because Simulator should depend only on these abstract contracts.
+
+```cpp
+struct AST { virtual ~AST() = default; };
+
+class Parser {
+public:
+  virtual ~Parser() = default;
+  virtual std::unique_ptr<AST> parse(const std::string& filename) = 0;
+  virtual bool validate() = 0;
+};
+
+class SimulatorEngine {
+public:
+  virtual ~SimulatorEngine() = default;
+  virtual void run(const AST& ast) = 0;
+  virtual void pause() = 0;
+  virtual void resume() = 0;
+};
+
+class ReportGenerator {
+public:
+  virtual ~ReportGenerator() = default;
+  virtual void coverage() = 0;
+  virtual void timing() = 0;
+};
+
+class Debugger {
+public:
+  virtual ~Debugger() = default;
+  virtual void attach(SimulatorEngine& engine) = 0;
+  virtual void run() = 0;
+};
+```
+
+### Jargon explained
+
+* **interface**: an abstract base class with virtual methods.
+* **contract**: what the functions *mean* (e.g. `validate()` must check syntax/semantic rules).
+* **unique_ptr**: a smart pointer with single ownership (it deletes automatically).
+
+---
+
+<span id="i8"></span>
+
+## 8. Build concrete implementations (Verilog/VHDL/SV)
+
+```cpp
+struct VerilogAST : AST {};
+struct VHDLAST : AST {};
+struct SVAST : AST {};
+
+class VerilogParser : public Parser {
+public:
+  std::unique_ptr<AST> parse(const std::string&) override {
+    return std::make_unique<VerilogAST>();
+  }
+  bool validate() override { return true; }
+};
+
+class VHDLParser : public Parser {
+public:
+  std::unique_ptr<AST> parse(const std::string&) override {
+    return std::make_unique<VHDLAST>();
+  }
+  bool validate() override { return true; }
+};
+
+class SVParser : public Parser {
+public:
+  std::unique_ptr<AST> parse(const std::string&) override {
+    return std::make_unique<SVAST>();
+  }
+  bool validate() override { return true; }
+};
+
+class VerilogSim : public SimulatorEngine {
+public:
+  void run(const AST&) override { /* event-driven */ }
+  void pause() override {}
+  void resume() override {}
+};
+
+class VHDLSim : public SimulatorEngine {
+public:
+  void run(const AST&) override { /* delta-cycle */ }
+  void pause() override {}
+  void resume() override {}
+};
+```
+
+---
+
+<span id="i9"></span>
+
+## 9. Build factories (one place decides the concrete types)
+
+### Factory interface (Abstract Factory)
+
+```cpp
+class HDLFactory {
+public:
+  virtual ~HDLFactory() = default;
+
+  virtual std::unique_ptr<Parser> createParser() const = 0;
+  virtual std::unique_ptr<SimulatorEngine> createSimulator() const = 0;
+  virtual std::unique_ptr<ReportGenerator> createReportGenerator() const = 0;
+  virtual std::unique_ptr<Debugger> createDebugger() const = 0;
+
+  virtual std::string language() const = 0;
+  virtual std::vector<std::string> extensions() const = 0;
+};
+```
+
+### Concrete factories
+
+```cpp
+class VerilogFactory final : public HDLFactory {
+public:
+  std::unique_ptr<Parser> createParser() const override {
+    return std::make_unique<VerilogParser>();
+  }
+  std::unique_ptr<SimulatorEngine> createSimulator() const override {
+    return std::make_unique<VerilogSim>();
+  }
+  std::unique_ptr<ReportGenerator> createReportGenerator() const override {
+    struct R : ReportGenerator { void coverage() override {} void timing() override {} };
+    return std::make_unique<R>();
+  }
+  std::unique_ptr<Debugger> createDebugger() const override {
+    struct D : Debugger { void attach(SimulatorEngine&) override {} void run() override {} };
+    return std::make_unique<D>();
+  }
+  std::string language() const override { return "Verilog"; }
+  std::vector<std::string> extensions() const override { return {".v", ".vlog"}; }
+};
+
+class VHDLFactory final : public HDLFactory {
+public:
+  std::unique_ptr<Parser> createParser() const override {
+    return std::make_unique<VHDLParser>();
+  }
+  std::unique_ptr<SimulatorEngine> createSimulator() const override {
+    return std::make_unique<VHDLSim>();
+  }
+  std::unique_ptr<ReportGenerator> createReportGenerator() const override {
+    struct R : ReportGenerator { void coverage() override {} void timing() override {} };
+    return std::make_unique<R>();
+  }
+  std::unique_ptr<Debugger> createDebugger() const override {
+    struct D : Debugger { void attach(SimulatorEngine&) override {} void run() override {} };
+    return std::make_unique<D>();
+  }
+  std::string language() const override { return "VHDL"; }
+  std::vector<std::string> extensions() const override { return {".vhd", ".vhdl"}; }
+};
+```
+
+---
+
+<span id="i10"></span>
+
+## 10. Build a registry (plugin-ready)
+
+### What is a registry?
+
+A registry is a map:
+
+* extension → language name
+* language name → factory
+
+```cpp
+class FactoryRegistry {
+public:
+  void registerFactory(std::unique_ptr<HDLFactory> f) {
+    auto lang = f->language();
+    for (auto& ext : f->extensions()) extToLang_[ext] = lang;
+    factories_[lang] = std::move(f);
+  }
+
+  const HDLFactory* byExtension(const std::string& file) const {
+    auto ext = getExtension(file);
+    auto it = extToLang_.find(ext);
+    if (it == extToLang_.end()) return nullptr;
+    auto it2 = factories_.find(it->second);
+    return (it2 == factories_.end()) ? nullptr : it2->second.get();
+  }
+
+private:
+  std::unordered_map<std::string, std::unique_ptr<HDLFactory>> factories_;
+  std::unordered_map<std::string, std::string> extToLang_;
+};
+```
+
+---
+
+<span id="i11"></span>
+
+## 11. Client code (Simulator) becomes clean
+
+Now Simulator becomes “pipeline-only”:
+
+```cpp
+class Simulator {
+public:
+  explicit Simulator(const HDLFactory& f)
+    : parser_(f.createParser()),
+      sim_(f.createSimulator()),
+      rpt_(f.createReportGenerator()),
+      dbg_(f.createDebugger()) {}
+
+  void simulate(const std::string& file) {
+    auto ast = parser_->parse(file);
+    if (!parser_->validate()) throw std::runtime_error("validation failed");
+    sim_->run(*ast);
+    rpt_->coverage();
+    rpt_->timing();
+  }
+
+  void debug() {
+    dbg_->attach(*sim_);
+    dbg_->run();
+  }
+
+private:
+  std::unique_ptr<Parser> parser_;
+  std::unique_ptr<SimulatorEngine> sim_;
+  std::unique_ptr<ReportGenerator> rpt_;
+  std::unique_ptr<Debugger> dbg_;
+};
+```
+
+Notice:
+
+* No `if (ext == ...)` here
+* No mention of Verilog/VHDL types here
+* No raw `new/delete` here
+
+This is what “clean architecture” means.
+
+---
+
+<span id="i12"></span>
+
+## 12. Ownership & RAII (the most important advanced part)
+
+### Why raw pointers are dangerous in factories
+
+If factory returns `Parser*`, who deletes it?
+
+* Simulator?
+* Registry?
+* Factory?
+
+If that is unclear, you get:
+
+* leaks
+* double deletes
+* use-after-free bugs
+
+### The Staff-level fix
+
+Use return types to encode ownership:
+
+* `std::unique_ptr<T>`: caller owns it
+* `std::shared_ptr<T>`: shared ownership
+* raw pointer: only for “non-owning observation” (rare, must be documented)
+
+That’s why our factory returns `unique_ptr`.
+
+---
+
+<span id="i13"></span>
+
+## 13. Thread-safety (real EDA workloads)
+
+Registries are read-heavy.
+Use shared mutex:
+
+* many readers can query simultaneously
+* writers (register) are rare
+
+```cpp
+class ThreadSafeRegistry {
+public:
+  void registerFactory(std::unique_ptr<HDLFactory> f) {
+    std::unique_lock lock(mu_);
+    auto lang = f->language();
+    for (auto& ext : f->extensions()) extToLang_[ext] = lang;
+    factories_[lang] = std::move(f);
+  }
+
+  const HDLFactory* byExtension(const std::string& file) const {
+    std::shared_lock lock(mu_);
+    auto ext = getExtension(file);
+    auto it = extToLang_.find(ext);
+    if (it == extToLang_.end()) return nullptr;
+    auto it2 = factories_.find(it->second);
+    return (it2 == factories_.end()) ? nullptr : it2->second.get();
+  }
+
+private:
+  mutable std::shared_mutex mu_;
+  std::unordered_map<std::string, std::unique_ptr<HDLFactory>> factories_;
+  std::unordered_map<std::string, std::string> extToLang_;
+};
+```
+
+---
+
+<span id="i14"></span>
+
+## 14. Performance (caching, pooling, object reuse)
+
+Default: create per run (simple, correct).
+
+Then optimize only if needed:
+
+* cache grammar tables inside parsers
+* pool large allocators
+* reuse symbol tables
+
+Staff-level statement:
+
+> correctness first, then profile, then optimize.
+
+---
+
+<span id="i15"></span>
+
+## 15. Mixed-language & config selection
+
+Factories can take configuration:
+
+```cpp
+struct Config { bool coverage=false; int threads=1; };
+
+class ConfiguredFactory final : public VerilogFactory {
+public:
+  explicit ConfiguredFactory(Config c) : cfg_(c) {}
+private:
+  Config cfg_;
+};
+```
+
+This is how real EDA tools create “fast mode vs debug mode” engines.
+
+---
+
+<span id="i16"></span>
+
+## 16. Testing (unit + integration + contract tests)
+
+Mock factory lets you test the pipeline without real HDL parsing:
+
+* parser returns dummy AST
+* simulator does nothing
+* reports are stubbed
+
+This is why factories massively improve testability.
+
+---
+
+<span id="i17"></span>
+
+## 17. Common pitfalls (staff-level warnings)
+
+* Hidden ownership (raw pointers)
+* Registry not thread-safe
+* Factories returning cached objects without documenting ownership
+* Passing STL types across plugin ABI boundaries without control
+* Too many “versions” causing factory explosion (solve with config objects)
+
+---
+
+<span id="i18"></span>
+
+## 18. Synopsys Senior/Staff interview answers
+
+### “Why factory in EDA?”
+
+Because we need:
+
+* extensibility (new languages/features)
+* plugin integration
+* clean separation of concerns
+* testability
+* stable core pipeline
+
+### “Factory Method vs Abstract Factory?”
+
+EDA needs product families → Abstract Factory is natural.
+
+### “How to add UPF?”
+
+Implement UPF products + UPFFactory + register → core simulator unchanged.
+
+---
+
+<span id="i19"></span>
+
+## 19. Final 30-second summary (memorize)
+
+Factory in EDA is not about hiding `new`.
+It is about **isolating creation decisions**, keeping the simulator pipeline stable,
+supporting plugins, making ownership explicit via RAII,
+and enabling new languages/features without editing core code.
+
+```
+```

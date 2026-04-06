@@ -1,16 +1,23 @@
 import { createClient } from "@/lib/supabase/server";
+import type { UserEntitlements } from "@/lib/trackAccess";
 
-export type UserEntitlements = {
-  trackAccess: Record<string, boolean>; // trackSlug -> hasAccess
-  siteAccess: boolean;
-};
+function isExpectedDynamicUsageError(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "digest" in error &&
+    (error as { digest?: string }).digest === "DYNAMIC_SERVER_USAGE"
+  );
+}
 
 export async function getUserEntitlements(): Promise<UserEntitlements> {
   try {
     const supabase = await createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     
-    if (!session?.user) {
+    if (!user) {
       return { trackAccess: {}, siteAccess: false };
     }
 
@@ -18,7 +25,7 @@ export async function getUserEntitlements(): Promise<UserEntitlements> {
     const { data: entitlements, error } = await supabase
       .from("entitlements")
       .select("*")
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .eq("status", "active");
 
     if (error) {
@@ -40,13 +47,9 @@ export async function getUserEntitlements(): Promise<UserEntitlements> {
 
     return { trackAccess, siteAccess };
   } catch (error) {
-    console.error("Error in getUserEntitlements:", error);
+    if (!isExpectedDynamicUsageError(error)) {
+      console.error("Error in getUserEntitlements:", error);
+    }
     return { trackAccess: {}, siteAccess: false };
   }
-}
-
-export function canAccessTrack(entitlements: UserEntitlements, trackSlug: string): boolean {
-  // Free tracks are always accessible
-  // Premium tracks need either site access or specific track access
-  return entitlements.siteAccess || entitlements.trackAccess[trackSlug] || false;
 }

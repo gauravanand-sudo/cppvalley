@@ -1,0 +1,2204 @@
+# 60 Questions — Code Snippet Diagnostics
+### What Will Happen? Why? What Does The Compiler Do?
+
+---
+
+## Lesson 1: Memory Model & Ordering
+### 10 Questions
+
+---
+
+**Q1.**
+```cpp
+std::atomic<int> x{0};
+
+// Thread 1
+x.store(1, std::memory_order_relaxed);
+
+// Thread 2
+int val = x.load(std::memory_order_relaxed);
+std::cout << val;
+```
+What are the possible outputs? Is there a data race?
+
+<details>
+<summary>Answer</summary>
+
+**Output:** Either `0` or `1`. Both are valid.
+
+No data race — `x` is atomic. But relaxed ordering gives zero ordering guarantees. Thread 2 may see the old value or the new value — the hardware is free to delay the store's visibility. There is no happens-before relationship between the store and the load. In an HFT system you'd never use relaxed for a flag like this — you'd use release/acquire.
+</details>
+
+---
+
+**Q2.**
+```cpp
+int data = 0;
+std::atomic<bool> ready{false};
+
+// Thread 1
+data = 42;
+ready.store(true, std::memory_order_release);
+
+// Thread 2
+while (!ready.load(std::memory_order_relaxed));
+std::cout << data;
+```
+What does Thread 2 print? Is this safe?
+
+<details>
+<summary>Answer</summary>
+
+**Not safe. Undefined behavior.**
+
+Thread 2 loads `ready` with **relaxed** — not acquire. There is no synchronizes-with relationship established. Even though Thread 2 spins until `ready` is true, without acquire ordering the compiler and hardware are free to reorder `data` read before the `ready` load. Thread 2 may print `0`.
+
+Fix: change `memory_order_relaxed` to `memory_order_acquire` on the load.
+</details>
+
+---
+
+**Q3.**
+```cpp
+std::atomic<int> x{0}, y{0};
+
+// Thread 1                // Thread 2
+x.store(1, seq_cst);      y.store(1, seq_cst);
+
+// Thread 3                // Thread 4
+int a = x.load(seq_cst);  int c = y.load(seq_cst);
+int b = y.load(seq_cst);  int d = x.load(seq_cst);
+```
+Can Thread 3 see `a=1, b=0` while Thread 4 sees `c=1, d=0`?
+
+<details>
+<summary>Answer</summary>
+
+**No.** With all operations `seq_cst`, there is a single total order of all seq_cst operations that all threads agree on. Either x's store precedes y's store or vice versa in this total order — and all threads observe the same ordering. If Thread 3 sees `a=1, b=0` (x before y), Thread 4 must see `c=0, d=1` (y not yet visible when x was). They cannot both see "their" store happened first.
+
+This would be possible with acquire-release — that's the difference seq_cst buys you.
+</details>
+
+---
+
+**Q4.**
+```cpp
+int data = 0;
+std::atomic<bool> ready{false};
+
+// Thread 1
+data = 42;
+std::atomic_thread_fence(std::memory_order_release);
+ready.store(true, std::memory_order_relaxed);
+
+// Thread 2
+while (!ready.load(std::memory_order_relaxed));
+std::atomic_thread_fence(std::memory_order_acquire);
+std::cout << data;
+```
+What does this print?
+
+<details>
+<summary>Answer</summary>
+
+**Prints `42`. This is safe.**
+
+The standalone release fence + relaxed store, paired with the relaxed load + standalone acquire fence, establishes the same happens-before as release/acquire on the atomic itself. The fence-fence synchronization rule: release fence before a store, acquire fence after a load that reads that store's value → happens-before established. All of Thread 1's writes before the fence are visible to Thread 2 after its fence.
+
+This pattern is used in HFT for bulk publishing — one fence covers many writes.
+</details>
+
+---
+
+**Q5.**
+```cpp
+std::atomic<int> x{0};
+
+// Thread 1
+x.store(1, std::memory_order_seq_cst);
+
+// Thread 2
+int val = x.load(std::memory_order_acquire);
+```
+Does Thread 2's acquire load participate in the seq_cst total order?
+
+<details>
+<summary>Answer</summary>
+
+**No.** This is the mixed-mode trap. The seq_cst total order only includes seq_cst operations. Thread 2's acquire load observes the value written by the seq_cst store — so it synchronizes-with it — but it does not participate in the total order S. If other threads are doing seq_cst loads on `x`, Thread 2's load is not sequenced relative to them in S. You lose the global ordering guarantee the moment you mix ordering modes on the same variable.
+</details>
+
+---
+
+**Q6.**
+```cpp
+// On ARM (weakly ordered)
+int data = 0;
+std::atomic<bool> flag{false};
+
+// Thread 1
+data = 42;
+flag.store(true);  // seq_cst by default
+
+// Thread 2
+if (flag.load()) {  // seq_cst by default
+    assert(data == 42);
+}
+```
+What assembly does `flag.store(true)` emit on ARMv8? Can the assert fire?
+
+<details>
+<summary>Answer</summary>
+
+**ARMv8 assembly for seq_cst store:**
+```nasm
+STLR w0, [flag_addr]   ; store-release
+DMB ISH                 ; full data memory barrier
+```
+
+**The assert cannot fire.** The seq_cst store on ARM emits STLR (store-release) which ensures `data = 42` is visible before the flag write. The seq_cst load emits LDAR (load-acquire) which ensures the flag is read before `data`. The release-acquire pair establishes happens-before. `data == 42` is guaranteed when the load sees `true`.
+
+On x86, no barrier instructions are emitted for the store or load — TSO provides this for free.
+</details>
+
+---
+
+**Q7.**
+```cpp
+std::atomic<uint32_t> seq{0};
+int payload = 0;
+
+// Writer
+void write(int val) {
+    seq.fetch_add(1, std::memory_order_relaxed); // make odd
+    std::atomic_thread_fence(std::memory_order_release);
+    payload = val;
+    std::atomic_thread_fence(std::memory_order_release);
+    seq.fetch_add(1, std::memory_order_relaxed); // make even
+}
+
+// Reader
+bool read(int& out) {
+    uint32_t s1 = seq.load(std::memory_order_acquire);
+    if (s1 & 1) return false;
+    std::atomic_thread_fence(std::memory_order_acquire);
+    out = payload;
+    std::atomic_thread_fence(std::memory_order_acquire);
+    uint32_t s2 = seq.load(std::memory_order_relaxed);
+    return s1 == s2;
+}
+```
+What is this structure? What happens if the writer's second fence is removed?
+
+<details>
+<summary>Answer</summary>
+
+**This is a seqlock.**
+
+If the writer's second release fence is removed: the final `seq.fetch_add` (making seq even) could become visible to readers before `payload = val` is visible. A reader could see an even sequence number — conclude the write is complete — read stale payload. The fence ensures all payload stores are visible before the "write complete" sequence number becomes visible.
+
+The second fence is not optional. Its absence is a correctness bug, not a performance issue.
+</details>
+
+---
+
+**Q8.**
+```cpp
+std::atomic<int> a{0}, b{0};
+
+// Thread 1
+a.store(1, std::memory_order_relaxed);
+b.store(1, std::memory_order_relaxed);
+
+// Thread 2
+while (b.load(std::memory_order_relaxed) == 0);
+assert(a.load(std::memory_order_relaxed) == 1);
+```
+Can the assert fire?
+
+<details>
+<summary>Answer</summary>
+
+**Yes. On ARM, the assert can fire.**
+
+All operations are relaxed. There is no happens-before between Thread 1's store to `a` and Thread 2's load of `a`. Thread 1's stores can be reordered — the store to `b` can become visible before the store to `a` on ARM (store-store reordering). Thread 2 exits the spin loop (sees `b=1`) but still sees `a=0`.
+
+On x86, this specific pattern is safe because TSO forbids store-store reordering. On ARM — a real production failure mode.
+
+Fix: use `memory_order_release` on Thread 1's `b` store and `memory_order_acquire` on Thread 2's `b` load.
+</details>
+
+---
+
+**Q9.**
+```cpp
+std::atomic<int> counter{0};
+
+// 8 threads simultaneously:
+for (int i = 0; i < 1000000; i++) {
+    counter.fetch_add(1, std::memory_order_relaxed);
+}
+
+// After all threads join:
+std::cout << counter.load();
+```
+What does this print? Is relaxed safe here?
+
+<details>
+<summary>Answer</summary>
+
+**Prints `8000000`. Relaxed is safe here.**
+
+`fetch_add` is an atomic read-modify-write operation — it is atomic regardless of memory order. Relaxed only means there are no ordering guarantees relative to other operations. But the atomicity of the increment itself is guaranteed — no two threads can produce a torn read-modify-write. The final count is always exactly 8,000,000.
+
+Relaxed is correct because no other operation's ordering depends on this counter. This is the canonical use case for relaxed — pure statistics counting with no control-flow dependency.
+</details>
+
+---
+
+**Q10.**
+```cpp
+// Thread 1
+std::atomic<Node*> head;
+Node* n = new Node(42);
+n->next = head.load(relaxed);
+while (!head.compare_exchange_weak(
+    n->next, n,
+    memory_order_release,
+    memory_order_relaxed));
+```
+Why is the success order `release` and failure order `relaxed`? What happens if you use `relaxed` for success?
+
+<details>
+<summary>Answer</summary>
+
+**Release on success:** When the CAS succeeds, we've published `n` to the shared `head`. Any thread that reads `head` and sees `n` must also see everything we wrote to `n` before the CAS — specifically `n->data` and `n->next`. The release ensures those writes are visible to any thread that acquires through `head`.
+
+**Relaxed on failure:** When the CAS fails, we haven't published anything. We just learned the current head value (loaded into `n->next`). There's nothing to synchronize — we just reload and retry. No ordering needed.
+
+**If success were relaxed:** A thread that reads the new `head` (seeing `n`) with an acquire load would not have a synchronizes-with partner — the CAS didn't release. That thread might read `n->data` or `n->next` before Thread 1's writes to them are visible. Data corruption.
+</details>
+
+---
+
+## Lesson 2: Lock-Free Data Structures
+### 10 Questions
+
+---
+
+**Q11.**
+```cpp
+std::atomic<Node*> head{nullptr};
+
+void push(int val) {
+    Node* n = new Node(val);
+    n->next = head.load(relaxed);
+    while (!head.compare_exchange_weak(
+        n->next, n, release, relaxed));
+}
+```
+Thread 1 calls `push(1)`. Thread 2 calls `push(2)` simultaneously. Can either node be lost?
+
+<details>
+<summary>Answer</summary>
+
+**No. Neither node can be lost.**
+
+If both threads read the same initial `head`, both set their `n->next` to the same value. One wins the CAS and becomes the new head. The other's CAS fails — `n->next` is updated to the new head — and it retries. On retry, the CAS sees the updated head and succeeds. Both pushes complete. Both nodes are in the list.
+
+The lock-free guarantee: CAS failure always means another thread made progress. Retries are bounded by actual concurrent operations.
+</details>
+
+---
+
+**Q12.**
+```cpp
+bool pop(int& out) {
+    Node* old = head.load(acquire);
+    while (old) {
+        if (head.compare_exchange_weak(
+            old, old->next, acquire, relaxed)) {
+            out = old->data;
+            delete old;   // ← focus here
+            return true;
+        }
+    }
+    return false;
+}
+```
+Thread 1 loads `head = A`, pauses. Thread 2 pops A, pops B, pushes new node which gets address A. Thread 1 resumes. What happens?
+
+<details>
+<summary>Answer</summary>
+
+**ABA problem + use-after-free. Undefined behavior.**
+
+Thread 1 has `old = A`. After Thread 2's operations, `head = A` again (new node at same address). Thread 1's CAS succeeds — it sees head == A (its expected value). It sets head to `A->next` — but this `next` was set when `A` was `new Node(42)`, not when A was recycled. Thread 1 is reading a field of a freed-then-reallocated object.
+
+Additionally, Thread 1 calls `delete old` on A — which was already deleted by Thread 2. Double free. Heap corruption.
+
+Fix: tagged pointers + hazard pointers or epoch-based reclamation.
+</details>
+
+---
+
+**Q13.**
+```cpp
+// compare_exchange_weak vs strong — ARM
+
+// Version A
+Node* expected = head.load(relaxed);
+if (head.compare_exchange_strong(expected, new_node, release, relaxed)) {
+    return;
+}
+
+// Version B
+Node* expected = head.load(relaxed);
+while (!head.compare_exchange_weak(expected, new_node, release, relaxed));
+```
+On ARM, which version generates more instructions? Which is preferred in a retry loop?
+
+<details>
+<summary>Answer</summary>
+
+**Version A generates more instructions in a retry loop.**
+
+On ARM, `compare_exchange_strong` is implemented with an internal retry loop around `LDAXR/STLXR` to handle spurious failures — the hardware LL/SC can fail even when values match. So strong has a hidden retry loop.
+
+In Version B (already in a retry loop), `compare_exchange_weak` uses a single `LDAXR/STLXR` pair. Spurious failures just re-execute the outer loop — no double-loop. One level of retry is more efficient than two.
+
+**Always use `weak` inside your own retry loop. Use `strong` for single-attempt CAS.**
+</details>
+
+---
+
+**Q14.**
+```cpp
+// SPSC Queue
+template<typename T, size_t N>
+struct Queue {
+    T data[N];
+    size_t write_pos{0};
+    size_t read_pos{0};
+    
+    bool enqueue(T val) {
+        size_t wp = write_pos;
+        size_t next = (wp + 1) % N;
+        if (next == read_pos) return false;
+        data[wp] = val;
+        write_pos = next;
+        return true;
+    }
+};
+```
+Two bugs. What are they?
+
+<details>
+<summary>Answer</summary>
+
+**Bug 1: write_pos and read_pos are not atomic.**
+
+`write_pos` is written by the producer and read by the consumer (to check fullness). `read_pos` is written by the consumer and read by the producer. Both are non-atomic reads/writes — data races. UB.
+
+**Bug 2: False sharing.**
+
+`write_pos` and `read_pos` are adjacent in the struct — same cache line. Every producer write to `write_pos` invalidates the cache line on the consumer core. Every consumer write to `read_pos` invalidates it on the producer core. 4-7x throughput degradation.
+
+Fix: `std::atomic<size_t>` with acquire/release, `alignas(64)` on both.
+</details>
+
+---
+
+**Q15.**
+```cpp
+struct HazardSlot {
+    std::atomic<Node*> hazard{nullptr};
+};
+HazardSlot slots[128];
+
+// In pop():
+Node* old_head = head.load(relaxed);
+slots[my_id].hazard.store(old_head, seq_cst);  // publish hazard
+Node* verify = head.load(seq_cst);              // verify
+if (verify != old_head) { /* retry */ }
+```
+Why must the hazard store and the verify load both be `seq_cst`? What breaks if they're relaxed?
+
+<details>
+<summary>Answer</summary>
+
+**The seq_cst ensures a total order between the hazard publication and the reclaimer's scan.**
+
+If the hazard store is relaxed: the reclaimer scanning hazard slots might not see our published hazard yet (invalidation queue not flushed). It scans, finds no hazard for `old_head`, frees `old_head`. We then read `old_head->next` — use after free.
+
+If the verify load is relaxed: even after publishing the hazard, we might read a stale `head` — believing head is still `old_head` when it's already changed, our hazard might be protecting the wrong node.
+
+The seq_cst total order guarantees: if we store the hazard before the reclaimer's scan, the reclaimer sees it. If the reclaimer scans before we store the hazard, our verify load sees the changed head and we retry. One of these must happen — that's the safety guarantee.
+</details>
+
+---
+
+**Q16.**
+```cpp
+// Michael-Scott Queue enqueue
+void enqueue(T val) {
+    Node* n = new Node(val);
+    while (true) {
+        Node* t = tail.load(acquire);
+        Node* next = t->next.load(acquire);
+        if (t == tail.load(relaxed)) {
+            if (next == nullptr) {
+                if (t->next.compare_exchange_weak(
+                    next, n, release, relaxed)) {
+                    tail.compare_exchange_strong(
+                        t, n, release, relaxed);
+                    return;  // ← returns here without CAS succeeding?
+                }
+            } else {
+                tail.compare_exchange_weak(t, next, release, relaxed);
+            }
+        }
+    }
+}
+```
+The function returns after the first CAS succeeds but the second CAS (tail advance) might fail. Is this a bug?
+
+<details>
+<summary>Answer</summary>
+
+**No. This is intentional. It is the helping mechanism.**
+
+When the first CAS succeeds, `n` is linked into the queue — it's reachable from `tail->next`. The enqueue is logically complete. The tail pointer just hasn't advanced yet.
+
+The next thread calling `enqueue` will load `tail`, load `tail->next`, find it non-null (`next != nullptr`), and execute the helping branch: `tail.compare_exchange_weak(t, next, ...)` — advancing tail for us.
+
+This is what makes the queue lock-free. Even if a thread stalls after linking but before advancing tail, every subsequent enqueuer advances it. No operation depends on a specific thread completing its tail advance.
+</details>
+
+---
+
+**Q17.**
+```cpp
+// Epoch-based reclamation
+thread_local uint64_t local_epoch = UINT64_MAX;
+std::atomic<uint64_t> global_epoch{0};
+
+void enter() {
+    local_epoch = global_epoch.load(seq_cst);
+}
+
+void exit() {
+    local_epoch = UINT64_MAX;
+    // try advance global_epoch
+}
+```
+Thread A enters (epoch 2), reads a node, pauses indefinitely. Thread B retires the node in epoch 2. Can the node ever be freed?
+
+<details>
+<summary>Answer</summary>
+
+**No. Not while Thread A is active.**
+
+When Thread B tries to advance the global epoch, it checks all active threads' local epochs. Thread A's local epoch is 2 — same as global. The global epoch cannot advance to 3 while Thread A is in epoch 2. (Advance requires all active threads to be in the current epoch.)
+
+Since the epoch never advances past 2, the safe reclaim epoch (current - 2) never reaches 2. The node stays in the retired list.
+
+This is the core problem with EBR: a stalled thread blocks memory reclamation for all threads. In HFT, threads are never blocked — this is fine. In systems with blocking operations, hazard pointers are safer (bounded memory usage regardless of stalls).
+</details>
+
+---
+
+**Q18.**
+```cpp
+// Lock-free stack with tagged pointer
+struct TaggedPtr {
+    Node* ptr;
+    uint16_t tag;
+};
+// packed into 64-bit atomic
+
+void pop() {
+    TaggedPtr old = head.load(acquire);
+    while (old.ptr) {
+        TaggedPtr next{old.ptr->next, old.tag + 1};
+        if (head.compare_exchange_weak(old, next, acquire, relaxed))
+            break;
+    }
+}
+```
+The tag is 16 bits, wrapping at 65536. Can ABA still occur?
+
+<details>
+<summary>Answer</summary>
+
+**Theoretically yes. Practically no.**
+
+ABA requires: the tag wraps 65,536 times during the window between a thread reading head and retrying its CAS. Each CAS takes ~10-50ns. The thread would need to be paused for 65,536 × 50ns = ~3.3ms while the same address is pushed/popped 65,536 times.
+
+On a modern system at full speed: possible but astronomically unlikely. A thread paused for 3.3ms while 65,536 CAS operations happen on the same address would require the system to be under extreme load and the OS scheduler to make very specific choices.
+
+In practice: tagged pointers with 16+ bit tags are considered ABA-safe. For true theoretical safety: use hazard pointers or EBR.
+</details>
+
+---
+
+**Q19.**
+```cpp
+template<typename T, size_t N>
+class SPSCQueue {
+    alignas(64) std::atomic<size_t> write_pos{0};
+    alignas(64) std::atomic<size_t> read_pos{0};
+    T data[N];
+    
+    bool enqueue(T val) {
+        size_t wp = write_pos.load(relaxed);
+        if ((wp + 1) % N == read_pos.load(acquire))
+            return false;
+        data[wp] = val;
+        write_pos.store((wp + 1) % N, release);
+        return true;
+    }
+};
+```
+Why is `read_pos` loaded with `acquire` in the producer, but `write_pos` loaded with `acquire` in the consumer?
+
+<details>
+<summary>Answer</summary>
+
+**Because each side needs to see the other side's completed operations before making decisions.**
+
+Producer loads `read_pos` with acquire: when the consumer advances `read_pos` (with release), it means it's done reading `data[old_rp]` — that slot is now free. The producer's acquire load ensures it sees the slot as truly free before writing to it. Without acquire, the producer might see a stale `read_pos` — thinking the queue is full when it isn't, or worse, thinking a slot is free that the consumer is still reading.
+
+Consumer loads `write_pos` with acquire: when the producer advances `write_pos` (with release), it means `data[old_wp]` has been fully written. The consumer's acquire load ensures it sees the completed write before reading the data. Without acquire: consumer reads stale or partially-written data.
+
+The pairing: producer's release store to `write_pos` synchronizes with consumer's acquire load of `write_pos`. Consumer's release store to `read_pos` synchronizes with producer's acquire load of `read_pos`.
+</details>
+
+---
+
+**Q20.**
+```cpp
+// Pool allocator free list — lock-free
+struct FreeNode { FreeNode* next; };
+std::atomic<FreeNode*> free_list{nullptr};
+
+void* allocate() {
+    FreeNode* old = free_list.load(acquire);
+    while (old) {
+        if (free_list.compare_exchange_weak(
+            old, old->next, release, relaxed))
+            return old;
+    }
+    return ::operator new(slot_size);
+}
+```
+What is the ABA scenario here specifically? How does it cause corruption?
+
+<details>
+<summary>Answer</summary>
+
+**Scenario:**
+
+1. Thread 1 loads `free_list = A`, reads `A->next = B`. Pauses.
+2. Thread 2 allocates A (CAS succeeds, head = B).
+3. Thread 2 allocates B (head = C).
+4. Thread 2 frees A back to the pool (head = A, A->next = C).
+5. Thread 1 resumes. CAS: "if head == A, set head to B." Head IS A — CAS succeeds.
+6. Head is now B — **a freed node**.
+
+Thread 1 set the free list head to B — which was already given out to a user and may contain user data. Next allocation returns B — but B's memory is already in use. Two live pointers to the same memory. Next write through either pointer corrupts the other's data.
+
+This is why lock-free pool free lists need the same ABA protection as lock-free stacks.
+</details>
+
+---
+
+## Lesson 3: False Sharing & Cache Lines
+### 10 Questions
+
+---
+
+**Q21.**
+```cpp
+struct Config {
+    bool debug_mode;       // written once at startup
+    bool verbose_logging;  // written once at startup
+    int log_level;         // written once at startup
+    std::atomic<int> request_count;   // written by all threads
+    std::atomic<int> error_count;     // written by all threads
+};
+Config config;
+```
+How many false sharing problems exist? How do you fix them?
+
+<details>
+<summary>Answer</summary>
+
+**Two false sharing problems:**
+
+1. `request_count` and `error_count` share a cache line. Every thread incrementing `request_count` invalidates the line for threads incrementing `error_count`. They should each be on separate cache lines: `alignas(64)`.
+
+2. `debug_mode`, `verbose_logging`, `log_level` share a cache line with `request_count`. These are read-only after startup — they don't cause false sharing with each other. But they share a line with `request_count`. Every write to `request_count` invalidates the cache line on threads reading the config fields — causing unnecessary cache misses for config reads. Put the hot-write atomics on their own lines.
+
+**Fix:**
+```cpp
+struct Config {
+    // Read-only after init — can share a line
+    bool debug_mode;
+    bool verbose_logging;
+    int log_level;
+    
+    alignas(64) std::atomic<int> request_count;
+    alignas(64) std::atomic<int> error_count;
+};
+```
+</details>
+
+---
+
+**Q22.**
+```cpp
+struct Worker {
+    std::function<void()> task;  // 32 bytes
+    bool is_running;             // 1 byte
+    // padding: 31 bytes (to align to cacheline)
+    char pad[31];
+};
+Worker workers[16];
+
+// Thread i only accesses workers[i]
+```
+Is there false sharing? Does `pad[31]` fix it?
+
+<details>
+<summary>Answer</summary>
+
+**No false sharing if `sizeof(Worker) == 64`. But the padding alone doesn't guarantee alignment.**
+
+`sizeof(Worker)` = 32 + 1 + 31 = 64 bytes. Each Worker is 64 bytes — no two Workers share a cache line assuming the array starts on a 64-byte boundary.
+
+But the array itself might not be 64-byte aligned. Stack allocation, heap allocation with `new` — both return 16-byte aligned addresses on x86-64. If `workers` starts at a 16-byte boundary but not a 64-byte boundary, `workers[0]` spans two cache lines and false sharing reappears.
+
+**Fix:**
+```cpp
+struct alignas(64) Worker {
+    std::function<void()> task;
+    bool is_running;
+};
+```
+`alignas(64)` guarantees each Worker starts at a 64-byte boundary. The padding is automatic.
+</details>
+
+---
+
+**Q23.**
+```cpp
+// Cache line size = 64 bytes
+// sizeof(int) = 4
+
+int array[16];
+
+// Thread 1: reads/writes array[0]
+// Thread 2: reads/writes array[8]
+```
+Is there false sharing?
+
+<details>
+<summary>Answer</summary>
+
+**No. They are on different cache lines.**
+
+`array[0]` is at offset 0, `array[8]` is at offset 8 × 4 = 32 bytes. Both are within the first 64 bytes — wait, that means they ARE on the same cache line.
+
+Actually: `array[0]` through `array[15]` occupies 64 bytes total. `array[0]` at offset 0, `array[15]` at offset 60. All 16 integers fit in ONE cache line.
+
+So `array[0]` and `array[8]` ARE on the same cache line. **False sharing exists.**
+
+To eliminate it, separate by 64 bytes minimum:
+```cpp
+alignas(64) int a = 0;  // Thread 1
+alignas(64) int b = 0;  // Thread 2
+```
+</details>
+
+---
+
+**Q24.**
+```cpp
+void update_stats(int thread_id) {
+    stats[thread_id]++;  // each thread writes its own slot
+}
+
+// Version A:
+std::atomic<int> stats[16];
+
+// Version B:
+struct alignas(64) PaddedStat { std::atomic<int> val; };
+PaddedStat stats[16];
+```
+What is the performance difference between A and B?
+
+<details>
+<summary>Answer</summary>
+
+**Version A: severe false sharing. Version B: zero false sharing.**
+
+Version A: `sizeof(atomic<int>) = 4`. 16 atomics = 64 bytes = exactly one cache line. All 16 threads write to the same cache line. Every write by any thread invalidates the line for every other thread. Under contention: each increment may cost 40-100 cycles (coherence miss) instead of 1-4 cycles. On 16 threads: ~16x slowdown.
+
+Version B: each `PaddedStat` is 64 bytes (alignas forces this). `stats[0]` is on cache line 0, `stats[1]` on cache line 1, etc. Thread i writes only to its own cache line. Zero false sharing. Each increment costs 1-4 cycles regardless of thread count.
+
+Measured difference in tight loops: 4-7x throughput on typical 8-16 core machines.
+</details>
+
+---
+
+**Q25.**
+```cpp
+class RingBuffer {
+    std::atomic<size_t> head{0};  // written by consumer
+    std::atomic<size_t> tail{0};  // written by producer
+    int data[1024];
+};
+```
+Identify and fix all cache issues.
+
+<details>
+<summary>Answer</summary>
+
+**Three issues:**
+
+1. **False sharing between head and tail.** They're adjacent — same cache line. Producer writes tail → invalidates consumer's cache line containing head. Consumer writes head → invalidates producer's cache line containing tail. Every operation invalidates the other side.
+
+2. **False sharing between indices and data.** head/tail share a cache line with the beginning of `data`. Writes to head/tail invalidate cache lines that threads reading `data[0]` through `data[14]` depend on.
+
+3. **data array alignment.** `data` may not start on a cache line boundary — first access after head/tail occupies partial cache line.
+
+**Fix:**
+```cpp
+class RingBuffer {
+    alignas(64) std::atomic<size_t> head{0};  // consumer's cache line
+    alignas(64) std::atomic<size_t> tail{0};  // producer's cache line
+    alignas(64) int data[1024];               // data starts on fresh line
+};
+```
+</details>
+
+---
+
+**Q26.**
+```cpp
+// On a machine with 32KB L1, 8-way associative
+// Cache line = 64 bytes, 64 sets
+
+char buf_A[65536];  // 64KB
+char buf_B[65536];  // immediately after in memory
+
+// Thread 1 accesses buf_A sequentially
+// Thread 2 accesses buf_B sequentially
+```
+Can these threads interfere even though they access completely different memory?
+
+<details>
+<summary>Answer</summary>
+
+**Yes. Cache aliasing.**
+
+The L1 set index comes from address bits 6-11. `buf_B` starts exactly 65,536 = 0x10000 bytes after `buf_A`. Bits 6-11 of any address in `buf_A` are identical to the corresponding address in `buf_B` (0x10000 only has bit 16 set — outside bits 6-11).
+
+So `buf_A[0]` and `buf_B[0]` map to the same L1 set. `buf_A[64]` and `buf_B[64]` map to the same set. Every line in buf_A aliases with the corresponding line in buf_B.
+
+With 8-way associativity and 2 threads both accessing sequential lines — they'll fill all 8 ways of the same sets and evict each other's lines constantly. This is L1 cache thrashing with no actual sharing.
+
+**Fix:** Add a small non-power-of-two offset:
+```cpp
+char buf_A[65536];
+char pad[128];  // break the aliasing
+char buf_B[65536];
+```
+</details>
+
+---
+
+**Q27.**
+```cpp
+struct Matrix {
+    float data[64][64];  // 64×64 floats = 16KB
+};
+
+// Version A: row-major access (C default)
+float sum_A(Matrix& m) {
+    float s = 0;
+    for (int i = 0; i < 64; i++)
+        for (int j = 0; j < 64; j++)
+            s += m.data[i][j];
+    return s;
+}
+
+// Version B: column-major access
+float sum_B(Matrix& m) {
+    float s = 0;
+    for (int j = 0; j < 64; j++)
+        for (int i = 0; i < 64; i++)
+            s += m.data[i][j];
+    return s;
+}
+```
+Which is faster? Why? What does the cache see?
+
+<details>
+<summary>Answer</summary>
+
+**Version A is significantly faster (3-10x on large matrices).**
+
+C arrays are stored row-major: `data[0][0], data[0][1], ..., data[0][63], data[1][0], ...`
+
+**Version A (row-major access):** accesses `data[i][0]` through `data[i][63]` sequentially. Each cache line holds 16 floats (64 bytes / 4 bytes). Accessing `data[i][0]` loads a cache line with `data[i][0]` through `data[i][15]`. The next 15 accesses are L1 cache hits. Cache utilization: 100%.
+
+**Version B (column-major access):** accesses `data[0][j], data[1][j], data[2][j]...`. Each row is 256 bytes (64 floats × 4 bytes). Consecutive accesses are 256 bytes apart — each access is a different cache line. For a 16KB matrix, every access is potentially a cache miss. Cache utilization: 1/16 = 6.25%.
+
+The hardware prefetcher recognizes Version A's sequential pattern and prefetches ahead. Version B's stride-256 pattern confuses the prefetcher. Result: Version B causes ~16× more cache misses.
+</details>
+
+---
+
+**Q28.**
+```cpp
+struct Node {
+    int value;
+    Node* left;
+    Node* right;
+    Node* parent;
+    bool is_red;
+    // total: 4 + 8 + 8 + 8 + 1 = 29 bytes
+    // with padding: 32 bytes
+};
+```
+You traverse this tree with 4 threads. Is false sharing a concern? How do you check?
+
+<details>
+<summary>Answer</summary>
+
+**Potentially yes, but only when threads modify adjacent nodes.**
+
+Two nodes share a cache line if their addresses are within 64 bytes. `sizeof(Node) = 32` bytes (with alignment padding). Two consecutive heap allocations may place nodes 32 bytes apart — sharing a cache line.
+
+For read-only traversal: no false sharing (reads don't invalidate cache lines in MESI).
+
+For modification (e.g., rebalancing a red-black tree): if Thread 1 modifies node A and Thread 2 modifies node B, and A and B are on the same cache line — false sharing. Both threads thrash the shared cache line.
+
+**How to check:**
+```bash
+perf c2c record ./tree_benchmark
+perf c2c report
+# Shows "contested" cache lines — the ones being bounced between cores
+```
+
+**Fix for high-contention trees:** `alignas(64)` on Node ensures each node occupies its own cache line. Cost: 2× memory usage (32 bytes used, 32 bytes padding). Worth it for highly concurrent trees.
+</details>
+
+---
+
+**Q29.**
+```cpp
+// Four threads, each incrementing a counter 10M times
+// Machine: 4 cores, L1=32KB, L2=256KB, L3=8MB
+
+// Version A: one shared counter
+std::atomic<long> counter{0};
+// all threads: counter.fetch_add(1, seq_cst);
+
+// Version B: per-thread, aggregated at end
+thread_local long local_counter{0};
+// each thread: local_counter++;
+// main thread: sum all thread_locals
+```
+What is the approximate cycle cost per increment for each version?
+
+<details>
+<summary>Answer</summary>
+
+**Version A: ~40-100 cycles per increment.**
+
+`fetch_add` with `seq_cst` on a contested cache line: requires RFO (Request For Ownership) to acquire the cache line exclusively. Each thread must wait for the previous thread's coherence transaction to complete. On 4 cores, the counter's cache line bounces between all 4 L1 caches. Each bounce: ~40-100 cycles (L3 round trip + coherence protocol).
+
+**Version B: ~1-4 cycles per increment.**
+
+`local_counter++` is a register operation — the compiler keeps it in a register for the entire loop. No memory access at all during the loop. At the end: one write to memory per thread. Total: 4 memory writes for 40 million increments.
+
+**Throughput ratio: 10-25× in favor of Version B.**
+
+The aggregation at the end costs ~4 cache line loads — negligible. This is the canonical example for why per-thread statistics beat shared atomics.
+</details>
+
+---
+
+**Q30.**
+```cpp
+class Mutex {
+    std::atomic<bool> locked{false};
+public:
+    void lock() {
+        bool expected = false;
+        while (!locked.compare_exchange_weak(
+            expected, true, acquire, relaxed)) {
+            expected = false;  // reset after failure
+            while (locked.load(relaxed));  // spin without CAS
+        }
+    }
+    void unlock() {
+        locked.store(false, release);
+    }
+};
+
+struct Data {
+    Mutex mtx;
+    int value;
+};
+Data d;
+```
+What cache issue exists? How does it affect performance under contention?
+
+<details>
+<summary>Answer</summary>
+
+**False sharing between `mtx.locked` and `d.value`.**
+
+`sizeof(atomic<bool>) = 1`. `Mutex` is likely 1 byte (or padded to alignment). `value` is at offset ~1-4 bytes. Both `locked` and `value` are on the same cache line.
+
+Under contention: every thread trying to acquire the lock spins on `locked` — causing repeated reads and CAS attempts. Each CAS attempt is a write — setting the cache line to Modified, then back to Shared. This constant coherence traffic on the lock's cache line also invalidates `value`'s cache line on all other cores.
+
+Even threads that hold the lock and modify `value` suffer: writing `value` invalidates the cache line, causing spinners to re-fetch it — slowing the lock holder's work.
+
+**Fix:** Separate lock and data onto different cache lines:
+```cpp
+struct Data {
+    alignas(64) Mutex mtx;
+    alignas(64) int value;
+};
+```
+
+Also: the spin-with-CAS is inefficient. The inner `while(locked.load(relaxed))` is correct — it avoids CAS bus traffic during spinning. The `_mm_pause()` (x86 PAUSE instruction) should be added inside the spin loop to reduce memory bus pressure and power consumption.
+</details>
+
+---
+
+## Lesson 4: Custom Allocators
+### 10 Questions
+
+---
+
+**Q31.**
+```cpp
+void render_frame() {
+    for (int i = 0; i < 10000; i++) {
+        auto* cmd = new DrawCommand();
+        submit(cmd);
+    }
+    for (int i = 0; i < 10000; i++) {
+        delete commands[i];
+    }
+}
+// Called 60 times per second
+```
+Approximately how much time is spent in allocation? What is the fix?
+
+<details>
+<summary>Answer</summary>
+
+**Approximately 60 × 20,000 × 300ns = 360ms per second. For a 16ms frame budget: ~22ms per frame in allocation alone — over 100% of the frame budget.**
+
+`new`/`delete` average 100-500ns each under contention (lock acquisition, bin search, coalescing). 20,000 operations × 300ns = 6ms per frame. At 60fps: 360ms/second of a total 1000ms budget.
+
+**Fixes in order of effectiveness:**
+
+1. **Per-frame arena:** All commands arena-allocated, freed with `arena.reset()` at frame end. Allocation: ~3-5ns per call. Total: ~60μs per frame. 100× improvement.
+
+2. **Pool allocator:** Pool of pre-allocated DrawCommand objects. `pool.construct()` = ~5-10ns. Slots reused across frames — no OS interaction.
+
+3. **Thread-local pool:** If multiple threads submit commands — per-thread pools eliminate all locking. Fast path: 3-5ns with zero contention.
+</details>
+
+---
+
+**Q32.**
+```cpp
+class Arena {
+    char* current;
+    char* end;
+public:
+    void* allocate(size_t size) {
+        if (current + size > end) return nullptr;
+        void* ptr = current;
+        current += size;
+        return ptr;
+    }
+};
+
+// Usage:
+Arena arena;
+auto* a = (int*)arena.allocate(4);
+auto* b = (double*)arena.allocate(8);
+*b = 3.14;
+```
+What is wrong with this code? What does it produce on ARM?
+
+<details>
+<summary>Answer</summary>
+
+**Alignment violation — undefined behavior, potential bus error on ARM.**
+
+After allocating `int` (4 bytes), `current` advances by 4. The next allocation (for `double`) starts at a 4-byte-aligned address. But `double` requires 8-byte alignment. On x86-64: misaligned access is slow but works. On ARM: misaligned access to `double` can cause a **bus error (SIGBUS)** — a hardware exception. The program crashes.
+
+**Fix — aligned bump allocation:**
+```cpp
+void* allocate(size_t size, size_t align) {
+    uintptr_t addr = (uintptr_t)current;
+    uintptr_t aligned = (addr + align - 1) & ~(align - 1);
+    if ((char*)aligned + size > end) return nullptr;
+    current = (char*)aligned + size;
+    return (void*)aligned;
+}
+```
+
+Always pass `alignof(T)` as the alignment argument. Or use the template helper `arena.make<double>()` which automatically uses `alignof(double)`.
+</details>
+
+---
+
+**Q33.**
+```cpp
+template<typename T>
+class Pool {
+    struct FreeNode { FreeNode* next; };
+    FreeNode* free_list = nullptr;
+    
+    static constexpr size_t SLOT_SIZE = sizeof(T);  // ← bug
+    
+    T* allocate() {
+        if (free_list) {
+            auto* node = free_list;
+            free_list = node->next;
+            return reinterpret_cast<T*>(node);
+        }
+        return static_cast<T*>(::operator new(SLOT_SIZE));
+    }
+};
+```
+What is the bug? When does it manifest?
+
+<details>
+<summary>Answer</summary>
+
+**Bug: `SLOT_SIZE = sizeof(T)` but the slot must also hold a `FreeNode` (which contains a pointer = 8 bytes on 64-bit).**
+
+When `sizeof(T) < sizeof(FreeNode*)` — for example, `T = char` (1 byte) or `T = int` (4 bytes) — the slot is too small to hold the free list pointer. When a slot is freed and `reinterpret_cast<FreeNode*>` is written, it writes 8 bytes into a 1 or 4 byte slot — overwriting adjacent memory.
+
+**Manifestation:** Heap corruption. Neighboring allocations get corrupted free list pointers. Next allocation from the corrupted list: segfault or wrong memory returned. Often manifests far from the actual bug in time and location — extremely hard to debug.
+
+**Fix:**
+```cpp
+static constexpr size_t SLOT_SIZE = 
+    std::max(sizeof(T), sizeof(FreeNode));
+```
+</details>
+
+---
+
+**Q34.**
+```cpp
+Arena frame_arena(4 * 1024 * 1024);  // 4MB
+
+struct Particle {
+    float x, y, z;
+    float vx, vy, vz;
+    // 24 bytes
+};
+
+void simulate_frame() {
+    auto* particles = frame_arena.make_array<Particle>(100000);
+    // ... simulate ...
+    frame_arena.reset();  // free all
+}
+```
+What happens to Particle destructors? Is this safe if Particle has a std::string member?
+
+<details>
+<summary>Answer</summary>
+
+**Particle destructors are NOT called by `frame_arena.reset()`.**
+
+`reset()` just moves the bump pointer back to the start. No destructors run. For `Particle` with only `float` members (trivially destructible): **safe**. No destructor needed. Memory is reused.
+
+If `Particle` contains `std::string`:
+```cpp
+struct Particle {
+    float x, y, z;
+    std::string name;  // heap-allocated string data
+};
+```
+`frame_arena.reset()` does not call `~Particle()`. `~std::string()` never runs. The string's internal heap allocation is **leaked**. Over many frames: memory leak grows unboundedly.
+
+**Rule:** Arena allocators are safe only for trivially destructible types, or when you manually track and destruct objects before reset:
+```cpp
+for (size_t i = 0; i < count; i++) particles[i].~Particle();
+frame_arena.reset();
+```
+</details>
+
+---
+
+**Q35.**
+```cpp
+void* operator new(size_t size) {
+    return malloc(size);
+}
+void operator delete(void* ptr) noexcept {
+    free(ptr);
+}
+```
+This replaces global `new`/`delete` with direct malloc/free calls. What is the actual performance improvement?
+
+<details>
+<summary>Answer</summary>
+
+**None. This IS what the default operator new/delete do.**
+
+The default `operator new` calls `malloc`. The default `operator delete` calls `free`. Replacing them with the same calls accomplishes nothing.
+
+The interviewer is checking whether you know what `operator new` does and when replacement helps.
+
+**When replacement actually helps:**
+1. Replace with a **custom allocator** (pool, arena, tcmalloc)
+2. Add **instrumentation** (allocation counting, leak detection)
+3. Add **alignment guarantees** (always return 64-byte aligned)
+4. Add **per-class overloading** (`class Foo { void* operator new(size_t); }`) to use a pool allocator for specific types
+
+**The real replacement that helps:**
+```cpp
+// Use jemalloc or tcmalloc as a drop-in
+// LD_PRELOAD=libjemalloc.so ./your_program
+// Typically 20-40% improvement for allocation-heavy workloads
+// No code changes required
+```
+</details>
+
+---
+
+**Q36.**
+```cpp
+class SlabAllocator {
+    struct Slab {
+        char storage[sizeof(T) * 64];
+        Slab() {
+            for (int i = 0; i < 64; i++)
+                new(&storage[i * sizeof(T)]) T();  // construct all
+        }
+    };
+};
+```
+What is the advantage of pre-constructing objects in the slab? What types is this NOT appropriate for?
+
+<details>
+<summary>Answer</summary>
+
+**Advantage:** Objects are always in a valid constructed state. `acquire()` returns a ready-to-use object without construction overhead. For objects with expensive constructors (mutex initialization, buffer allocation, socket setup): pay cost once at slab creation, zero cost per acquire.
+
+**Not appropriate for:**
+
+1. **Types with expensive constructors AND many unused objects.** If you pre-construct 64 mutexes but only use 3: 61 mutex initializations wasted.
+
+2. **Types that need construction arguments.** Pre-constructing requires default construction. If `T` has no default constructor or needs specific init parameters: slab is inappropriate.
+
+3. **Types with large resources.** Pre-constructing 64 objects that each allocate 1MB of buffers: 64MB allocated upfront whether used or not.
+
+4. **Types where "reset" is ambiguous.** When returning to the slab, the object's state must be reset for the next user. If reset is not well-defined or expensive — slab loses its advantage.
+
+**Best use:** Objects with mutex/spinlock members, pre-allocated fixed-size buffers, or complex initialization sequences that are cheap to reset.
+</details>
+
+---
+
+**Q37.**
+```cpp
+template<size_t ObjSize>
+class ThreadLocalPool {
+    thread_local static void* free_list;
+    thread_local static int count;
+    
+    void* allocate() {
+        if (count > 0) {
+            void* p = free_list;
+            free_list = *(void**)free_list;
+            count--;
+            return p;
+        }
+        return refill_from_central();
+    }
+};
+```
+Thread A allocates 1000 objects and frees them all. Thread B allocates objects and runs out. Thread B calls `refill_from_central()`. Is thread B guaranteed to get Thread A's freed objects?
+
+<details>
+<summary>Answer</summary>
+
+**No. Not directly.**
+
+Thread A's freed objects are in Thread A's thread-local free list. Thread B's `refill_from_central()` fetches from the central pool, not from Thread A's local list.
+
+Thread A's local list returns objects to the central pool only when Thread A's local list exceeds a threshold (`TRIM_BATCH`) — at that point it returns a batch to the shared central pool. If Thread A freed 1000 objects but its local list threshold is 256: it returns 3 batches of ~256 to central. Thread B can then get them from central.
+
+But if Thread A's free list sits at exactly 1000 and Thread A never hits the threshold: those objects stay local until Thread A either allocates them again or its thread ends (typically returning them to central at thread exit).
+
+This is a known tradeoff: thread-local caches improve allocation speed but can cause **memory hoarding** — one thread holds a large free list while others allocate from central/OS. tcmalloc addresses this with periodic "garbage collection" passes that return excess local memory to central.
+</details>
+
+---
+
+**Q38.**
+```cpp
+// Scope-based arena usage
+void process_request(Arena& arena) {
+    auto marker = arena.get_marker();
+    
+    auto* temp_buf = arena.make_array<char>(1024 * 1024);  // 1MB
+    // ... use temp_buf ...
+    
+    auto* result = arena.make<Result>();
+    // ... compute result ...
+    
+    arena.rewind_to(marker);  // ← rewinds everything
+    return;  // caller uses result — but result is freed!
+}
+```
+What is wrong? What is the correct pattern?
+
+<details>
+<summary>Answer</summary>
+
+**Use-after-free. `result` is allocated inside the arena, then the arena is rewound past it. The caller receives a pointer to freed (reused) arena memory.**
+
+The scope/marker pattern is only valid when ALL allocations within the scope are truly temporary — not when some need to outlive the scope.
+
+**Correct patterns:**
+
+**Pattern 1: Caller provides the result buffer:**
+```cpp
+void process_request(Arena& arena, Result& out) {
+    auto marker = arena.get_marker();
+    auto* temp_buf = arena.make_array<char>(1024 * 1024);
+    compute(temp_buf, out);  // write result to caller-owned memory
+    arena.rewind_to(marker); // safe — out is not in the arena
+}
+```
+
+**Pattern 2: Return before rewind:**
+```cpp
+Result process_request(Arena& arena) {
+    auto* temp_buf = arena.make_array<char>(1024 * 1024);
+    Result result = compute(temp_buf);  // value copy
+    // temp_buf stays alive until next reset — acceptable waste
+    return result;  // returned by value, not pointer into arena
+}
+```
+
+**Pattern 3: Two arenas — scratch and persistent:**
+```cpp
+void process_request(Arena& scratch, Arena& persistent) {
+    auto* temp = scratch.make_array<char>(1024 * 1024);
+    auto* result = persistent.make<Result>();
+    compute(temp, result);
+    scratch.reset();  // temp freed, result survives in persistent arena
+}
+```
+</details>
+
+---
+
+**Q39.**
+```cpp
+std::vector<int, ArenaAllocator<int>> vec(arena_alloc);
+vec.reserve(100);
+vec.push_back(1);
+vec.push_back(2);
+// ... push 100 elements ...
+vec.push_back(101);  // ← 101st element
+```
+What happens on the 101st push_back with an arena allocator?
+
+<details>
+<summary>Answer</summary>
+
+**The vector reallocates — it calls `arena_alloc.allocate(200)` for a new, larger buffer. The old buffer (100 elements) is "freed" with `arena_alloc.deallocate()` — which is a no-op for arena allocators.**
+
+The old 100-element buffer stays in the arena, wasted until reset. The new 200-element buffer is allocated from the arena. Both exist simultaneously.
+
+**Performance implications:**
+- Reallocation is cheap (arena bump) but the old buffer is wasted memory
+- If this happens many times (many push_backs beyond capacity), the arena fills with dead buffers
+- For arenas with short lifetimes (per-frame): acceptable — all waste freed on reset
+- For long-lived arenas: use `vec.reserve(final_size)` upfront to prevent reallocation waste
+
+**Memory ordering implications:**
+- Elements are moved (or copied) from old buffer to new buffer — constructors/move-constructors run
+- With `if constexpr (Trivial<T>)`: memcpy instead — much faster for int
+- The arena's no-op deallocate means the move is one-way — no possibility of the old memory being reused for something else during the move (safe, unlike `malloc` which might reuse immediately)
+</details>
+
+---
+
+**Q40.**
+```cpp
+// Debug build: all allocations go through system malloc
+// Release build: all allocations go through pool allocator
+
+void* pool_alloc(size_t size);
+void pool_free(void* ptr);
+
+#ifdef NDEBUG
+    #define ALLOC(size) pool_alloc(size)
+    #define FREE(ptr)   pool_free(ptr)
+#else
+    #define ALLOC(size) malloc(size)
+    #define FREE(ptr)   free(ptr)
+#endif
+```
+What bug does this introduce? How does it manifest in production?
+
+<details>
+<summary>Answer</summary>
+
+**Cross-allocator free — undefined behavior.**
+
+If code allocates in debug mode (malloc) and the binary is then recompiled in release mode (pool_alloc), or if library boundaries mix allocators — a pointer allocated with `malloc` gets freed with `pool_free`, or vice versa.
+
+`pool_free` expects a pointer from its own pool — it reinterprets the memory as a `FreeNode` and links it into the free list. A malloc pointer fed to pool_free corrupts the pool's free list. Next allocation from the pool returns corrupted memory.
+
+**Real manifestation:** Works perfectly in all debug runs (consistent allocator). First release build: intermittent crashes in the pool allocator's allocate path. Callstack points to the allocator, not the actual bug. The mismatch might be in a completely different subsystem. Extremely hard to debug.
+
+**Fix:**
+```cpp
+// Never use preprocessor to switch allocators
+// Use consistent allocator throughout
+// If debugging is needed: instrument the allocator itself
+class PoolAllocator {
+#ifdef NDEBUG
+    // production implementation
+#else
+    // debug implementation with bounds checking, leak detection
+#endif
+};
+```
+</details>
+
+---
+
+## Lesson 5: TMP, SFINAE & Concepts
+### 10 Questions
+
+---
+
+**Q41.**
+```cpp
+template<typename T>
+void func(T x) {
+    undeclared();  // phase 1 or phase 2 error?
+    x.method();   // phase 1 or phase 2 error?
+}
+```
+Which line errors at phase 1 (template definition)? Which at phase 2 (instantiation)?
+
+<details>
+<summary>Answer</summary>
+
+**`undeclared()` → Phase 1 error.**
+
+`undeclared()` doesn't depend on `T`. The compiler looks it up immediately at template definition time. If it's not declared: error before any instantiation.
+
+**`x.method()` → Phase 2 error.**
+
+`x.method()` depends on `T` (x is of type T). The compiler defers checking until instantiation. When you call `func(42)`, T=int, `int` has no `.method()` → error at instantiation.
+
+Phase 1 errors: syntax errors, non-dependent name lookups, `static_assert` with non-dependent conditions.
+Phase 2 errors: dependent name resolution failures, type mismatches involving T.
+
+This distinction matters for SFINAE — SFINAE only works in the **immediate context** (phase 2 substitution). Errors inside the function body (after a function is selected) are hard errors, not SFINAE.
+</details>
+
+---
+
+**Q42.**
+```cpp
+template<typename T, 
+    typename = std::enable_if_t<std::is_integral_v<T>>>
+void process(T x) { std::cout << "integral\n"; }
+
+template<typename T,
+    typename = std::enable_if_t<!std::is_integral_v<T>>>
+void process(T x) { std::cout << "non-integral\n"; }
+
+process(42);
+process(3.14);
+```
+Does this compile? If not, why?
+
+<details>
+<summary>Answer</summary>
+
+**Does NOT compile. Redefinition error.**
+
+Both templates have the signature `template<typename T, typename>`. The default values (`enable_if_t<...>`) are not part of the signature — they don't distinguish the overloads. From the compiler's perspective, these are two definitions of the same function template.
+
+**Fix — use a non-type template parameter:**
+```cpp
+template<typename T, 
+    std::enable_if_t<std::is_integral_v<T>, int> = 0>
+void process(T x) { std::cout << "integral\n"; }
+
+template<typename T,
+    std::enable_if_t<!std::is_integral_v<T>, int> = 0>
+void process(T x) { std::cout << "non-integral\n"; }
+```
+
+Now the non-type parameters have different types (or one exists and one doesn't) — they ARE distinguishable. The `= 0` default means callers never specify it.
+
+Or better — use Concepts:
+```cpp
+template<std::integral T>
+void process(T x) { std::cout << "integral\n"; }
+
+template<typename T> requires (!std::integral<T>)
+void process(T x) { std::cout << "non-integral\n"; }
+```
+</details>
+
+---
+
+**Q43.**
+```cpp
+template<typename T, typename = void>
+struct has_begin : std::false_type {};
+
+template<typename T>
+struct has_begin<T, 
+    std::void_t<decltype(std::declval<T>().begin())>
+> : std::true_type {};
+
+static_assert(has_begin<std::vector<int>>::value);
+static_assert(!has_begin<int>::value);
+```
+Trace exactly what happens when the compiler evaluates `has_begin<int>`.
+
+<details>
+<summary>Answer</summary>
+
+**Step by step:**
+
+1. Compiler instantiates `has_begin<int>` — that's `has_begin<int, void>` (second param defaults to void).
+
+2. Compiler looks for specializations. Finds the partial specialization: `has_begin<T, void_t<decltype(std::declval<T>().begin())>>`.
+
+3. Tries to match: `T = int`. Evaluates: `std::declval<int>().begin()`.
+
+4. `std::declval<int>()` returns `int&&` (in unevaluated context). `.begin()` on `int&&` — `int` has no `begin()` member. Invalid expression.
+
+5. `decltype(invalid_expression)` — substitution failure in the template argument.
+
+6. **SFINAE:** failure in the immediate context of substitution → not an error. Partial specialization is rejected.
+
+7. Compiler falls back to primary template: `has_begin<int, void>` matches `has_begin<T, void>` with T=int.
+
+8. Primary template inherits from `false_type`. `has_begin<int>::value = false`. ✓
+</details>
+
+---
+
+**Q44.**
+```cpp
+template<typename T>
+concept Printable = requires(T x) {
+    std::cout << x;
+};
+
+template<typename T>
+concept Saveable = requires(T x) {
+    x.save();
+};
+
+template<typename T>
+concept PrintableAndSaveable = Printable<T> && Saveable<T>;
+
+// Overloads:
+template<Printable T>      void handle(T x) { std::cout << x; }
+template<Saveable T>       void handle(T x) { x.save(); }
+template<PrintableAndSaveable T> void handle(T x) { std::cout << x; x.save(); }
+
+struct Both {
+    void save() {}
+    friend std::ostream& operator<<(std::ostream& os, Both) { return os; }
+};
+
+handle(Both{});
+```
+Which overload is called? Why?
+
+<details>
+<summary>Answer</summary>
+
+**The `PrintableAndSaveable` overload is called.**
+
+`Both` satisfies all three concepts. All three overloads are valid candidates. Concept subsumption breaks the tie:
+
+`PrintableAndSaveable<T>` is defined as `Printable<T> && Saveable<T>`. It subsumes both `Printable<T>` and `Saveable<T>` — it implies all their requirements plus adds nothing extra (well, it requires both). A constraint that subsumes another is more constrained.
+
+The `PrintableAndSaveable` overload subsumes both other overloads. It is the most constrained. The compiler selects it.
+
+This is the key advantage over SFINAE: with enable_if you'd need `enable_if<is_printable && is_saveable>` for the combined version AND `enable_if<is_printable && !is_saveable>` for the printable-only version — explicit mutual exclusion. Concepts subsumption handles it automatically.
+</details>
+
+---
+
+**Q45.**
+```cpp
+template<typename T>
+T max_val(T a, T b) {
+    if constexpr (std::is_floating_point_v<T>) {
+        if (std::isnan(a)) return b;
+        if (std::isnan(b)) return a;
+    }
+    return a > b ? a : b;
+}
+
+max_val(1, 2);
+max_val(1.0, std::numeric_limits<double>::quiet_NaN());
+```
+What does each call return? What happens to the NaN check for the integer call?
+
+<details>
+<summary>Answer</summary>
+
+**`max_val(1, 2)` returns `2`.**
+
+T=int. `if constexpr (std::is_floating_point_v<int>)` is false. The entire NaN-checking block is **not compiled** for this instantiation. `std::isnan` is never called (it doesn't even exist for `int` — with regular `if`, this would be a compile error for int instantiation). Returns `1 > 2 ? 1 : 2` = 2.
+
+**`max_val(1.0, NaN)` returns `1.0`.**
+
+T=double. `if constexpr` condition is true. Block is compiled. `std::isnan(1.0)` = false. `std::isnan(NaN)` = true. Returns `a` = 1.0. Correct NaN handling.
+
+**The key point:** Without `if constexpr`, using regular `if`: `std::isnan` would need to be valid for `int`, which it's not (or produces a warning/error). `if constexpr` eliminates the branch entirely for non-floating-point types at compile time.
+</details>
+
+---
+
+**Q46.**
+```cpp
+template<typename T>
+auto serialize(T val) 
+    -> std::enable_if_t<std::is_arithmetic_v<T>, std::vector<uint8_t>> 
+{
+    std::vector<uint8_t> bytes(sizeof(T));
+    std::memcpy(bytes.data(), &val, sizeof(T));
+    return bytes;
+}
+
+template<typename T>
+auto serialize(T val)
+    -> std::enable_if_t
+        !std::is_arithmetic_v<T> && 
+        std::is_same_v<decltype(val.serialize()), std::vector<uint8_t>>,
+        std::vector<uint8_t>>
+{
+    return val.serialize();
+}
+```
+Rewrite this using C++20 Concepts. What is simpler about the Concepts version?
+
+<details>
+<summary>Answer</summary>
+
+**Concepts version:**
+```cpp
+template<std::is_arithmetic T>  // Hmm — actually:
+
+template<typename T>
+concept ArithmeticSerializable = std::is_arithmetic_v<T>;
+
+template<typename T>
+concept MethodSerializable = requires(T val) {
+    { val.serialize() } -> std::same_as<std::vector<uint8_t>>;
+};
+
+template<ArithmeticSerializable T>
+std::vector<uint8_t> serialize(T val) {
+    std::vector<uint8_t> bytes(sizeof(T));
+    std::memcpy(bytes.data(), &val, sizeof(T));
+    return bytes;
+}
+
+template<MethodSerializable T>
+std::vector<uint8_t> serialize(T val) {
+    return val.serialize();
+}
+```
+
+**What's simpler:**
+1. No `!std::is_arithmetic_v<T>` exclusion needed — subsumption handles it automatically if `ArithmeticSerializable` and `MethodSerializable` don't overlap (arithmetic types don't have `.serialize()`)
+2. Return type is part of the function signature, not buried in enable_if
+3. The requirement `{ val.serialize() } -> std::same_as<...>` is self-documenting — reads as English
+4. Error messages say "T does not satisfy MethodSerializable" — not a cryptic enable_if substitution failure
+</details>
+
+---
+
+**Q47.**
+```cpp
+template<typename T>
+struct TypeTraits {
+    static constexpr bool is_fast = false;
+};
+
+template<>
+struct TypeTraits<int> {
+    static constexpr bool is_fast = true;
+};
+
+template<>
+struct TypeTraits<float> {
+    static constexpr bool is_fast = true;
+};
+
+template<typename T>
+void compute(T val) {
+    if constexpr (TypeTraits<T>::is_fast) {
+        fast_path(val);
+    } else {
+        slow_path(val);
+    }
+}
+```
+`compute(3.14)` — float or double? Which path runs? What if called with `3.14f`?
+
+<details>
+<summary>Answer</summary>
+
+**`compute(3.14)` — T=double. Slow path.**
+
+`3.14` is a `double` literal. `TypeTraits<double>::is_fast` — no specialization for double. Primary template: `is_fast = false`. `slow_path(val)` runs.
+
+**`compute(3.14f)` — T=float. Fast path.**
+
+`3.14f` is a `float` literal. `TypeTraits<float>::is_fast = true`. `fast_path(val)` runs.
+
+This illustrates a common API design issue: callers must be precise about literal types. `3.14` vs `3.14f` changes behavior silently. Better design: add a specialization for double, or use a concept to cover all floating-point types:
+
+```cpp
+template<std::floating_point T>
+struct TypeTraits<T> {  // partial specialization
+    static constexpr bool is_fast = true;
+};
+```
+
+Now double, float, and long double all get `is_fast = true`.
+</details>
+
+---
+
+**Q48.**
+```cpp
+template<typename T>
+void process(T&& val) {
+    if constexpr (std::is_lvalue_reference_v<T>) {
+        std::cout << "lvalue\n";
+    } else {
+        std::cout << "rvalue\n";
+    }
+}
+
+int x = 5;
+process(x);    // ?
+process(5);    // ?
+process(std::move(x));  // ?
+```
+What does each call print?
+
+<details>
+<summary>Answer</summary>
+
+**`process(x)` prints "lvalue".**
+
+`x` is an lvalue. With forwarding reference `T&&`: when argument is lvalue of type `int`, T is deduced as `int&`. `std::is_lvalue_reference_v<int&>` = true. Prints "lvalue".
+
+**`process(5)` prints "rvalue".**
+
+`5` is a prvalue (rvalue). T is deduced as `int` (not `int&`). `std::is_lvalue_reference_v<int>` = false. Prints "rvalue".
+
+**`process(std::move(x))` prints "rvalue".**
+
+`std::move(x)` casts to `int&&` (xvalue — a kind of rvalue). T is deduced as `int`. `std::is_lvalue_reference_v<int>` = false. Prints "rvalue".
+
+This is reference collapsing: `T=int&` + `&&` → `int& &&` collapses to `int&` (lvalue ref). `T=int` + `&&` → `int&&` (rvalue ref). The deduced T tells you the value category of the argument.
+</details>
+
+---
+
+**Q49.**
+```cpp
+template<typename T>
+concept Container = requires(T c) {
+    c.begin();
+    c.end();
+    typename T::value_type;
+};
+
+template<typename T>
+concept SizedContainer = Container<T> && requires(T c) {
+    { c.size() } -> std::convertible_to<size_t>;
+};
+
+// Does std::forward_list satisfy SizedContainer?
+// Does std::vector satisfy SizedContainer?
+// Does std::array<int,5> satisfy SizedContainer?
+```
+Answer all three. What determines the answer for std::forward_list?
+
+<details>
+<summary>Answer</summary>
+
+**`std::forward_list`: Does NOT satisfy SizedContainer.**
+
+`std::forward_list` deliberately omits `size()` — it would be O(n) (singly-linked list). It has `begin()`, `end()`, and `value_type` → satisfies `Container`. But no `size()` → fails `SizedContainer`.
+
+**`std::vector`: Satisfies SizedContainer.** Has `begin()`, `end()`, `value_type`, and `size()` returning `size_t`. ✓
+
+**`std::array<int,5>`: Satisfies SizedContainer.** Has all required: `begin()`, `end()`, `value_type`, `size()` (returns `size_t` = 5 at compile time). ✓
+
+**What determines forward_list's failure:** The standard explicitly removed `size()` from `forward_list` to make the absence of O(1) size a feature, not a bug. This is a design choice expressing the constraint. Concepts perfectly capture this distinction — `SizedContainer` correctly excludes `forward_list` without any special-casing.
+
+This is exactly why concept hierarchies are useful: `Container` for algorithms that only need iteration, `SizedContainer` for algorithms that need to pre-allocate or report sizes.
+</details>
+
+---
+
+**Q50.**
+```cpp
+template<typename T>
+requires std::is_integral_v<T>
+T divide(T a, T b) {
+    return a / b;
+}
+
+template<typename T>
+requires std::is_floating_point_v<T>
+T divide(T a, T b) {
+    return a / b;
+}
+
+divide(10, 3);    // ?
+divide(10.0, 3.0); // ?
+divide(10, 0);    // ?
+divide(10.0, 0.0); // ?
+```
+What does each call return or do?
+
+<details>
+<summary>Answer</summary>
+
+**`divide(10, 3)` returns `3`.**
+T=int. Integer division truncates toward zero. 10/3 = 3 (remainder 1 discarded).
+
+**`divide(10.0, 3.0)` returns `3.333...`.**
+T=double. Floating-point division. Returns 3.3333333333333335 (IEEE 754).
+
+**`divide(10, 0)` — undefined behavior.**
+T=int. Integer division by zero is UB in C++. On x86: the CPU raises a divide-by-zero exception (SIGFPE). Program crashes. The concept constraint (`is_integral`) doesn't prevent this — it only constrains the type, not the value.
+
+**`divide(10.0, 0.0)` returns `inf`.**
+T=double. Floating-point division by zero is **not UB** — it is defined by IEEE 754. Returns positive infinity (`std::numeric_limits<double>::infinity()`). No crash. The result is a valid (if unusual) double value.
+
+This asymmetry — integer divide-by-zero is UB/crash, floating-point is defined — is a critical difference between the types that Concepts don't capture. You'd need a runtime check or a precondition annotation.
+</details>
+
+---
+
+## Lesson 6: Undefined Behavior
+### 10 Questions
+
+---
+
+**Q51.**
+```cpp
+int arr[5] = {1, 2, 3, 4, 5};
+int* p = arr + 5;  // one past the end
+std::cout << *p;   // ← ?
+```
+Is `arr + 5` UB? Is `*p` UB?
+
+<details>
+<summary>Answer</summary>
+
+**`arr + 5` is NOT UB. `*p` IS UB.**
+
+The C++ standard explicitly allows computing a pointer one past the end of an array — this is necessary for the idiom `for (auto it = arr; it != arr + 5; ++it)`. `arr + 5` is a valid pointer computation.
+
+However, dereferencing the one-past-the-end pointer IS UB. There is no object at `arr[5]`. The memory may belong to something else (stack variables, other heap objects) or be unmapped.
+
+What `*p` actually reads: the 4 bytes after `arr[4]`. On the stack: likely another local variable. On the heap: likely malloc metadata. With optimization: the compiler may eliminate the read entirely (reading UB produces indeterminate values, so the result can be anything — including nothing).
+
+**Practical consequence:** This compiles and often "works" (reads adjacent stack memory) but is a bug that sanitizers catch immediately:
+```
+ASan: stack-buffer-overflow on address 0x... READ of size 4
+```
+</details>
+
+---
+
+**Q52.**
+```cpp
+// Compiled with -O2
+int* get_ptr() {
+    int x = 42;
+    return &x;  // warning: returning address of local
+}
+
+int main() {
+    int* p = get_ptr();
+    std::cout << *p;  // what prints?
+}
+```
+What does this print? What does it print with `-O0`? Why are they different?
+
+<details>
+<summary>Answer</summary>
+
+**With `-O0`: probably prints `42`.**
+
+In debug mode, the compiler preserves the stack frame of `get_ptr()` beyond its return (it's still physically there, just "logically" freed). The memory at `x`'s address hasn't been overwritten yet when `*p` is read. Reading it gives `42`. This is still UB — it "works" by accident.
+
+**With `-O2`: unpredictable. Could print anything or crash.**
+
+The compiler knows `x` is a local variable. Its lifetime ends at `return`. With optimization: the compiler may reuse `x`'s stack slot for something else after `get_ptr()` returns. The `cout << *p` read gets whatever is now in that slot — could be the return address, a saved register, zero, or garbage.
+
+Alternatively, the compiler may detect the dangling pointer situation and optimize the access away or transform the code. With extreme optimization: the undefined behavior infects the surrounding code.
+
+**Key lesson:** Code that "works" in debug and fails in release is the hallmark of UB. The difference between `-O0` and `-O2` is the compiler's exploitation of UB assumptions.
+</details>
+
+---
+
+**Q53.**
+```cpp
+// Compiled with -O2, -fstrict-aliasing (default)
+float f = 1.5f;
+uint32_t bits = *(uint32_t*)(&f);  // strict aliasing violation
+printf("0x%x\n", bits);
+```
+What does this print? Is it guaranteed?
+
+<details>
+<summary>Answer</summary>
+
+**On most compilers with `-O0`: prints `0x3fc00000` (IEEE 754 representation of 1.5).**
+
+**With `-O2`: not guaranteed. Could print anything.**
+
+The strict aliasing violation: `float*` and `uint32_t*` are different types and cannot alias. The compiler assumes they don't alias. With optimization, the compiler may keep `f` in a floating-point register and never write it to memory. The cast `(uint32_t*)(&f)` takes an address — but the value might still be in a register. The `uint32_t` load reads from an address that may not have been updated from the register yet.
+
+In practice, `gcc -O2` often still produces `0x3fc00000` because it happens to spill `f` to memory. `clang -O2` with aggressive optimization may not. MSVC behaves differently.
+
+**Correct fix:**
+```cpp
+uint32_t bits;
+std::memcpy(&bits, &f, sizeof(bits));  // always correct
+// or:
+uint32_t bits = std::bit_cast<uint32_t>(f);  // C++20, always correct
+```
+</details>
+
+---
+
+**Q54.**
+```cpp
+// -O2
+void process(int* data, size_t n) {
+    for (size_t i = 0; i <= n; i++) {  // ← <= not 
+        data[i] *= 2;
+    }
+}
+process(arr, SIZE_MAX);
+```
+What happens? What does the compiler do with this loop?
+
+<details>
+<summary>Answer</summary>
+
+**UB: `i <= n` with `n = SIZE_MAX`.**
+
+`SIZE_MAX` is `std::numeric_limits<size_t>::max()`. After `i = SIZE_MAX`, `i++` wraps to 0 (unsigned overflow is defined — wraparound). So `i <= SIZE_MAX` is always true — infinite loop... until the array access `data[i]` goes wildly out of bounds.
+
+Actually: `data[SIZE_MAX]` is immediately an out-of-bounds access. Segfault.
+
+But more subtly: the compiler may analyze `i <= n` with `n = SIZE_MAX` and note that `size_t` is unsigned — `i` will wrap after SIZE_MAX. The compiler could optimize this differently depending on version and flags.
+
+**The real lesson:** The bug is `<=` instead of `<`. With any reasonable `n`, this accesses `data[n]` — one past the end. UB. The `SIZE_MAX` case just makes the crash immediate and obvious. With `n = 10`, it accesses `data[10]` on an 11-element array — same UB, less obvious crash (might "work" and read adjacent memory).
+
+UBSAN catches this:
+```
+runtime error: index 5 out of bounds for type 'int [5]'
+```
+</details>
+
+---
+
+**Q55.**
+```cpp
+// Compiled with -O2
+bool flag = false;
+
+void thread1() {
+    while (!flag);    // spin wait
+    std::cout << "done\n";
+}
+
+void thread2() {
+    flag = true;
+}
+```
+Does thread1 ever print "done"? What does the compiler generate for thread1?
+
+<details>
+<summary>Answer</summary>
+
+**Thread1 may never print "done". Data race → UB.**
+
+The compiler analyzes `thread1()`:
+- `flag` is a `bool` — not atomic
+- No writes to `flag` in `thread1()`'s code
+- Assumes no data races (UB assumption)
+- Therefore: `flag` cannot change during `thread1()`'s execution
+- `!flag` is either always true or always false
+- If `flag` starts false: `!flag` is always true → infinite loop
+- Compiler may optimize to:
+
+```cpp
+void thread1() {
+    if (!flag) {
+        while (true);  // infinite loop, no memory read
+    }
+    std::cout << "done\n";
+}
+```
+
+Thread2's write to `flag` is a data race. The compiler's optimization is correct given the UB assumption. Thread1 loops forever.
+
+**Fix:** `std::atomic<bool> flag{false}` with appropriate memory ordering.
+</details>
+
+---
+
+**Q56.**
+```cpp
+// Security-critical code, -O2
+int check_permission(user_t* user) {
+    if (user == nullptr) return -1;
+    
+    log_access(user->id);  // dereference
+    
+    if (user == nullptr) return -1;  // second check
+    
+    return grant_access(user->id);
+}
+```
+Which null check is eliminated by the compiler? Is this a security issue?
+
+<details>
+<summary>Answer</summary>
+
+**The second null check is eliminated.**
+
+The compiler sees: `log_access(user->id)` dereferences `user`. Null dereference is UB. The compiler assumes UB doesn't happen. Therefore `user` is not null at that point. The code after the dereference runs in a context where the compiler has proved `user != nullptr`. The second `if (user == nullptr)` is dead code — eliminated.
+
+**Is it a security issue?**
+
+In this specific code: no, because the first check already handles null before the dereference. The security logic is correct.
+
+But consider the pattern that IS a security issue:
+```cpp
+int check_permission(user_t* user) {
+    // No initial null check
+    log_access(user->id);  // dereference
+    
+    if (user == nullptr) {  // supposed safety check
+        return -1;  // eliminated by compiler
+    }
+    return grant_access(user->id);
+}
+```
+Here, the null check was intended as the safety check. The dereference before it proves non-null to the compiler. The safety check is deleted. If `user` is null — we crash at the dereference instead of returning -1. And if the dereference somehow doesn't crash (e.g., null + offset is mapped memory): `grant_access` runs for a null user. Privilege escalation.
+
+This exact pattern appears in real CVEs.
+</details>
+
+---
+
+**Q57.**
+```cpp
+// -O2
+int foo(int x) {
+    int y = x * 1000000000;  // potential overflow
+    if (y > 0) return 1;
+    if (y < 0) return -1;
+    return 0;
+}
+
+foo(3);  // 3 * 1000000000 = 3,000,000,000 > INT_MAX
+```
+What does `foo(3)` return? What does the generated assembly look like?
+
+<details>
+<summary>Answer</summary>
+
+**With `-O2`: returns `1`.**
+
+`3 * 1000000000 = 3,000,000,000`. `INT_MAX = 2,147,483,647`. This overflows. Signed overflow is UB.
+
+Compiler analysis:
+- `y = x * 1000000000`. Signed overflow is UB → never happens. Therefore `y` is a valid int.
+- `1000000000 > 0`. If `x > 0` then `y > 0`. If `x = 3 > 0`, y > 0.
+- `if (y > 0) return 1` → always taken for x=3.
+- Returns 1.
+
+Generated assembly (conceptually):
+```nasm
+; foo(3):
+; Compiler proves: 3 * 1000000000 > 0 (no overflow assumption)
+; Directly returns 1
+MOV eax, 1
+RET
+```
+
+With `-O0`: actually computes `3 * 1000000000` = `-1294967296` (wrapped). `y < 0` → returns `-1`. The debug and release builds return different values for the same input. This is UB.
+
+UBSAN: `runtime error: signed integer overflow: 3 * 1000000000 cannot be represented in type 'int'`
+</details>
+
+---
+
+**Q58.**
+```cpp
+int arr[10];
+
+// Which of these has UB?
+int* p1 = arr + 10;      // A: one past end
+int* p2 = arr + 11;      // B: two past end
+int* p3 = arr - 1;       // C: before start
+bool b1 = (p1 == arr + 10);  // D: compare one-past-end
+int  v1 = *(arr + 9);    // E: last element
+int  v2 = *(arr + 10);   // F: one past end dereferenced
+```
+
+<details>
+<summary>Answer</summary>
+
+**A: `arr + 10` — NOT UB.** One-past-end pointer formation is explicitly allowed.
+
+**B: `arr + 11` — UB.** Only one-past-end is allowed. Two-past-end pointer arithmetic is UB, even without dereferencing.
+
+**C: `arr - 1` — UB.** Pointer arithmetic before the start of an array is UB, even without dereferencing.
+
+**D: `(p1 == arr + 10)` — NOT UB.** Comparing one-past-end pointers is well-defined. This is how range-based for loops and STL algorithms work: `for (auto it = begin; it != end; ++it)` where `end` is one-past-the-end.
+
+**E: `*(arr + 9)` — NOT UB.** `arr + 9` is `arr[9]` — the last valid element. Valid access.
+
+**F: `*(arr + 10)` — UB.** Dereferencing one-past-end. The pointer is valid but dereferencing it accesses memory outside the array.
+
+**Summary:** Forming one-past-end pointer: OK. Forming two-past or before-start: UB. Dereferencing one-past-end: UB. Comparing one-past-end: OK.
+</details>
+
+---
+
+**Q59.**
+```cpp
+struct Base {
+    virtual void func() { std::cout << "Base\n"; }
+};
+struct Derived : Base {
+    void func() override { std::cout << "Derived\n"; }
+    int extra_data = 42;
+};
+
+Base* b = new Base();
+Derived* d = static_cast<Derived*>(b);  // downcast without dynamic_cast
+d->func();         // A
+int x = d->extra_data;  // B
+```
+Line A and B — which is UB? What does each likely do?
+
+<details>
+<summary>Answer</summary>
+
+**Both A and B are UB. `b` is actually a `Base` object — `static_cast` to `Derived*` is undefined when the object isn't actually `Derived`.**
+
+**Line A: `d->func()`**
+
+Calls a virtual function through a Derived* that points to a Base object. The vtable pointer in the Base object points to Base's vtable, which contains Base::func. The call goes through the vtable — likely calls `Base::func` and prints "Base". In practice: "works" because virtual dispatch uses the actual vtable, not the static type.
+
+But it's still UB — the standard gives no guarantee. A compiler could optimize virtual calls through `Derived*` assuming the object IS a Derived, producing wrong behavior.
+
+**Line B: `d->extra_data`**
+
+Accesses `Derived::extra_data`, which is at offset `sizeof(Base)` in a Derived object. But `b` points to a `Base` object — there's no `extra_data` there. This reads memory beyond the Base object: adjacent heap memory (malloc metadata, other objects). Prints garbage. In a sanitized build: heap-buffer-overflow.
+
+**Safe alternative:** `dynamic_cast<Derived*>(b)` — returns nullptr for incorrect downcasts. Always check the result.
+</details>
+
+---
+
+**Q60.**
+```cpp
+// Run with UBSAN enabled
+int main() {
+    int x;           // uninitialized
+    int y = x + 1;  
+    
+    if (x > 0) {
+        std::cout << x << "\n";
+    }
+    
+    return y;
+}
+```
+UBSAN reports: `runtime error: load of uninitialized value`. Where exactly? What does the program print without UBSAN?
+
+<details>
+<summary>Answer</summary>
+
+**UBSAN fires at `int y = x + 1;` — the first read of uninitialized `x`.**
+
+Reading an uninitialized `int` (not `unsigned char`) is UB. UBSAN instruments every load and tracks which memory has been written. At `x + 1`, UBSAN detects x was never initialized.
+
+**Without UBSAN, `-O0`:** `x` contains whatever was on the stack at `x`'s address — typically 0 on Linux (OS zeroes stack pages on first touch) but not guaranteed. If `x` happens to be 0: `0 > 0` is false, nothing prints. Returns 1.
+
+**Without UBSAN, `-O2`:**
+
+The compiler sees `x` is uninitialized. Reading it is UB. The compiler may:
+1. Assume `x > 0` is false (to eliminate branches) → nothing prints
+2. Assume `x > 0` is true (to eliminate the else) → prints garbage
+3. Keep `x` in a register that was last used for something else → prints that value
+4. Optimize `return y` as `return (uninitialized + 1)` → any return value
+
+The `if (x > 0)` branch may be completely removed. The output is genuinely unpredictable — not just "garbage," but structurally different code generated by the compiler based on assumptions about a value that doesn't exist.
+
+**MemorySanitizer (MSAN)** catches more cases than UBSAN here — it tracks memory initialization at byte granularity.
+</details>
+
+---
+
+## How To Use These 60 Questions
+
+Work through them in order — each lesson's questions build on each other. For each question:
+
+1. **Read the code. Stop. Think before expanding the answer.**
+2. Trace the execution mentally — compiler, hardware, memory model.
+3. If you got it wrong: go back to the lecture section that covers it. Don't move on.
+4. If you got it right: articulate *why* — not just the answer but the mechanism.
+
+The difference between a good engineer and an architect in these interviews is not knowing the answer. It is explaining the mechanism that produces the answer — from hardware up.

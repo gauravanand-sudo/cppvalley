@@ -8,23 +8,8 @@ export function createClient() {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
-        detectSessionInUrl: true,
+        detectSessionInUrl: false,
         flowType: 'pkce',
-        storageKey: 'sb-auth-token',
-        storage: {
-          getItem: (key: string) => {
-            if (typeof window === 'undefined') return null
-            return window.localStorage.getItem(key)
-          },
-          setItem: (key: string, value: string) => {
-            if (typeof window === 'undefined') return
-            window.localStorage.setItem(key, value)
-          },
-          removeItem: (key: string) => {
-            if (typeof window === 'undefined') return
-            window.localStorage.removeItem(key)
-          }
-        }
       }
     }
   )

@@ -22,6 +22,12 @@ type TrackSection = {
   items: TrackSyllabusItem[];
 };
 
+function hasChildren(
+  item: TrackSyllabusItem
+): item is Extract<TrackSyllabusItem, { children: { title: string; slug: string; access: Access }[] }> {
+  return "children" in item;
+}
+
 function clamp(n: number, a: number, b: number) {
   return Math.max(a, Math.min(b, n));
 }
@@ -69,8 +75,8 @@ function ProgressRing({ value }: { value: number }) {
 function flattenLessonSlugs(sections: TrackSection[]) {
   const out: string[] = [];
   for (const sec of sections) {
-    for (const it of sec.items as any[]) {
-      if (it?.children && Array.isArray(it.children)) {
+    for (const it of sec.items) {
+      if (hasChildren(it)) {
         for (const c of it.children) if (c?.slug) out.push(c.slug);
       } else if (it?.slug) out.push(it.slug);
     }
@@ -127,14 +133,6 @@ export default function TrackReaderShell({
   // restore scroll + progress on mount
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) {
-        const v = Number(raw);
-        if (!Number.isNaN(v)) setProgress(clamp(v, 0, 1));
-      }
-    } catch {}
-    // restore scrollTop too (nice UX)
-    try {
       const rawTop = localStorage.getItem(`${storageKey}:top`);
       const top = rawTop ? Number(rawTop) : 0;
       if (rightRef.current && !Number.isNaN(top)) {
@@ -189,22 +187,19 @@ export default function TrackReaderShell({
         const items: TrackSyllabusItem[] = [];
 
         for (const it of sec.items) {
-          // module
-          if ((it as any).children) {
-            const mod = it as any;
-            const childHits = (mod.children as any[]).filter(
+          if (hasChildren(it)) {
+            const childHits = it.children.filter(
               (c) => match(c.title) || match(c.slug)
             );
-            if (match(mod.title) || childHits.length > 0) {
+            if (match(it.title) || childHits.length > 0) {
               items.push({
-                title: mod.title,
-                access: mod.access,
-                children: childHits.length ? childHits : mod.children,
-              } as any);
+                title: it.title,
+                access: it.access,
+                children: childHits.length ? childHits : it.children,
+              });
             }
           } else {
-            const leaf = it as any;
-            if (match(leaf.title) || match(leaf.slug)) items.push(it);
+            if (match(it.title) || match(it.slug)) items.push(it);
           }
         }
 
@@ -253,9 +248,8 @@ export default function TrackReaderShell({
                     </div>
 
                     <div className="mt-2 space-y-1">
-                      {sec.items.map((it: any, i: number) => {
-                        // module
-                        if (it.children) {
+                      {sec.items.map((it, i: number) => {
+                        if (hasChildren(it)) {
                           return (
                             <div key={`${sec.title}-${i}`} className="mt-3">
                               <div className="px-2 text-[12px] font-semibold text-gray-800 flex items-center gap-2">
@@ -266,7 +260,7 @@ export default function TrackReaderShell({
                               </div>
 
                               <div className="mt-1 space-y-1">
-                                {it.children.map((c: any) => {
+                                {it.children.map((c) => {
                                   const isCurrent = c.slug === lessonSlug;
                                   const locked =
                                     c.access !== "free" && !canAccessPremium;
@@ -276,7 +270,7 @@ export default function TrackReaderShell({
                                       key={c.slug}
                                       href={
                                         locked
-                                          ? `/pricing?track=${trackSlug}`
+                                          ? `/checkout?track=${trackSlug}`
                                           : `/learn/tracks/${trackSlug}/${c.slug}`
                                       }
                                       className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition ${
@@ -313,7 +307,7 @@ export default function TrackReaderShell({
                             key={it.slug}
                             href={
                               locked
-                                ? `/pricing?track=${trackSlug}`
+                                ? `/checkout?track=${trackSlug}`
                                 : `/learn/tracks/${trackSlug}/${it.slug}`
                             }
                             className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition ${
@@ -346,10 +340,10 @@ export default function TrackReaderShell({
                 {session?.user?.email ? `signed in` : `guest`}
               </span>
               <Link
-                href="/pricing"
+                href="/learn/tracks"
                 className="text-xs font-mono text-cyan-700 hover:text-cyan-800"
               >
-                upgrade →
+                all tracks →
               </Link>
             </div>
           </div>

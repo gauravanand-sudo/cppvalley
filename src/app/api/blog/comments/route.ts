@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getAuthenticatedUser } from "@/lib/supabase/requestUser";
-
-type ProfileRow = {
-  id: string;
-  name: string | null;
-  image: string | null;
-};
+import { isBlogAuthorEmail } from "@/lib/blogComments";
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,11 +11,16 @@ export async function GET(req: NextRequest) {
     }
 
     const supabase = await createClient();
-    const user = await getAuthenticatedUser(req);
+    let user = null;
+    try {
+      user = await getAuthenticatedUser(req);
+    } catch (error) {
+      console.error("Unable to resolve viewer for blog comments:", error);
+    }
 
     const { data: comments, error } = await supabase
       .from("blog_comments")
-      .select("id,post_slug,parent_id,user_id,body,created_at")
+      .select("id,post_slug,parent_id,user_id,body,created_at,author_name,author_image,is_author")
       .eq("post_slug", postSlug)
       .order("created_at", { ascending: true });
 
@@ -30,37 +30,17 @@ export async function GET(req: NextRequest) {
     }
 
     const commentIds = (comments ?? []).map((comment) => comment.id);
-    const userIds = Array.from(new Set((comments ?? []).map((comment) => comment.user_id)));
-
-    const [{ data: likes, error: likesError }, { data: profiles, error: profilesError }] =
-      await Promise.all([
-        commentIds.length > 0
-          ? supabase
-              .from("blog_comment_likes")
-              .select("comment_id,user_id")
-              .in("comment_id", commentIds)
-          : Promise.resolve({ data: [], error: null }),
-        userIds.length > 0
-          ? supabase
-              .from("profiles")
-              .select("id,name,image")
-              .in("id", userIds)
-          : Promise.resolve({ data: [], error: null }),
-      ]);
+    const { data: likes, error: likesError } = commentIds.length > 0
+      ? await supabase
+          .from("blog_comment_likes")
+          .select("comment_id,user_id")
+          .in("comment_id", commentIds)
+      : { data: [], error: null };
 
     if (likesError) {
       console.error("Error loading blog comment likes:", likesError);
       return NextResponse.json({ error: "Unable to load comments." }, { status: 500 });
     }
-
-    if (profilesError) {
-      console.error("Error loading blog comment profiles:", profilesError);
-      return NextResponse.json({ error: "Unable to load comments." }, { status: 500 });
-    }
-
-    const profileMap = new Map(
-      ((profiles ?? []) as ProfileRow[]).map((profile) => [profile.id, profile])
-    );
 
     const likeMap = new Map<string, number>();
     const viewerLiked = new Set<string>();
@@ -72,7 +52,6 @@ export async function GET(req: NextRequest) {
     }
 
     const payload = (comments ?? []).map((comment) => {
-      const profile = profileMap.get(comment.user_id);
       return {
         id: comment.id,
         postSlug: comment.post_slug,
@@ -80,8 +59,9 @@ export async function GET(req: NextRequest) {
         userId: comment.user_id,
         body: comment.body,
         createdAt: comment.created_at,
-        authorName: profile?.name ?? "Reader",
-        authorImage: profile?.image ?? null,
+        authorName: comment.author_name?.trim() || "Reader",
+        authorImage: comment.author_image ?? null,
+        isAuthor: Boolean(comment.is_author),
         heartCount: likeMap.get(comment.id) ?? 0,
         viewerHasLiked: viewerLiked.has(comment.id),
       };
@@ -115,6 +95,24 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = await createClient();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("name,image")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const authorName =
+      (typeof profile?.name === "string" && profile.name.trim()) ||
+      (typeof user.user_metadata?.full_name === "string" && user.user_metadata.full_name.trim()) ||
+      (typeof user.user_metadata?.name === "string" && user.user_metadata.name.trim()) ||
+      (typeof user.email === "string" && user.email.split("@")[0]?.trim()) ||
+      "Reader";
+
+    const authorImage =
+      (typeof profile?.image === "string" && profile.image.trim()) ||
+      (typeof user.user_metadata?.avatar_url === "string" && user.user_metadata.avatar_url.trim()) ||
+      null;
+    const isAuthor = isBlogAuthorEmail(user.email);
 
     if (parentId) {
       const { data: parent, error: parentError } = await supabase
@@ -137,6 +135,9 @@ export async function POST(req: NextRequest) {
       post_slug: postSlug,
       parent_id: parentId,
       user_id: user.id,
+      author_name: authorName,
+      author_image: authorImage,
+      is_author: isAuthor,
       body: content,
     });
 
@@ -149,5 +150,112 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Unexpected blog comment create error:", error);
     return NextResponse.json({ error: "Unable to post comment." }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const commentId = typeof body.commentId === "string" ? body.commentId.trim() : "";
+    const content = typeof body.body === "string" ? body.body.trim() : "";
+
+    if (!commentId) {
+      return NextResponse.json({ error: "Missing commentId." }, { status: 400 });
+    }
+
+    if (content.length < 1 || content.length > 2000) {
+      return NextResponse.json({ error: "Comment must be between 1 and 2000 characters." }, { status: 400 });
+    }
+
+    const supabase = await createClient();
+    const { data: comment, error: commentError } = await supabase
+      .from("blog_comments")
+      .select("id,user_id")
+      .eq("id", commentId)
+      .maybeSingle();
+
+    if (commentError) {
+      console.error("Error loading comment for edit:", commentError);
+      return NextResponse.json({ error: "Unable to edit comment." }, { status: 500 });
+    }
+
+    if (!comment) {
+      return NextResponse.json({ error: "Comment not found." }, { status: 404 });
+    }
+
+    if (comment.user_id !== user.id) {
+      return NextResponse.json({ error: "You can only edit your own comments." }, { status: 403 });
+    }
+
+    const { error } = await supabase
+      .from("blog_comments")
+      .update({
+        body: content,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", commentId)
+      .eq("user_id", user.id);
+
+    if (error) {
+      console.error("Error updating comment:", error);
+      return NextResponse.json({ error: "Unable to edit comment." }, { status: 500 });
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Unexpected blog comment update error:", error);
+    return NextResponse.json({ error: "Unable to edit comment." }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
+    const commentId = req.nextUrl.searchParams.get("commentId")?.trim();
+    if (!commentId) {
+      return NextResponse.json({ error: "Missing commentId." }, { status: 400 });
+    }
+
+    const supabase = await createClient();
+    const { data: comment, error: commentError } = await supabase
+      .from("blog_comments")
+      .select("id,user_id")
+      .eq("id", commentId)
+      .maybeSingle();
+
+    if (commentError) {
+      console.error("Error loading comment for delete:", commentError);
+      return NextResponse.json({ error: "Unable to delete comment." }, { status: 500 });
+    }
+
+    if (!comment) {
+      return NextResponse.json({ error: "Comment not found." }, { status: 404 });
+    }
+
+    const canDelete = comment.user_id === user.id || isBlogAuthorEmail(user.email);
+    if (!canDelete) {
+      return NextResponse.json({ error: "You cannot delete this comment." }, { status: 403 });
+    }
+
+    const { error } = await supabase.from("blog_comments").delete().eq("id", commentId);
+
+    if (error) {
+      console.error("Error deleting comment:", error);
+      return NextResponse.json({ error: "Unable to delete comment." }, { status: 500 });
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Unexpected blog comment delete error:", error);
+    return NextResponse.json({ error: "Unable to delete comment." }, { status: 500 });
   }
 }

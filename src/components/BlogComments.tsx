@@ -6,6 +6,7 @@ import { Heart, MessageCircle } from "lucide-react";
 import type { Session } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { getAuthRedirectUrl } from "@/lib/authRedirect";
+import { BLOG_AUTHOR_EMAIL, isBlogAuthorEmail } from "@/lib/blogComments";
 
 type FlatComment = {
   id: string;
@@ -16,6 +17,7 @@ type FlatComment = {
   createdAt: string;
   authorName: string;
   authorImage: string | null;
+  isAuthor: boolean;
   heartCount: number;
   viewerHasLiked: boolean;
 };
@@ -83,7 +85,12 @@ function CommentItem({
   onReply,
   onToggleReply,
   onLike,
+  onEdit,
+  onDelete,
   activeReplyId,
+  activeEditId,
+  editDraft,
+  onEditDraftChange,
   session,
 }: {
   comment: CommentNode;
@@ -92,9 +99,19 @@ function CommentItem({
   onReply: (commentId: string) => Promise<void>;
   onToggleReply: (commentId: string) => void;
   onLike: (commentId: string, liked: boolean) => Promise<void>;
+  onEdit: (commentId: string) => Promise<void>;
+  onDelete: (commentId: string) => Promise<void>;
   activeReplyId: string | null;
+  activeEditId: string | null;
+  editDraft: string;
+  onEditDraftChange: (value: string) => void;
   session: Session | null;
 }) {
+  const isOwnComment = session?.user?.id === comment.userId;
+  const isViewerAuthor = isBlogAuthorEmail(session?.user?.email);
+  const canEdit = Boolean(session) && isOwnComment;
+  const canDelete = Boolean(session) && (isOwnComment || isViewerAuthor);
+
   return (
     <div
       className="rounded-2xl p-3"
@@ -107,16 +124,68 @@ function CommentItem({
         <Avatar name={comment.authorName} image={comment.authorImage} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-3">
-            <div className="truncate text-sm font-semibold" style={{ color: "var(--blog-heading)" }}>
-              {comment.authorName}
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="truncate text-sm font-semibold" style={{ color: "var(--blog-heading)" }}>
+                {comment.authorName}
+              </div>
+              {comment.isAuthor ? (
+                <span
+                  className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em]"
+                  style={{
+                    backgroundColor: "color-mix(in srgb, var(--blog-accent-soft) 92%, transparent)",
+                    color: "var(--blog-accent)",
+                    border: "1px solid color-mix(in srgb, var(--blog-accent) 30%, transparent)",
+                  }}
+                >
+                  Author
+                </span>
+              ) : null}
             </div>
             <div className="text-[11px] font-mono" style={{ color: "var(--blog-muted)" }}>
               {formatTime(comment.createdAt)}
             </div>
           </div>
-          <p className="mt-1 whitespace-pre-wrap text-sm leading-6" style={{ color: "var(--blog-body)" }}>
-            {comment.body}
-          </p>
+
+          {activeEditId === comment.id ? (
+            <div className="mt-2">
+              <textarea
+                value={editDraft}
+                onChange={(e) => onEditDraftChange(e.target.value)}
+                className="min-h-[84px] w-full rounded-xl px-3 py-2 text-sm outline-none"
+                style={{
+                  border: "1px solid var(--blog-border)",
+                  backgroundColor: "var(--blog-surface-soft)",
+                  color: "var(--blog-heading)",
+                }}
+              />
+              <div className="mt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => onEditDraftChange("")}
+                  className="rounded-full px-3 py-1.5 text-xs font-semibold"
+                  style={{
+                    border: "1px solid var(--blog-border)",
+                    backgroundColor: "var(--blog-surface-soft)",
+                    color: "var(--blog-muted)",
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onEdit(comment.id)}
+                  className="rounded-full px-3 py-1.5 text-xs font-semibold text-white"
+                  style={{ backgroundColor: "var(--blog-accent)" }}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="mt-1 whitespace-pre-wrap text-sm leading-6" style={{ color: "var(--blog-body)" }}>
+              {comment.body}
+            </p>
+          )}
 
           <div className="mt-3 flex items-center gap-3 text-xs">
             <button
@@ -159,6 +228,34 @@ function CommentItem({
               <MessageCircle className="h-3.5 w-3.5" />
               Reply
             </button>
+            {canEdit ? (
+              <button
+                type="button"
+                onClick={() => onEditDraftChange(activeEditId === comment.id ? "" : comment.body)}
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 transition-colors"
+                style={{
+                  border: "1px solid var(--blog-border)",
+                  backgroundColor: "var(--blog-surface-soft)",
+                  color: "var(--blog-muted)",
+                }}
+              >
+                {activeEditId === comment.id ? "Editing" : "Edit"}
+              </button>
+            ) : null}
+            {canDelete ? (
+              <button
+                type="button"
+                onClick={() => onDelete(comment.id)}
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 transition-colors"
+                style={{
+                  border: "1px solid color-mix(in srgb, #b42318 20%, var(--blog-border))",
+                  backgroundColor: "color-mix(in srgb, #b42318 8%, var(--blog-surface-soft))",
+                  color: "#b42318",
+                }}
+              >
+                Delete
+              </button>
+            ) : null}
           </div>
 
           {activeReplyId === comment.id ? (
@@ -207,13 +304,18 @@ function CommentItem({
               {comment.replies.map((reply) => (
                 <CommentItem
                   key={reply.id}
-                comment={reply}
-                replyDraft={activeReplyId === reply.id ? replyDraft : ""}
-                onReplyDraftChange={onReplyDraftChange}
-                onReply={onReply}
-                onToggleReply={onToggleReply}
+                  comment={reply}
+                  replyDraft={replyDraft}
+                  onReplyDraftChange={onReplyDraftChange}
+                  onReply={onReply}
+                  onToggleReply={onToggleReply}
                   onLike={onLike}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
                   activeReplyId={activeReplyId}
+                  activeEditId={activeEditId}
+                  editDraft={editDraft}
+                  onEditDraftChange={onEditDraftChange}
                   session={session}
                 />
               ))}
@@ -233,6 +335,8 @@ export default function BlogComments({ postSlug }: { postSlug: string }) {
   const [draft, setDraft] = useState("");
   const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
   const [replyDraft, setReplyDraft] = useState("");
+  const [activeEditId, setActiveEditId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const tree = useMemo(() => buildTree(comments), [comments]);
@@ -333,6 +437,63 @@ export default function BlogComments({ postSlug }: { postSlug: string }) {
     }
   }
 
+  async function saveEdit(commentId: string) {
+    if (!session) {
+      await ensureLogin();
+      return;
+    }
+
+    const content = editDraft.trim();
+    if (!content) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/blog/comments", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ commentId, body: content }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Unable to edit comment.");
+      setActiveEditId(null);
+      setEditDraft("");
+      await loadComments();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function deleteComment(commentId: string) {
+    if (!session) {
+      await ensureLogin();
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/blog/comments?commentId=${encodeURIComponent(commentId)}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Unable to delete comment.");
+      if (activeReplyId === commentId) {
+        setActiveReplyId(null);
+        setReplyDraft("");
+      }
+      if (activeEditId === commentId) {
+        setActiveEditId(null);
+        setEditDraft("");
+      }
+      await loadComments();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <aside
       id="blog-comments-panel"
@@ -413,7 +574,20 @@ export default function BlogComments({ postSlug }: { postSlug: string }) {
                   setActiveReplyId((current) => (current === commentId ? null : commentId));
                 }}
                 onLike={toggleLike}
+                onEdit={saveEdit}
+                onDelete={deleteComment}
                 activeReplyId={activeReplyId}
+                activeEditId={activeEditId}
+                editDraft={activeEditId === comment.id ? editDraft : ""}
+                onEditDraftChange={(value) => {
+                  if (value === "") {
+                    setActiveEditId(null);
+                    setEditDraft("");
+                    return;
+                  }
+                  setActiveEditId(comment.id);
+                  setEditDraft(value);
+                }}
                 session={session}
               />
             ))

@@ -3,6 +3,12 @@ import { createClient } from "@/lib/supabase/server";
 import { getAuthenticatedUser } from "@/lib/supabase/requestUser";
 import { isBlogAuthorEmail } from "@/lib/blogComments";
 
+type LegacyProfileRow = {
+  id: string;
+  name: string | null;
+  image: string | null;
+};
+
 function isMissingColumnError(error: unknown) {
   if (!error || typeof error !== "object") return false;
   const message = "message" in error && typeof error.message === "string" ? error.message : "";
@@ -26,6 +32,7 @@ export async function GET(req: NextRequest) {
 
     let comments = null;
     let error = null;
+    let usingLegacySchema = false;
 
     const richResult = await supabase
       .from("blog_comments")
@@ -34,6 +41,7 @@ export async function GET(req: NextRequest) {
       .order("created_at", { ascending: true });
 
     if (richResult.error && isMissingColumnError(richResult.error)) {
+      usingLegacySchema = true;
       const fallbackResult = await supabase
         .from("blog_comments")
         .select("id,post_slug,parent_id,user_id,body,created_at")
@@ -52,6 +60,7 @@ export async function GET(req: NextRequest) {
     }
 
     const commentIds = (comments ?? []).map((comment) => comment.id);
+    const userIds = Array.from(new Set((comments ?? []).map((comment) => comment.user_id)));
     const { data: likes, error: likesError } = commentIds.length > 0
       ? await supabase
           .from("blog_comment_likes")
@@ -64,6 +73,18 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unable to load comments." }, { status: 500 });
     }
 
+    let profileMap = new Map<string, LegacyProfileRow>();
+    if (usingLegacySchema && userIds.length > 0) {
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id,name,image")
+        .in("id", userIds);
+
+      if (!profilesError) {
+        profileMap = new Map(((profiles ?? []) as LegacyProfileRow[]).map((profile) => [profile.id, profile]));
+      }
+    }
+
     const likeMap = new Map<string, number>();
     const viewerLiked = new Set<string>();
     for (const like of likes ?? []) {
@@ -74,6 +95,7 @@ export async function GET(req: NextRequest) {
     }
 
     const payload = (comments ?? []).map((comment) => {
+      const legacyProfile = profileMap.get(comment.user_id);
       return {
         id: comment.id,
         postSlug: comment.post_slug,
@@ -83,11 +105,12 @@ export async function GET(req: NextRequest) {
         createdAt: comment.created_at,
         authorName:
           ("author_name" in comment && typeof comment.author_name === "string" && comment.author_name.trim()) ||
+          legacyProfile?.name?.trim() ||
           "Reader",
         authorImage:
           "author_image" in comment && typeof comment.author_image === "string"
             ? comment.author_image
-            : null,
+            : legacyProfile?.image ?? null,
         isAuthor: "is_author" in comment ? Boolean(comment.is_author) : false,
         heartCount: likeMap.get(comment.id) ?? 0,
         viewerHasLiked: viewerLiked.has(comment.id),

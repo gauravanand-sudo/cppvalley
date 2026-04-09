@@ -3,6 +3,12 @@ import { createClient } from "@/lib/supabase/server";
 import { getAuthenticatedUser } from "@/lib/supabase/requestUser";
 import { isBlogAuthorEmail } from "@/lib/blogComments";
 
+function isMissingColumnError(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+  const message = "message" in error && typeof error.message === "string" ? error.message : "";
+  return message.toLowerCase().includes("column");
+}
+
 export async function GET(req: NextRequest) {
   try {
     const postSlug = req.nextUrl.searchParams.get("slug")?.trim();
@@ -18,11 +24,27 @@ export async function GET(req: NextRequest) {
       console.error("Unable to resolve viewer for blog comments:", error);
     }
 
-    const { data: comments, error } = await supabase
+    let comments = null;
+    let error = null;
+
+    const richResult = await supabase
       .from("blog_comments")
       .select("id,post_slug,parent_id,user_id,body,created_at,author_name,author_image,is_author")
       .eq("post_slug", postSlug)
       .order("created_at", { ascending: true });
+
+    if (richResult.error && isMissingColumnError(richResult.error)) {
+      const fallbackResult = await supabase
+        .from("blog_comments")
+        .select("id,post_slug,parent_id,user_id,body,created_at")
+        .eq("post_slug", postSlug)
+        .order("created_at", { ascending: true });
+      comments = fallbackResult.data;
+      error = fallbackResult.error;
+    } else {
+      comments = richResult.data;
+      error = richResult.error;
+    }
 
     if (error) {
       console.error("Error loading blog comments:", error);
@@ -59,9 +81,14 @@ export async function GET(req: NextRequest) {
         userId: comment.user_id,
         body: comment.body,
         createdAt: comment.created_at,
-        authorName: comment.author_name?.trim() || "Reader",
-        authorImage: comment.author_image ?? null,
-        isAuthor: Boolean(comment.is_author),
+        authorName:
+          ("author_name" in comment && typeof comment.author_name === "string" && comment.author_name.trim()) ||
+          "Reader",
+        authorImage:
+          "author_image" in comment && typeof comment.author_image === "string"
+            ? comment.author_image
+            : null,
+        isAuthor: "is_author" in comment ? Boolean(comment.is_author) : false,
         heartCount: likeMap.get(comment.id) ?? 0,
         viewerHasLiked: viewerLiked.has(comment.id),
       };
@@ -131,7 +158,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const { error } = await supabase.from("blog_comments").insert({
+    const richInsert = await supabase.from("blog_comments").insert({
       post_slug: postSlug,
       parent_id: parentId,
       user_id: user.id,
@@ -140,6 +167,18 @@ export async function POST(req: NextRequest) {
       is_author: isAuthor,
       body: content,
     });
+
+    const error =
+      richInsert.error && isMissingColumnError(richInsert.error)
+        ? (
+            await supabase.from("blog_comments").insert({
+              post_slug: postSlug,
+              parent_id: parentId,
+              user_id: user.id,
+              body: content,
+            })
+          ).error
+        : richInsert.error;
 
     if (error) {
       console.error("Error creating blog comment:", error);

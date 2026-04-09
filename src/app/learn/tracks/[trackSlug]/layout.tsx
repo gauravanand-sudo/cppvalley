@@ -7,6 +7,7 @@ import { getTrackProgress } from "@/lib/progress";
 import TrackLayout from "@/components/TrackLayout";
 import TrackSidebar from "@/components/TrackSidebar";
 import LessonContentWrapper from "@/components/LessonContentWrapper";
+import { isPublicTrackSlug } from "@/lib/publicContent";
 
 export default async function TrackLayoutPage({
   children,
@@ -19,6 +20,7 @@ export default async function TrackLayoutPage({
   const trackSlug = p?.trackSlug;
 
   if (typeof trackSlug !== "string") notFound();
+  if (!isPublicTrackSlug(trackSlug)) notFound();
 
   const track = requireContent("tracks", trackSlug);
   const sections = parseTrackSyllabus(track.content);

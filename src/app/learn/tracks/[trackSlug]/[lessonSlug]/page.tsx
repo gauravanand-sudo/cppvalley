@@ -6,6 +6,11 @@ import Link from "next/link";
 import TrackProgressPing from "@/components/TrackProgressPing";
 import { getUserEntitlements } from "@/lib/entitlements";
 import { hasTrackAccess, trackRequiresPurchase } from "@/lib/trackAccess";
+import { isPublicTrackSlug } from "@/lib/publicContent";
+import GoogleAdSlot from "@/components/GoogleAdSlot";
+
+const LESSON_INLINE_AD_SLOT = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SLOT_LESSON_INLINE;
+const LESSON_FOOTER_AD_SLOT = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SLOT_LESSON_FOOTER;
 
 interface PageParams {
   params: Promise<{ trackSlug: string; lessonSlug: string }>;
@@ -46,18 +51,23 @@ function loadTrack(trackSlug: string) {
 export default async function TrackLessonPage({ params }: PageParams) {
   const { trackSlug, lessonSlug } = await params;
   if (!trackSlug || !lessonSlug) notFound();
+  if (!isPublicTrackSlug(trackSlug)) notFound();
 
   const track = loadTrack(trackSlug);
-  const entitlements = await getUserEntitlements();
-  const trackUnlocked = hasTrackAccess(entitlements, track.meta);
-  const requiresPurchase = trackRequiresPurchase(track.meta);
-  if (requiresPurchase && !trackUnlocked) {
-    redirect(`/checkout?track=${encodeURIComponent(trackSlug)}`);
-  }
   const sections = parseTrackSyllabus(track.content);
   const all = flatten(sections.flatMap((s: TrackSection) => s.items ?? []));
   const idx = all.findIndex((x) => x.slug === lessonSlug);
   if (idx === -1) notFound();
+
+  const lessonItem = all[idx] as AnyItem & { access?: string };
+  const lessonIsFree = lessonItem?.access === "free";
+
+  const entitlements = await getUserEntitlements();
+  const trackUnlocked = hasTrackAccess(entitlements, track.meta);
+  const requiresPurchase = trackRequiresPurchase(track.meta);
+  if (requiresPurchase && !trackUnlocked && !lessonIsFree) {
+    redirect(`/checkout?track=${encodeURIComponent(trackSlug)}`);
+  }
 
   const lesson = loadLesson(trackSlug, lessonSlug);
   const prevLesson = idx > 0 ? all[idx - 1] : null;
@@ -78,6 +88,12 @@ export default async function TrackLessonPage({ params }: PageParams) {
         >
           <MdxRenderer source={lesson.content} />
         </article>
+
+        <GoogleAdSlot
+          slot={LESSON_INLINE_AD_SLOT}
+          className="mb-6"
+          label="Advertisement"
+        />
 
         {/* Prev / next navigation */}
         <div className="pt-5" style={{ borderTop: "1px solid var(--reader-border)" }}>
@@ -139,6 +155,12 @@ export default async function TrackLessonPage({ params }: PageParams) {
             </Link>
           </div>
         </div>
+
+        <GoogleAdSlot
+          slot={LESSON_FOOTER_AD_SLOT}
+          className="mt-8"
+          label="Sponsored"
+        />
       </div>
     </div>
   );

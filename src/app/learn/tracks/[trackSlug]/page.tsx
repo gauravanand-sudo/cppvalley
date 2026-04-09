@@ -11,6 +11,10 @@ import {
 import { ChevronRight, Lock, Sparkles } from "lucide-react";
 import { getUserEntitlements } from "@/lib/entitlements";
 import { hasTrackAccess, trackRequiresPurchase } from "@/lib/trackAccess";
+import { isPublicTrackSlug } from "@/lib/publicContent";
+import GoogleAdSlot from "@/components/GoogleAdSlot";
+
+const COURSE_INLINE_AD_SLOT = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SLOT_COURSE_INLINE;
 
 // Add any track slug here that should redirect to a standalone HTML page
 // File must exist at public/<filename>.html
@@ -32,6 +36,10 @@ export default async function TrackIntroPage({
   // Redirect to standalone HTML page if configured
   if (HTML_REDIRECTS[trackSlug]) {
     redirect(HTML_REDIRECTS[trackSlug]);
+  }
+
+  if (!isPublicTrackSlug(trackSlug)) {
+    notFound();
   }
 
   const track = getTrackBySlug(trackSlug);
@@ -187,6 +195,12 @@ export default async function TrackIntroPage({
             ))}
           </div>
         )}
+
+        <GoogleAdSlot
+          slot={COURSE_INLINE_AD_SLOT}
+          className="mb-8"
+          label="Advertisement"
+        />
 
         {/* Syllabus */}
         {sections.length > 0 && (

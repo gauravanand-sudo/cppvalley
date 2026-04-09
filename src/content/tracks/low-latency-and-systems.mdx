@@ -1,0 +1,244 @@
+---
+title: "Low Latency & Systems"
+slug: "low-latency-and-systems"
+access: "paid"
+live: true
+price: 599
+currency: "INR"
+priceLabel: "₹599"
+duration: "5 weeks"
+level: "Intermediate/Hard"
+description: "Cache geometry, lock-free programming, custom allocators, profiling tools, and systems design patterns used in HFT and high-performance C++."
+tags: ["C++", "Low Latency", "HFT", "Lock-Free", "Cache", "Allocators", "Profiling", "Systems Design", "Performance"]
+order: 3
+---
+
+## Module 1
+
+- {
+  "title": "CPU & Memory",
+  "slug": "cpu-memory-module",
+  "description": "Cache hierarchy, spatial locality, false sharing, and branch prediction — the hardware that shapes every performance decision",
+  "access": "paid",
+  "live": true,
+  "order": 1,
+  "children": [
+    {
+      "id": "cache-hierarchy",
+      "title": "Cache Hierarchy",
+      "slug": "cache-hierarchy",
+      "access": "free",
+      "live": true,
+      "duration": "40 min",
+      "level": "Intermediate",
+      "summary": "L1/L2/L3 cache sizes, latencies, and how the memory hierarchy shapes the performance envelope of every C++ program.",
+      "practice": 6
+    },
+    {
+      "id": "cache-friendly-data-structures",
+      "title": "Cache-Friendly Data Structures",
+      "slug": "cache-friendly-data-structures",
+      "access": "free",
+      "live": true,
+      "duration": "45 min",
+      "level": "Intermediate",
+      "summary": "Designing structs and containers that maximize spatial locality — AoS vs SoA, hot/cold splitting, and practical benchmarks.",
+      "practice": 8
+    },
+    {
+      "id": "false-sharing",
+      "title": "False Sharing",
+      "slug": "false-sharing",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "How two threads writing different variables on the same cache line destroy throughput, and how to pad your way out.",
+      "practice": 6
+    },
+    {
+      "id": "branch-prediction",
+      "title": "Branch Prediction",
+      "slug": "branch-prediction",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "How CPUs speculatively execute ahead of branches, what causes mispredictions, and how to write branch-predictor-friendly code.",
+      "practice": 5
+    }
+  ]
+}
+
+## Module 2
+
+- {
+  "title": "Lock-Free Programming",
+  "slug": "lock-free-programming-module",
+  "description": "Atomics, memory ordering, lock-free queues, and the ABA problem — concurrent programming without mutexes",
+  "access": "paid",
+  "live": true,
+  "order": 2,
+  "children": [
+    {
+      "id": "atomics",
+      "title": "Atomics",
+      "slug": "atomics",
+      "access": "free",
+      "live": true,
+      "duration": "40 min",
+      "level": "Intermediate",
+      "summary": "std::atomic and the operations it guarantees — load, store, exchange, compare_exchange, and fetch_add without locks.",
+      "practice": 7
+    },
+    {
+      "id": "memory-ordering",
+      "title": "Memory Ordering",
+      "slug": "memory-ordering",
+      "access": "paid",
+      "live": true,
+      "duration": "50 min",
+      "level": "Hard",
+      "summary": "relaxed, acquire, release, acq_rel, and seq_cst — what each memory order enforces and when to use which.",
+      "practice": 10
+    },
+    {
+      "id": "lock-free-queue",
+      "title": "Lock-Free Queue",
+      "slug": "lock-free-queue",
+      "access": "paid",
+      "live": true,
+      "duration": "55 min",
+      "level": "Hard",
+      "summary": "Building a single-producer single-consumer lock-free queue from scratch using atomics and memory ordering.",
+      "practice": 10
+    },
+    {
+      "id": "aba-problem",
+      "title": "ABA Problem",
+      "slug": "aba-problem",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Hard",
+      "summary": "The classic ABA hazard in CAS loops, why it silently corrupts lock-free structures, and solutions including tagged pointers.",
+      "practice": 8
+    }
+  ]
+}
+
+## Module 3
+
+- {
+  "title": "Memory Allocators",
+  "slug": "memory-allocators-module",
+  "description": "Why general-purpose allocators are slow and how to build pool and arena allocators from scratch",
+  "access": "paid",
+  "live": true,
+  "order": 3,
+  "children": [
+    {
+      "id": "why-malloc-is-slow",
+      "title": "Why malloc Is Slow",
+      "slug": "why-malloc-is-slow",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "The hidden costs inside general-purpose allocators — fragmentation, lock contention, bookkeeping overhead, and TLB pressure.",
+      "practice": 5
+    },
+    {
+      "id": "pool-allocator",
+      "title": "Pool Allocator",
+      "slug": "pool-allocator",
+      "access": "paid",
+      "live": true,
+      "duration": "45 min",
+      "level": "Hard",
+      "summary": "Implementing a fixed-size pool allocator that eliminates fragmentation and reduces allocation to a pointer bump.",
+      "practice": 8
+    },
+    {
+      "id": "arena-allocator",
+      "title": "Arena Allocator",
+      "slug": "arena-allocator",
+      "access": "paid",
+      "live": true,
+      "duration": "40 min",
+      "level": "Hard",
+      "summary": "Bump-pointer arenas for request-scoped allocation — O(1) alloc, zero per-object free, and bulk reset.",
+      "practice": 7
+    }
+  ]
+}
+
+## Module 4
+
+- {
+  "title": "Profiling",
+  "slug": "profiling-module",
+  "description": "perf, Google Benchmark, and flamegraphs — the toolchain for finding and fixing real performance bottlenecks",
+  "access": "paid",
+  "live": true,
+  "order": 4,
+  "children": [
+    {
+      "id": "perf-profiling",
+      "title": "perf Profiling",
+      "slug": "perf-profiling",
+      "access": "paid",
+      "live": true,
+      "duration": "40 min",
+      "level": "Intermediate",
+      "summary": "Using Linux perf to collect CPU performance counters, find hot functions, and understand where cycles are spent.",
+      "practice": 6
+    },
+    {
+      "id": "google-benchmark",
+      "title": "Google Benchmark",
+      "slug": "google-benchmark",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Writing micro-benchmarks with Google Benchmark — preventing dead-code elimination, controlling iterations, and reading output.",
+      "practice": 6
+    },
+    {
+      "id": "flamegraphs",
+      "title": "Flamegraphs",
+      "slug": "flamegraphs",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Generating and reading flamegraphs from perf data to visualize the full call-stack cost profile of a running program.",
+      "practice": 5
+    }
+  ]
+}
+
+## Module 5
+
+- {
+  "title": "Systems Design",
+  "slug": "systems-design-module",
+  "description": "High-performance data structures used in real systems — ring buffers, queues, and lock-free pipelines",
+  "access": "paid",
+  "live": true,
+  "order": 5,
+  "children": [
+    {
+      "id": "ring-buffer",
+      "title": "Ring Buffer",
+      "slug": "ring-buffer",
+      "access": "paid",
+      "live": true,
+      "duration": "45 min",
+      "level": "Hard",
+      "summary": "Designing a cache-line-aligned ring buffer for high-throughput inter-thread communication without dynamic allocation.",
+      "practice": 8
+    }
+  ]
+}

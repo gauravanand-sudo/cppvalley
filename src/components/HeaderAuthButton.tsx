@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { getAuthRedirectUrl } from "@/lib/authRedirect";
 
 export default function HeaderAuthButton() {
   const supabase = createClient();
+  const pathname = usePathname();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -50,6 +52,8 @@ export default function HeaderAuthButton() {
       setLoading(true);
       await supabase.auth.signOut();
       setSession(null);
+      const nextHref = pathname.startsWith("/learn/tracks") ? "/" : pathname;
+      window.location.assign(nextHref || "/");
     } finally {
       setLoading(false);
     }

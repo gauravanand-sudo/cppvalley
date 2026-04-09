@@ -1,0 +1,1325 @@
+---
+title: "Core C++ for Interviews"
+slug: "core-cpp-for-interviews"
+access: "paid"
+live: true
+price: 899
+currency: "INR"
+priceLabel: "₹899"
+duration: "6 weeks"
+level: "Beginner/Intermediate"
+description: "Every C++ concept interviewers actually test — memory, move semantics, templates, STL, concurrency, UB, and 7 live coding builds. 97 lessons."
+tags: ["C++", "Interviews", "Memory", "Move Semantics", "Templates", "STL", "Concurrency", "OOP", "Undefined Behavior", "Design Patterns"]
+order: 2
+---
+
+## Module 1
+
+- {
+  "title": "C++ Fundamentals Every Interviewer Tests",
+  "slug": "cpp-fundamentals-module",
+  "description": "Compilation, linkage, const, static, sizeof — the questions that trip up candidates who only know surface-level C++",
+  "access": "paid",
+  "live": true,
+  "order": 1,
+  "children": [
+    {
+      "id": "what-happens-when-you-compile-cpp",
+      "title": "What Actually Happens When You Compile C++ — And Why Interviewers Ask This",
+      "slug": "what-happens-when-you-compile-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "30 min",
+      "level": "Beginner",
+      "summary": "Preprocessing, compilation, assembly, linking — what each stage does and why interviewers probe this.",
+      "practice": 4
+    },
+    {
+      "id": "stack-vs-heap",
+      "title": "Stack vs Heap: Answer This Wrong and You Fail the Interview",
+      "slug": "stack-vs-heap",
+      "access": "free",
+      "live": true,
+      "duration": "30 min",
+      "level": "Beginner",
+      "summary": "How stack and heap differ in layout, lifetime, and performance — and the exact answer interviewers want.",
+      "practice": 5
+    },
+    {
+      "id": "pointers-vs-references",
+      "title": "Pointers vs References: The #1 Most Asked C++ Fundamental",
+      "slug": "pointers-vs-references",
+      "access": "free",
+      "live": true,
+      "duration": "25 min",
+      "level": "Beginner",
+      "summary": "Nullability, rebinding, syntax, and the real semantic differences that interviewers want you to articulate.",
+      "practice": 4
+    },
+    {
+      "id": "const-correctness",
+      "title": "const Correctness: The Trap That Fails 80% of Candidates",
+      "slug": "const-correctness",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "const on pointers, references, member functions, and return types — read the declarations right every time.",
+      "practice": 6
+    },
+    {
+      "id": "four-meanings-of-static",
+      "title": "The 4 Meanings of static — Interviewers Love This Question",
+      "slug": "four-meanings-of-static",
+      "access": "free",
+      "live": true,
+      "duration": "30 min",
+      "level": "Beginner",
+      "summary": "Static local variables, static member variables, static member functions, and static at file scope — all four, clearly explained.",
+      "practice": 5
+    },
+    {
+      "id": "volatile-vs-atomic",
+      "title": "volatile vs atomic — Don't Confuse These in an Interview",
+      "slug": "volatile-vs-atomic",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Why volatile doesn't give you thread safety, what std::atomic actually guarantees, and when each belongs.",
+      "practice": 5
+    },
+    {
+      "id": "extern-and-linkage",
+      "title": "extern and Linkage — What Senior Engineers Know That Juniors Don't",
+      "slug": "extern-and-linkage",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Internal vs external linkage, what extern does, and how this knowledge prevents ODR bugs.",
+      "practice": 4
+    },
+    {
+      "id": "sizeof-traps",
+      "title": "sizeof Traps — Classic Interview Trick Questions Decoded",
+      "slug": "sizeof-traps",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Beginner",
+      "summary": "sizeof on arrays vs pointers, structs with padding, empty classes — every trick question with a clear explanation.",
+      "practice": 5
+    },
+    {
+      "id": "odr-rule",
+      "title": "The ODR Rule — Why It Comes Up in Every System Design Round",
+      "slug": "odr-rule",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "One Definition Rule — what it forbids, how violations cause silent UB, and how inline and templates interact with it.",
+      "practice": 4
+    },
+    {
+      "id": "header-files-translation-units",
+      "title": "Header Files and Translation Units — What Interviewers Expect You to Know",
+      "slug": "header-files-translation-units",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Beginner",
+      "summary": "Include guards, forward declarations, what belongs in headers vs source files, and why this matters at scale.",
+      "practice": 4
+    }
+  ]
+}
+
+## Module 2
+
+- {
+  "title": "Memory & Ownership — The Most Tested C++ Topic",
+  "slug": "memory-ownership-module",
+  "description": "RAII, smart pointers, alignment, placement new — the questions that define whether you really know C++ memory",
+  "access": "paid",
+  "live": true,
+  "order": 2,
+  "children": [
+    {
+      "id": "raii",
+      "title": "RAII: If You Can't Explain This, You Won't Pass a C++ Interview",
+      "slug": "raii",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Resource Acquisition Is Initialization — tying resource lifetimes to object lifetimes to eliminate entire classes of bugs.",
+      "practice": 6
+    },
+    {
+      "id": "stack-unwinding",
+      "title": "How Stack Unwinding Works — And Why It Matters in Real Code",
+      "slug": "stack-unwinding",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "What the runtime does to your stack frames when an exception propagates, and why destructors must not throw.",
+      "practice": 4
+    },
+    {
+      "id": "new-delete-vs-malloc-free",
+      "title": "new/delete vs malloc/free — Interviewers Will Ask the Difference",
+      "slug": "new-delete-vs-malloc-free",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Beginner",
+      "summary": "Constructor/destructor invocation, type safety, operator overloading, and when you'd ever mix the two.",
+      "practice": 5
+    },
+    {
+      "id": "smart-pointers",
+      "title": "unique_ptr vs shared_ptr vs weak_ptr — Master All Three",
+      "slug": "smart-pointers",
+      "access": "paid",
+      "live": true,
+      "duration": "45 min",
+      "level": "Intermediate",
+      "summary": "Ownership semantics, reference counting, cycle breaking, and the interview traps inside each smart pointer.",
+      "practice": 8
+    },
+    {
+      "id": "make-shared-vs-new",
+      "title": "make_shared vs shared_ptr(new T) — The Answer That Impresses Interviewers",
+      "slug": "make-shared-vs-new",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "One allocation vs two, exception safety, and the control block layout — the detail that separates good answers from great ones.",
+      "practice": 4
+    },
+    {
+      "id": "shared-ptr-not-thread-safe",
+      "title": "Why shared_ptr Is NOT Thread-Safe — The Trap That Trips Everyone",
+      "slug": "shared-ptr-not-thread-safe",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "The reference count is atomic but the pointer isn't — exactly what is and isn't safe, with code that proves it.",
+      "practice": 5
+    },
+    {
+      "id": "dangling-pointers",
+      "title": "Dangling Pointers — Spot and Fix Them Live in an Interview",
+      "slug": "dangling-pointers",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Returning stack addresses, iterator invalidation, use-after-free — recognise the patterns on a whiteboard instantly.",
+      "practice": 6
+    },
+    {
+      "id": "memory-leaks",
+      "title": "Memory Leaks — How to Find, Explain and Prevent Them on a Whiteboard",
+      "slug": "memory-leaks",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Shared pointer cycles, exception paths, valgrind and AddressSanitizer — the full answer interviewers want.",
+      "practice": 5
+    },
+    {
+      "id": "rule-of-3-5-0",
+      "title": "Rule of 3, Rule of 5, Rule of 0 — Which One Applies and When",
+      "slug": "rule-of-3-5-0",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Copy/move constructors, copy/move assignment, destructor — the compiler-generated special members and when to take control.",
+      "practice": 6
+    },
+    {
+      "id": "copy-elision-rvo",
+      "title": "Copy Elision and RVO — Why Your Copy Constructor Isn't Always Called",
+      "slug": "copy-elision-rvo",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Named Return Value Optimization, mandatory copy elision in C++17, and how to write code that lets the compiler help.",
+      "practice": 4
+    },
+    {
+      "id": "alignment-and-padding",
+      "title": "Object Alignment and Padding — Why Your Struct Is Bigger Than You Think",
+      "slug": "alignment-and-padding",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Alignment requirements, internal and trailing padding, reordering fields, and alignas for cache-line alignment.",
+      "practice": 5
+    },
+    {
+      "id": "placement-new",
+      "title": "placement new — When Interviewers Ask About Custom Memory Control",
+      "slug": "placement-new",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Hard",
+      "summary": "Constructing objects in pre-allocated memory, explicit destructor calls, and where this matters in allocators and embedded.",
+      "practice": 5
+    }
+  ]
+}
+
+## Module 3
+
+- {
+  "title": "Move Semantics — Where Most Candidates Fake It",
+  "slug": "move-semantics-module",
+  "description": "Value categories, move constructors, std::move, perfect forwarding — understand it deeply enough to write it live",
+  "access": "paid",
+  "live": true,
+  "order": 3,
+  "children": [
+    {
+      "id": "lvalues-rvalues",
+      "title": "lvalues, rvalues, xvalues — Explain This Clearly and Stand Out",
+      "slug": "lvalues-rvalues",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "The full value category taxonomy — what makes something an lvalue or rvalue and how the compiler uses it for overload resolution.",
+      "practice": 6
+    },
+    {
+      "id": "move-constructor-from-scratch",
+      "title": "Write a Move Constructor from Scratch — The Most Common Live Coding Ask",
+      "slug": "move-constructor-from-scratch",
+      "access": "paid",
+      "live": true,
+      "duration": "40 min",
+      "level": "Intermediate",
+      "summary": "Implement a correct move constructor and move assignment operator for a resource-owning class, step by step.",
+      "practice": 8
+    },
+    {
+      "id": "std-move",
+      "title": "std::move Is Just a Cast — Here's What Interviewers Want You to Say",
+      "slug": "std-move",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "std::move doesn't move anything — it casts to rvalue reference. Understand exactly what that means and when it matters.",
+      "practice": 4
+    },
+    {
+      "id": "std-move-forward",
+      "title": "std::forward and Perfect Forwarding — Stop Guessing, Understand It",
+      "slug": "std-move-forward",
+      "access": "paid",
+      "live": true,
+      "duration": "40 min",
+      "level": "Intermediate",
+      "summary": "Universal references, reference collapsing, and why std::forward is the only correct way to pass through arguments.",
+      "practice": 7
+    },
+    {
+      "id": "compiler-generated-move",
+      "title": "When Does the Compiler Auto-Generate Move Operations — Interview Answer",
+      "slug": "compiler-generated-move",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "The exact conditions that suppress auto-generation of move constructor and move assignment — and why they exist.",
+      "practice": 4
+    },
+    {
+      "id": "moved-from-state",
+      "title": "Moved-From State — What's Left and Why Interviewers Care",
+      "slug": "moved-from-state",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "What the standard guarantees about moved-from objects, why valid-but-unspecified matters, and common pitfalls.",
+      "practice": 4
+    },
+    {
+      "id": "noexcept-on-move",
+      "title": "noexcept on Move — Why std::vector Requires It and You Should Too",
+      "slug": "noexcept-on-move",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "How std::vector decides whether to move or copy during reallocation, and why noexcept(true) on your move ops is critical.",
+      "practice": 4
+    }
+  ]
+}
+
+## Module 4
+
+- {
+  "title": "OOP in C++ — Asked at Every Single Company",
+  "slug": "oop-module",
+  "description": "Constructors, virtual dispatch, inheritance, casts, operator overloading — the C++ OOP questions that never stop coming up",
+  "access": "paid",
+  "live": true,
+  "order": 4,
+  "children": [
+    {
+      "id": "constructors-deep-dive",
+      "title": "Constructors Deep Dive — Default, Delegating, explicit and When Each Matters",
+      "slug": "constructors-deep-dive",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Default vs value initialization, delegating constructors, explicit to prevent implicit conversions — all the traps.",
+      "practice": 6
+    },
+    {
+      "id": "virtual-destructors",
+      "title": "Virtual Destructors — Get This Wrong and Leak Memory in the Interview",
+      "slug": "virtual-destructors",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "Why deleting through a base pointer without a virtual destructor is UB, and the one rule that prevents it.",
+      "practice": 4
+    },
+    {
+      "id": "inheritance-access-specifiers",
+      "title": "Inheritance — Public vs Protected vs Private, Explained for Interviews",
+      "slug": "inheritance-access-specifiers",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "What each inheritance mode means for member access, is-a vs implemented-in-terms-of, and when private inheritance is right.",
+      "practice": 5
+    },
+    {
+      "id": "how-vtables-work",
+      "title": "How vtables Work Internally — The Answer That Makes Interviewers Nod",
+      "slug": "how-vtables-work",
+      "access": "paid",
+      "live": true,
+      "duration": "40 min",
+      "level": "Intermediate",
+      "summary": "vptr placement, vtable layout, virtual dispatch cost, and why virtual destructors need their own vtable entry.",
+      "practice": 6
+    },
+    {
+      "id": "pure-virtual-abstract-classes",
+      "title": "Pure Virtual Functions and Abstract Classes — Write One in an Interview",
+      "slug": "pure-virtual-abstract-classes",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "= 0 syntax, abstract class rules, pure virtual with a body, and common interview patterns using interfaces.",
+      "practice": 4
+    },
+    {
+      "id": "override-and-final",
+      "title": "override and final — Why Not Using Them Is a Red Flag",
+      "slug": "override-and-final",
+      "access": "paid",
+      "live": true,
+      "duration": "20 min",
+      "level": "Beginner",
+      "summary": "How override catches signature mismatches at compile time, what final prevents, and why modern code uses both.",
+      "practice": 3
+    },
+    {
+      "id": "object-slicing",
+      "title": "Object Slicing — The Gotcha That Catches Even Experienced Candidates",
+      "slug": "object-slicing",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "What happens when a derived object is assigned to a base — data loss, virtual dispatch loss, and how to prevent it.",
+      "practice": 4
+    },
+    {
+      "id": "multiple-inheritance-diamond",
+      "title": "Multiple Inheritance and the Diamond Problem — How to Solve It Cleanly",
+      "slug": "multiple-inheritance-diamond",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Diamond ambiguity, virtual inheritance, the cost it introduces, and when to prefer composition instead.",
+      "practice": 5
+    },
+    {
+      "id": "cpp-casts",
+      "title": "All 4 C++ Casts — When to Use Each One in an Interview Answer",
+      "slug": "cpp-casts",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "static_cast, dynamic_cast, const_cast, reinterpret_cast — what each does, what each costs, and what each risks.",
+      "practice": 6
+    },
+    {
+      "id": "operator-overloading",
+      "title": "Operator Overloading — Rules, Traps, and What Interviewers Actually Test",
+      "slug": "operator-overloading",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Member vs non-member, return types, canonical forms, and the operators you cannot overload — all in one lesson.",
+      "practice": 6
+    },
+    {
+      "id": "mutable-keyword",
+      "title": "mutable Keyword — The One That Always Comes Up in const Discussions",
+      "slug": "mutable-keyword",
+      "access": "paid",
+      "live": true,
+      "duration": "20 min",
+      "level": "Intermediate",
+      "summary": "Mutating state inside const member functions, mutable lambdas, and the logical vs bitwise const distinction.",
+      "practice": 3
+    }
+  ]
+}
+
+## Module 5
+
+- {
+  "title": "Templates — Where Good C++ Engineers Separate Themselves",
+  "slug": "templates-module",
+  "description": "Type deduction, specialization, SFINAE, Concepts, CRTP — the template knowledge that defines senior C++ engineers",
+  "access": "paid",
+  "live": true,
+  "order": 5,
+  "children": [
+    {
+      "id": "templates-basics",
+      "title": "Function and Class Templates — The Basics Every Interviewer Expects",
+      "slug": "templates-basics",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Type and non-type parameters, instantiation, two-phase lookup — what every C++ engineer must know about templates.",
+      "practice": 5
+    },
+    {
+      "id": "template-type-deduction",
+      "title": "How Template Type Deduction Works — Explain It Without Stumbling",
+      "slug": "template-type-deduction",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "The three cases of template argument deduction, how auto mirrors them, and where deduction fails or surprises you.",
+      "practice": 6
+    },
+    {
+      "id": "template-specialization",
+      "title": "Template Specialization — Full vs Partial, With Real Interview Examples",
+      "slug": "template-specialization",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Full and partial specialization — customizing behavior for specific types while keeping the generic case intact.",
+      "practice": 5
+    },
+    {
+      "id": "constexpr",
+      "title": "constexpr — Compile-Time Computation Asked in Performance Interviews",
+      "slug": "constexpr",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "constexpr functions and variables, if constexpr for compile-time branching, and C++20 consteval and constinit.",
+      "practice": 6
+    },
+    {
+      "id": "variadic-templates",
+      "title": "Variadic Templates — What They Are and How to Use Them Confidently",
+      "slug": "variadic-templates",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Hard",
+      "summary": "Parameter packs, pack expansion, fold expressions, and the practical patterns you'll see in real codebases.",
+      "practice": 6
+    },
+    {
+      "id": "sfinae",
+      "title": "SFINAE — What It Is, Why It Exists, How to Explain It Simply",
+      "slug": "sfinae",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Hard",
+      "summary": "Substitution Failure Is Not An Error — the mechanism behind conditional templates and the overload resolution trick.",
+      "practice": 6
+    },
+    {
+      "id": "enable-if",
+      "title": "std::enable_if — Conditional Templates Without Confusion",
+      "slug": "enable-if",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Hard",
+      "summary": "SFINAE via enable_if on return types, template parameters, and function arguments — with clear before/after examples.",
+      "practice": 5
+    },
+    {
+      "id": "concepts-cpp20",
+      "title": "Concepts (C++20) — The Modern Answer to SFINAE in Interviews",
+      "slug": "concepts-cpp20",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "requires clauses, concept definitions, shorthand syntax, and why Concepts replace most SFINAE use cases cleanly.",
+      "practice": 5
+    },
+    {
+      "id": "crtp",
+      "title": "CRTP — The Pattern Behind Static Polymorphism, Explained Simply",
+      "slug": "crtp",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Hard",
+      "summary": "Curiously Recurring Template Pattern — zero-cost static dispatch, mixin utilities, and where it beats virtual.",
+      "practice": 6
+    },
+    {
+      "id": "type-traits",
+      "title": "type_traits — is_same, decay, remove_reference in Real Interviews",
+      "slug": "type-traits",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "The standard type trait toolkit, how to implement your own, and how they combine with enable_if and Concepts.",
+      "practice": 5
+    }
+  ]
+}
+
+## Module 6
+
+- {
+  "title": "STL Mastery — Asked at Google, Meta, Amazon, Bloomberg",
+  "slug": "stl-module",
+  "description": "Vector internals, iterator invalidation, algorithm selection, string_view, optional — know the STL like you wrote it",
+  "access": "paid",
+  "live": true,
+  "order": 6,
+  "children": [
+    {
+      "id": "vector-internals",
+      "title": "std::vector Internals — Capacity, Reallocation, Amortized Cost Explained",
+      "slug": "vector-internals",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Growth factor, reallocation strategy, amortized O(1) push_back, and the exceptions to that guarantee.",
+      "practice": 6
+    },
+    {
+      "id": "list-deque-array",
+      "title": "std::list vs std::deque vs std::array — Choose Correctly Under Pressure",
+      "slug": "list-deque-array",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Cache locality, iterator stability, fixed vs dynamic size — the decision framework for container selection.",
+      "practice": 5
+    },
+    {
+      "id": "map-vs-unordered-map",
+      "title": "std::map vs std::unordered_map — When Each Wins and Why",
+      "slug": "map-vs-unordered-map",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Red-black tree vs hash table, ordering guarantees, worst-case complexity, and hash collision attack vectors.",
+      "practice": 5
+    },
+    {
+      "id": "iterator-invalidation",
+      "title": "Iterator Invalidation — The Bug That Hides Until the Interview",
+      "slug": "iterator-invalidation",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Which operations invalidate iterators in vector, list, map, and unordered_map — and the UB when you miss one.",
+      "practice": 6
+    },
+    {
+      "id": "iterator-categories",
+      "title": "Iterator Categories — What Every STL Power User Knows",
+      "slug": "iterator-categories",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "Input, forward, bidirectional, random-access, contiguous — why the category determines which algorithms you can use.",
+      "practice": 4
+    },
+    {
+      "id": "stl-algorithms",
+      "title": "std::sort, std::find, std::transform — Use Algorithms Like a Pro",
+      "slug": "stl-algorithms",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "The algorithms interviewers test, their complexity guarantees, and how to chain them with lambdas cleanly.",
+      "practice": 7
+    },
+    {
+      "id": "string-view",
+      "title": "std::string_view — Stop Copying Strings in Interview Code",
+      "slug": "string-view",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "Non-owning string references, dangling risks, and why string_view is the right default for read-only string params.",
+      "practice": 4
+    },
+    {
+      "id": "optional-and-variant",
+      "title": "std::optional and std::variant — The Modern C++ Answer to Nullable Types",
+      "slug": "optional-and-variant",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "optional for nullable values, variant for type-safe unions, std::visit for exhaustive pattern matching.",
+      "practice": 6
+    },
+    {
+      "id": "custom-comparators",
+      "title": "Custom Comparators — Write Clean, Correct Code for Sorted Containers",
+      "slug": "custom-comparators",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "Strict weak ordering, lambda comparators, function objects vs std::less, and the bugs from getting it wrong.",
+      "practice": 5
+    },
+    {
+      "id": "span",
+      "title": "std::span — Safer Array Passing Without Performance Cost",
+      "slug": "span",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "Non-owning view over contiguous ranges, fixed vs dynamic extent, and why span replaces pointer+length pairs.",
+      "practice": 4
+    }
+  ]
+}
+
+## Module 7
+
+- {
+  "title": "Modern C++ — What Separates 2024 Engineers from the Rest",
+  "slug": "modern-cpp-module",
+  "description": "auto, lambdas, structured bindings, brace initialization — the C++11/14/17/20 features interviewers probe daily",
+  "access": "paid",
+  "live": true,
+  "order": 7,
+  "children": [
+    {
+      "id": "auto-keyword",
+      "title": "auto — Where It Helps and Where It Quietly Breaks Your Code",
+      "slug": "auto-keyword",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "How auto deduces types (same rules as templates), where it drops qualifiers, and the proxy-object trap with vector<bool>.",
+      "practice": 4
+    },
+    {
+      "id": "lambda-expressions",
+      "title": "Lambda Expressions — Capture Correctly or Introduce Subtle Bugs",
+      "slug": "lambda-expressions",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Capture by value vs reference, dangling captures, mutable lambdas, generic lambdas, and the generated closure type.",
+      "practice": 6
+    },
+    {
+      "id": "range-based-for",
+      "title": "Range-Based For — What's Happening Under the Hood",
+      "slug": "range-based-for",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Beginner",
+      "summary": "The begin/end protocol, how to make your own types range-compatible, and the copy trap without auto&.",
+      "practice": 4
+    },
+    {
+      "id": "brace-initialization",
+      "title": "Brace Initialization — Uniform Initialization and Its Surprising Quirks",
+      "slug": "brace-initialization",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Narrowing conversion prevention, initializer_list hijacking, most-vexing-parse elimination — and the edge cases.",
+      "practice": 5
+    },
+    {
+      "id": "nullptr-vs-null",
+      "title": "nullptr vs NULL — Why This Still Comes Up in Interviews",
+      "slug": "nullptr-vs-null",
+      "access": "paid",
+      "live": true,
+      "duration": "20 min",
+      "level": "Beginner",
+      "summary": "nullptr_t, overload resolution with NULL, and why nullptr is unambiguous in a way that 0 and NULL never were.",
+      "practice": 3
+    },
+    {
+      "id": "enum-class-vs-enum",
+      "title": "enum class vs enum — The Safety Difference Interviewers Test",
+      "slug": "enum-class-vs-enum",
+      "access": "paid",
+      "live": true,
+      "duration": "20 min",
+      "level": "Beginner",
+      "summary": "Scoped vs unscoped enums, implicit integer conversion, underlying type control, and forward declarations.",
+      "practice": 3
+    },
+    {
+      "id": "if-constexpr",
+      "title": "if constexpr — Compile-Time Branching Explained Clearly",
+      "slug": "if-constexpr",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "Discarding branches at compile time inside templates, why it beats SFINAE for simple cases, and C++23 if consteval.",
+      "practice": 4
+    },
+    {
+      "id": "structured-bindings",
+      "title": "Structured Bindings — Write Cleaner Code That Impresses Reviewers",
+      "slug": "structured-bindings",
+      "access": "paid",
+      "live": true,
+      "duration": "20 min",
+      "level": "Intermediate",
+      "summary": "Binding to tuples, pairs, structs, and arrays — plus how to extend structured bindings to your own types.",
+      "practice": 3
+    },
+    {
+      "id": "initializer-list",
+      "title": "std::initializer_list — Common Interview Question on Construction",
+      "slug": "initializer-list",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "How initializer_list constructors are preferred, the vector<int>{10} vs vector<int>(10) trap, and lifetime rules.",
+      "practice": 4
+    }
+  ]
+}
+
+## Module 8
+
+- {
+  "title": "Exception Handling — Tested at Bloomberg, Citadel, FAANG",
+  "slug": "exceptions-module",
+  "description": "try/catch/throw mechanics, exception safety guarantees, noexcept, and when to avoid exceptions entirely",
+  "access": "paid",
+  "live": true,
+  "order": 8,
+  "children": [
+    {
+      "id": "try-catch-throw",
+      "title": "try, catch, throw — The Mechanics Every C++ Dev Must Know",
+      "slug": "try-catch-throw",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Beginner",
+      "summary": "Exception propagation, catch by reference, rethrowing, and why catching by value is almost always wrong.",
+      "practice": 5
+    },
+    {
+      "id": "exception-safety-guarantees",
+      "title": "Exception Safety Guarantees — Basic, Strong, Nothrow — Explain All Three",
+      "slug": "exception-safety-guarantees",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "The three guarantees every C++ API should document, how to achieve them, and the copy-and-swap idiom for the strong guarantee.",
+      "practice": 6
+    },
+    {
+      "id": "noexcept",
+      "title": "noexcept — Its Real Impact on Performance and Move Semantics",
+      "slug": "noexcept",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "noexcept as a contract, conditional noexcept, std::terminate on violation, and the vector reallocation connection.",
+      "practice": 4
+    },
+    {
+      "id": "exception-stack-unwinding",
+      "title": "Stack Unwinding — What Happens to Your Objects When an Exception Flies",
+      "slug": "exception-stack-unwinding",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Destructor invocation order during unwinding, why throwing from a destructor is fatal, and RAII as the solution.",
+      "practice": 5
+    },
+    {
+      "id": "when-not-to-use-exceptions",
+      "title": "When NOT to Use Exceptions — The Answer for Low-Latency Interviews",
+      "slug": "when-not-to-use-exceptions",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "The zero-cost model and its non-zero throw path, alternatives (error codes, expected, outcome), and HFT conventions.",
+      "practice": 4
+    },
+    {
+      "id": "terminate-vs-abort",
+      "title": "std::terminate vs std::abort — Know the Difference Before the Interview",
+      "slug": "terminate-vs-abort",
+      "access": "paid",
+      "live": true,
+      "duration": "20 min",
+      "level": "Intermediate",
+      "summary": "What triggers each, whether destructors run, custom terminate handlers, and the noexcept connection.",
+      "practice": 3
+    }
+  ]
+}
+
+## Module 9
+
+- {
+  "title": "Undefined Behavior — The Chapter That Makes You Dangerous",
+  "slug": "ub-module",
+  "description": "Signed overflow, use-after-free, strict aliasing, data races — the UB that silently destroys production code",
+  "access": "paid",
+  "live": true,
+  "order": 9,
+  "children": [
+    {
+      "id": "what-ub-really-means",
+      "title": "What UB Really Means — The Compiler Is Allowed to Do Anything",
+      "slug": "what-ub-really-means",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "The formal definition of UB, why 'works on my machine' is not safe, and how compilers exploit UB for optimization.",
+      "practice": 5
+    },
+    {
+      "id": "signed-integer-overflow",
+      "title": "Signed Integer Overflow — The UB That Silently Corrupts Production Code",
+      "slug": "signed-integer-overflow",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "Why signed overflow is UB (but unsigned wraparound isn't), optimizer assumptions this enables, and real bugs it caused.",
+      "practice": 4
+    },
+    {
+      "id": "use-after-free",
+      "title": "Use After Free — Spot It in Code Review Style Interview Questions",
+      "slug": "use-after-free",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Dangling pointer patterns in real code, why it doesn't always crash immediately, and AddressSanitizer detection.",
+      "practice": 6
+    },
+    {
+      "id": "uninitialized-variables",
+      "title": "Uninitialized Variables — The Bug That Only Shows Up on Demo Day",
+      "slug": "uninitialized-variables",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "Why reading uninitialized memory is UB (not just random values), how compilers may assume it's dead, and prevention.",
+      "practice": 4
+    },
+    {
+      "id": "out-of-bounds-access",
+      "title": "Out-of-Bounds Access — Why It Doesn't Always Crash (and That's Worse)",
+      "slug": "out-of-bounds-access",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "Why OOB reads often return garbage and OOB writes corrupt nearby memory silently — and how ASan catches them.",
+      "practice": 5
+    },
+    {
+      "id": "strict-aliasing",
+      "title": "Strict Aliasing Violations — Advanced UB for Senior Engineer Interviews",
+      "slug": "strict-aliasing",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Hard",
+      "summary": "The type-based aliasing rule, why casting between unrelated pointer types is UB, and memcpy/std::bit_cast as solutions.",
+      "practice": 5
+    },
+    {
+      "id": "data-races-ub",
+      "title": "Data Races Are UB in C++ — Unlike Java, and Interviewers Know This",
+      "slug": "data-races-ub",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "Why concurrent unsynchronized access is formal UB in C++, what the memory model says, and what sanitizers catch.",
+      "practice": 4
+    },
+    {
+      "id": "ub-sanitizers",
+      "title": "Tools to Catch UB — AddressSanitizer, UBSan, Valgrind — Name Drop These",
+      "slug": "ub-sanitizers",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "What each tool catches, compile flags, runtime overhead, and how to use them as part of a CI pipeline.",
+      "practice": 4
+    }
+  ]
+}
+
+## Module 10
+
+- {
+  "title": "Concurrency — The Topic That Defines Senior C++ Engineers",
+  "slug": "concurrency-module",
+  "description": "Threads, mutexes, atomics, memory ordering, futures — the concurrency knowledge every senior C++ engineer must own",
+  "access": "paid",
+  "live": true,
+  "order": 10,
+  "children": [
+    {
+      "id": "std-thread",
+      "title": "std::thread — Creation, Join, Detach — The Basics Done Right",
+      "slug": "std-thread",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Thread lifecycle, RAII thread wrappers, joinable state, and why detach is almost always the wrong choice.",
+      "practice": 5
+    },
+    {
+      "id": "mutex-lock-guard",
+      "title": "std::mutex and std::lock_guard — Write Thread-Safe Code Confidently",
+      "slug": "mutex-lock-guard",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "mutex, recursive_mutex, lock_guard vs unique_lock vs scoped_lock — pick the right one every time.",
+      "practice": 5
+    },
+    {
+      "id": "deadlocks",
+      "title": "Deadlocks — How They Happen and How to Prevent Them in an Interview",
+      "slug": "deadlocks",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "The four Coffman conditions, lock ordering, std::lock for multi-mutex acquire, and livelock vs deadlock.",
+      "practice": 6
+    },
+    {
+      "id": "condition-variable",
+      "title": "std::condition_variable — Solve Producer-Consumer on a Whiteboard",
+      "slug": "condition-variable",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "wait, notify_one, notify_all, spurious wakeups, and a complete producer-consumer implementation.",
+      "practice": 7
+    },
+    {
+      "id": "atomics",
+      "title": "std::atomic — Basics Every Concurrent C++ Engineer Must Know",
+      "slug": "atomics",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Atomic load/store/exchange/CAS, which types are lock-free, and when atomics are enough vs when you need a mutex.",
+      "practice": 6
+    },
+    {
+      "id": "memory-ordering",
+      "title": "Memory Ordering — Relaxed, Acquire, Release, Seq_cst — Simplified",
+      "slug": "memory-ordering",
+      "access": "paid",
+      "live": true,
+      "duration": "45 min",
+      "level": "Hard",
+      "summary": "What each memory order actually prevents, the acquire-release handshake pattern, and when relaxed is safe.",
+      "practice": 8
+    },
+    {
+      "id": "shared-mutex",
+      "title": "std::shared_mutex — Solve the Readers-Writers Problem Cleanly",
+      "slug": "shared-mutex",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "shared_lock for concurrent reads, unique_lock for exclusive writes, and the fairness guarantees the standard provides.",
+      "practice": 4
+    },
+    {
+      "id": "async-future-promise",
+      "title": "std::async, std::future, std::promise — Modern Async Patterns",
+      "slug": "async-future-promise",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Launching async tasks, blocking on futures, passing values across threads with promise, and launch policy traps.",
+      "practice": 6
+    },
+    {
+      "id": "thread-local",
+      "title": "thread_local — When and Why, Explained for Interviews",
+      "slug": "thread-local",
+      "access": "paid",
+      "live": true,
+      "duration": "20 min",
+      "level": "Intermediate",
+      "summary": "Per-thread storage, initialization order, performance characteristics, and the patterns where thread_local shines.",
+      "practice": 3
+    }
+  ]
+}
+
+## Module 11
+
+- {
+  "title": "Design Patterns — Asked at Every Mid-Senior Interview",
+  "slug": "design-patterns-module",
+  "description": "Singleton, Factory, Observer, PIMPL, type erasure — the patterns that come up in C++ system design rounds",
+  "access": "paid",
+  "live": true,
+  "order": 11,
+  "children": [
+    {
+      "id": "singleton-pattern",
+      "title": "Singleton in C++ — The Thread-Safe Implementation Interviewers Want",
+      "slug": "singleton-pattern",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Meyers singleton, static local initialization guarantee (C++11), double-checked locking, and when not to use it.",
+      "practice": 5
+    },
+    {
+      "id": "factory-pattern",
+      "title": "Factory Pattern — Write One From Scratch in an Interview",
+      "slug": "factory-pattern",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Simple factory, factory method, and abstract factory — pick the right one and implement it cleanly in C++.",
+      "practice": 5
+    },
+    {
+      "id": "observer-pattern",
+      "title": "Observer Pattern — Implement It Cleanly in Modern C++",
+      "slug": "observer-pattern",
+      "access": "paid",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Subject-observer contract, thread-safety considerations, and the modern version using std::function callbacks.",
+      "practice": 5
+    },
+    {
+      "id": "pimpl-idiom",
+      "title": "PIMPL Idiom — Why It Exists and When to Use It",
+      "slug": "pimpl-idiom",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "Pointer to Implementation for ABI stability and reduced compile times — implement it correctly with unique_ptr.",
+      "practice": 4
+    },
+    {
+      "id": "strategy-pattern",
+      "title": "Strategy Pattern with std::function — Modern C++ Done Right",
+      "slug": "strategy-pattern",
+      "access": "paid",
+      "live": true,
+      "duration": "25 min",
+      "level": "Intermediate",
+      "summary": "Swappable algorithms via std::function, virtual dispatch, and CRTP — choose the right mechanism for the context.",
+      "practice": 4
+    },
+    {
+      "id": "type-erasure",
+      "title": "Type Erasure — How std::function Works and Why Interviewers Love This",
+      "slug": "type-erasure",
+      "access": "paid",
+      "live": true,
+      "duration": "40 min",
+      "level": "Hard",
+      "summary": "Hiding concrete types behind a stable interface without inheritance — the technique inside std::function and std::any.",
+      "practice": 6
+    }
+  ]
+}
+
+## Module 12
+
+- {
+  "title": "Build It From Scratch — Live Coding Interview Prep",
+  "slug": "build-from-scratch-module",
+  "description": "shared_ptr, unique_ptr, thread-safe queue, vector, LRU cache, spin lock — the builds that define a great C++ interview",
+  "access": "paid",
+  "live": true,
+  "order": 12,
+  "children": [
+    {
+      "id": "build-shared-ptr",
+      "title": "Build shared_ptr from Scratch — Reference Counting Explained",
+      "slug": "build-shared-ptr",
+      "access": "paid",
+      "live": true,
+      "duration": "50 min",
+      "level": "Hard",
+      "summary": "Control block, atomic reference count, weak_ptr support, and the edge cases that separate complete from correct.",
+      "practice": 10
+    },
+    {
+      "id": "build-unique-ptr",
+      "title": "Build unique_ptr from Scratch — Ownership Without Overhead",
+      "slug": "build-unique-ptr",
+      "access": "paid",
+      "live": true,
+      "duration": "40 min",
+      "level": "Intermediate",
+      "summary": "Move-only semantics, custom deleters, array specialization — implement unique_ptr with zero runtime cost.",
+      "practice": 8
+    },
+    {
+      "id": "build-thread-safe-queue",
+      "title": "Build a Thread-Safe Queue — The Most Asked Concurrency Coding Problem",
+      "slug": "build-thread-safe-queue",
+      "access": "paid",
+      "live": true,
+      "duration": "50 min",
+      "level": "Intermediate",
+      "summary": "mutex + condition_variable, blocking push/pop, bounded capacity, and shutdown signalling — the complete implementation.",
+      "practice": 10
+    },
+    {
+      "id": "build-memory-pool",
+      "title": "Build a Memory Pool Allocator — For Systems and Performance Interviews",
+      "slug": "build-memory-pool",
+      "access": "paid",
+      "live": true,
+      "duration": "50 min",
+      "level": "Hard",
+      "summary": "Fixed-size block pool, free-list management, alignment, and the pmr allocator interface for drop-in use.",
+      "practice": 10
+    },
+    {
+      "id": "build-vector",
+      "title": "Build std::vector from Scratch — Dynamic Arrays Under the Hood",
+      "slug": "build-vector",
+      "access": "paid",
+      "live": true,
+      "duration": "55 min",
+      "level": "Hard",
+      "summary": "Raw storage, placement new, reallocation with strong exception safety, and iterator implementation.",
+      "practice": 10
+    },
+    {
+      "id": "build-lru-cache",
+      "title": "Build an LRU Cache in C++ — Asked at Google, Meta, Amazon",
+      "slug": "build-lru-cache",
+      "access": "paid",
+      "live": true,
+      "duration": "50 min",
+      "level": "Intermediate",
+      "summary": "O(1) get and put using unordered_map + doubly-linked list, iterator stability, and thread-safe extension.",
+      "practice": 10
+    },
+    {
+      "id": "build-spin-lock",
+      "title": "Build a Spin Lock Using Atomics — The Low-Latency Interview Favourite",
+      "slug": "build-spin-lock",
+      "access": "paid",
+      "live": true,
+      "duration": "35 min",
+      "level": "Hard",
+      "summary": "CAS-based spin lock, memory ordering for correctness, exponential backoff, and when spin locks beat mutexes.",
+      "practice": 7
+    }
+  ]
+}

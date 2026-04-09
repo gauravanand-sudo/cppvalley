@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import Script from "next/script";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import CppvalleyLoading from "@/components/CppvalleyLoading";
+import GoogleAdSlot from "@/components/GoogleAdSlot";
+import { isPublicTrackSlug } from "@/lib/publicContent";
+
+const CHECKOUT_AD_SLOT = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SLOT_CHECKOUT;
 
 declare global {
   interface Window {
@@ -27,11 +30,14 @@ declare global {
 }
 
 export default function CheckoutPage() {
-  const supabase = createClient();
   const sp = useSearchParams();
   const trackSlug = sp.get("track") || "";
+  const validTrackSlug = isPublicTrackSlug(trackSlug) ? trackSlug : "";
 
-  const title = useMemo(() => `Course: ${trackSlug}`, [trackSlug]);
+  const title = useMemo(
+    () => `Course: ${validTrackSlug || "Unavailable"}`,
+    [validTrackSlug]
+  );
 
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -41,84 +47,9 @@ export default function CheckoutPage() {
 
   async function startPayment() {
     setErr(null);
-    setLoading(true);
-
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      const accessToken = session?.access_token;
-      if (!accessToken) {
-        throw new Error("Please login before starting payment.");
-      }
-
-      const res = await fetch("/api/razorpay/create-order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ trackSlug }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "failed");
-
-      const options = {
-        key: data.keyId,
-        order_id: data.orderId,
-        name: "cppvalley",
-        description: data.trackTitle || title,
-        amount: data.amount,
-        currency: data.currency,
-        theme: { color: "#9B1C3A" },
-        handler: async (response: {
-          razorpay_payment_id: string;
-          razorpay_order_id: string;
-          razorpay_signature: string;
-        }) => {
-          setVerifying(true);
-          setErr(null);
-
-          const verifyRes = await fetch("/api/razorpay/verify-payment", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-            body: JSON.stringify({
-              ...response,
-              trackSlug,
-            }),
-          });
-
-          const verifyData = await verifyRes.json();
-          if (!verifyRes.ok) {
-            setVerifying(false);
-            setErr(verifyData?.error || "Payment succeeded, but verification failed.");
-            return;
-          }
-
-          setPaid(true);
-          window.location.href = verifyData.redirectTo || `/learn/tracks/${trackSlug}`;
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-      setReady(true);
-      rzp.open();
-    } catch (error: unknown) {
-      setErr(error instanceof Error ? error.message : "Payment init failed");
-    } finally {
-      setLoading(false);
-    }
+    setReady(false);
+    setErr("Course payments are launching on May 1, 2026.");
   }
-
-  useEffect(() => {
-    startPayment();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   if (verifying || paid) {
     return (
@@ -152,11 +83,13 @@ export default function CheckoutPage() {
               Secure checkout
             </div>
             <h1 className="max-w-xl text-4xl font-bold tracking-tight text-[#4A1F2C]">
-              Complete your purchase and unlock the course instantly.
+              Course checkout opens on May 1.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-8 text-[#6f555c]">
               {trackSlug
-                ? `You are purchasing "${trackSlug}". After successful Razorpay verification, the course unlocks and the purchase is recorded in your profile automatically.`
+                ? validTrackSlug
+                  ? `You selected "${validTrackSlug}". Payments are not live yet. Click below to see the launch notice for May 1, 2026.`
+                  : "That course is not publicly available."
                 : "Choose a valid course to continue to secure payment."}
             </p>
 
@@ -168,13 +101,13 @@ export default function CheckoutPage() {
               </div>
               <div className="rounded-2xl border border-[#ead2da] bg-[#fcf7f8] p-4">
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[#9B1C3A]">Step 2</div>
-                <div className="mt-2 text-sm font-semibold text-[#4A1F2C]">Pay securely</div>
-                <div className="mt-1 text-sm text-[#6f555c]">Razorpay opens in a secure flow and payment remains server-verified.</div>
+                <div className="mt-2 text-sm font-semibold text-[#4A1F2C]">Launch notice</div>
+                <div className="mt-1 text-sm text-[#6f555c]">Click the button to see the launch date instead of entering payment right now.</div>
               </div>
               <div className="rounded-2xl border border-[#ead2da] bg-[#fcf7f8] p-4">
                 <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[#9B1C3A]">Step 3</div>
-                <div className="mt-2 text-sm font-semibold text-[#4A1F2C]">Access unlocked</div>
-                <div className="mt-1 text-sm text-[#6f555c]">Your course, profile history, and track buttons update after verification.</div>
+                <div className="mt-2 text-sm font-semibold text-[#4A1F2C]">Come back at launch</div>
+                <div className="mt-1 text-sm text-[#6f555c]">Full checkout and unlock flow will go live on May 1, 2026.</div>
               </div>
             </div>
           </section>
@@ -183,17 +116,23 @@ export default function CheckoutPage() {
             <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[#dcbec7]">cppvalley payment</div>
             <h2 className="mt-3 text-2xl font-bold">{title}</h2>
             <p className="mt-3 text-sm leading-7 text-[#e6d8dd]">
-              One-time payment. No pricing hub, no monthly plan selection, just direct checkout for this course.
+              Checkout is currently paused. We are opening payments for these courses on May 1, 2026.
             </p>
 
             <div className="mt-8 rounded-2xl bg-white/8 p-5">
               <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#dcbec7]">After payment</div>
               <ul className="mt-3 space-y-2 text-sm text-[#f5eaee]">
-                <li>Your course entitlement is granted on the server.</li>
-                <li>The purchase appears in your profile history.</li>
-                <li>Home and course pages reflect the unlocked state.</li>
+                <li>Checkout opens on May 1, 2026.</li>
+                <li>Your course access will unlock after successful verification.</li>
+                <li>Your purchase will appear in your profile once payments go live.</li>
               </ul>
             </div>
+
+            <GoogleAdSlot
+              slot={CHECKOUT_AD_SLOT}
+              className="mt-6"
+              label="Sponsored"
+            />
 
             {err ? (
               <div className="mt-6 rounded-2xl border border-[#d08da0] bg-[#ffffff14] p-4 text-sm text-[#ffe4ea]">
@@ -213,13 +152,13 @@ export default function CheckoutPage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <button
                 onClick={startPayment}
-                disabled={loading || !trackSlug}
+                disabled={loading || !validTrackSlug}
                 className="rounded-xl bg-[#f7eef1] px-5 py-3 text-sm font-semibold text-[#4A1F2C] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {loading ? "Opening Razorpay..." : paid ? "Unlocked" : "Pay with Razorpay"}
+                See launch date
               </button>
               <Link
-                href={trackSlug ? `/learn/tracks/${trackSlug}` : "/learn/tracks"}
+                href={validTrackSlug ? `/learn/tracks/${validTrackSlug}` : "/learn/tracks"}
                 className="rounded-xl border border-[#ffffff2b] px-5 py-3 text-sm font-semibold text-white/90 transition hover:bg-white/10"
               >
                 Back
@@ -230,7 +169,7 @@ export default function CheckoutPage() {
               Payments are signature-verified server-side before access is granted.
             </div>
             <div className="mt-2 text-xs font-mono text-[#cdaab4]">
-              {ready ? "Razorpay is ready." : "Razorpay will open automatically after the page loads."}
+              {ready ? "Checkout is ready." : "Payments are opening on May 1, 2026."}
             </div>
           </aside>
         </div>

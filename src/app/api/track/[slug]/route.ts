@@ -1,6 +1,7 @@
 // src/app/api/track/[slug]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { requireContent, parseTrackSyllabus } from "@/lib/content";
+import { isPublicTrackSlug } from "@/lib/publicContent";
 
 export async function GET(
   request: NextRequest,
@@ -8,6 +9,10 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
+    if (!isPublicTrackSlug(slug)) {
+      return NextResponse.json({ error: "Track not found" }, { status: 404 });
+    }
+
     const track = requireContent("tracks", slug);
     const sections = parseTrackSyllabus(track.content);
     

@@ -18,6 +18,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
+import GoogleAdSlot from "@/components/GoogleAdSlot";
+
+const PROFILE_TOP_AD_SLOT = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SLOT_PROFILE_TOP;
 
 type Profile = {
   id: string;
@@ -225,6 +228,12 @@ export default function ProfileClient() {
             Keep your account details up to date, jump back into purchased courses, and review your learning activity in one clean place.
           </p>
         </div>
+
+        <GoogleAdSlot
+          slot={PROFILE_TOP_AD_SLOT}
+          className="mb-8"
+          label="Sponsored"
+        />
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">

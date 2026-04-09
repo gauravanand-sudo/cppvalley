@@ -4,6 +4,7 @@ import Razorpay from "razorpay";
 import { createClient as createSupabaseAuthClient } from "@supabase/supabase-js";
 import { createClient as createServerSupabaseClient } from "@/lib/supabase/server";
 import { getTrackBySlug } from "@/lib/content";
+import { isPublicTrackSlug } from "@/lib/publicContent";
 
 function getBearerToken(req: Request) {
   const authHeader = req.headers.get("authorization") || "";
@@ -62,6 +63,10 @@ export async function POST(req: Request) {
 
     if (!orderId || !paymentId || !signature || !trackSlug) {
       return NextResponse.json({ error: "Incomplete payment verification payload." }, { status: 400 });
+    }
+
+    if (!isPublicTrackSlug(trackSlug)) {
+      return NextResponse.json({ error: "Course not found." }, { status: 404 });
     }
 
     if (!verifyPaymentSignature(orderId, paymentId, signature)) {

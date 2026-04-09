@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { getTrackBySlug } from "@/lib/content";
+import { isPublicTrackSlug } from "@/lib/publicContent";
 
 function getBearerToken(req: Request) {
   const authHeader = req.headers.get("authorization") || "";
@@ -46,6 +47,10 @@ export async function POST(req: Request) {
 
     if (!trackSlug) {
       return NextResponse.json({ error: "Course slug is required." }, { status: 400 });
+    }
+
+    if (!isPublicTrackSlug(trackSlug)) {
+      return NextResponse.json({ error: "Course not found." }, { status: 404 });
     }
 
     const track = getTrackBySlug(trackSlug);

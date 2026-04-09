@@ -49,23 +49,23 @@ export default function TrackLayout({
       >
         <div className="flex h-full min-h-0 flex-col">
           <header
-            className="border-b px-4 py-2 sm:px-6"
+            className="border-b px-3 py-1.5 sm:px-5"
             style={{
               borderColor: "var(--reader-border)",
               background:
                 "linear-gradient(180deg, color-mix(in srgb, var(--reader-surface) 92%, white) 0%, var(--reader-surface-soft) 100%)",
             }}
           >
-            <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4">
-              <div className="flex min-w-0 items-center gap-4">
-                <Link href="/" className="flex shrink-0 items-center gap-3 transition-opacity hover:opacity-80">
+            <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-2">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <Link href="/" className="flex shrink-0 items-center gap-2.5 transition-opacity hover:opacity-80">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold tracking-tight" style={{ color: "var(--reader-heading)" }}>
+                    <span className="text-[13px] font-semibold tracking-tight" style={{ color: "var(--reader-heading)" }}>
                       <span style={{ color: "var(--reader-accent)" }}>cpp</span>
                       valley
                     </span>
                     <span
-                      className="rounded border px-1.5 py-0.5 font-mono text-[10px]"
+                      className="rounded border px-1.5 py-0.5 font-mono text-[9px]"
                       style={{
                         borderColor: "var(--reader-border)",
                         backgroundColor: "var(--reader-surface)",
@@ -76,7 +76,7 @@ export default function TrackLayout({
                     </span>
                   </div>
                   <span
-                    className="hidden rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] sm:inline"
+                    className="hidden rounded-full border px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] sm:inline"
                     style={{
                       borderColor: "color-mix(in srgb, var(--reader-accent) 35%, transparent)",
                       color: "var(--reader-accent)",
@@ -91,25 +91,35 @@ export default function TrackLayout({
                 </Link>
 
                 <div
-                  className="hidden h-8 w-px shrink-0 sm:block"
+                  className="hidden h-6 w-px shrink-0 sm:block"
                   style={{ backgroundColor: "var(--reader-border)" }}
                 />
 
-                <div className="min-w-0">
-                  <div className="truncate text-[10px] font-mono leading-4 sm:text-[11px]" style={{ color: "var(--reader-muted)" }}>
+                <div className="min-w-0 truncate text-[12px] font-medium leading-4" style={{ color: "var(--reader-heading)" }}>
+                  <span className="font-mono text-[10px]" style={{ color: "var(--reader-muted)" }}>
                     {trackTitle}
-                  </div>
-                  <div className="truncate text-sm font-semibold leading-5" style={{ color: "var(--reader-heading)" }}>
-                    {currentTitle}
-                  </div>
+                  </span>
+                  <span style={{ color: "var(--reader-muted)" }}> {" · "} </span>
+                  <span>{currentTitle}</span>
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+              <div className="flex shrink-0 items-center justify-end gap-1 sm:gap-1.5">
+                <Link
+                  href="/"
+                  className="inline-flex rounded-full border px-2 py-1 text-[10px] font-semibold transition hover:opacity-90 sm:px-2.5 sm:text-[11px]"
+                  style={{
+                    borderColor: "var(--reader-border)",
+                    backgroundColor: "var(--reader-surface)",
+                    color: "var(--reader-body)",
+                  }}
+                >
+                  Home
+                </Link>
                 <button
                   type="button"
                   onClick={() => setMobileSidebarOpen(true)}
-                  className="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition hover:opacity-90 lg:hidden"
+                  className="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[10px] font-semibold transition hover:opacity-90 sm:px-2.5 sm:text-[11px] lg:hidden"
                   style={{
                     borderColor: "var(--reader-border)",
                     backgroundColor: "var(--reader-surface)",
@@ -121,7 +131,7 @@ export default function TrackLayout({
                 </button>
                 {isLessonPage ? (
                   <>
-                    <span className="text-xs font-mono" style={{ color: "var(--reader-muted)" }}>
+                    <span className="text-[11px] font-mono" style={{ color: "var(--reader-muted)" }}>
                       {Math.max(1, currentIndex + 1)}/{Math.max(1, lessons.length)}
                     </span>
                     <MarkComplete trackSlug={trackSlug} lessonSlug={currentSlug} compact />
@@ -129,7 +139,7 @@ export default function TrackLayout({
                 ) : null}
                 <Link
                   href="/learn/tracks"
-                  className="hidden rounded-full border px-3 py-1.5 text-xs font-semibold transition hover:opacity-90 sm:inline-flex"
+                  className="rounded-full border px-2 py-1 text-[10px] font-semibold transition hover:opacity-90 sm:px-2.5 sm:text-[11px]"
                   style={{
                     borderColor: "var(--reader-border)",
                     backgroundColor: "var(--reader-surface)",

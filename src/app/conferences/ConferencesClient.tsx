@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import GoogleAdSlot from "@/components/GoogleAdSlot";
 import type { ContentMeta } from "@/lib/content";
+
+const DIRECTORY_TOP_AD_SLOT = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SLOT_DIRECTORY_TOP;
+const DIRECTORY_INLINE_AD_SLOT = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SLOT_DIRECTORY_INLINE;
 
 function getYear(date?: string) {
   if (!date) return "Unknown";
@@ -130,6 +134,12 @@ export default function ConferencesClient({
           </div>
         </header>
 
+        <GoogleAdSlot
+          slot={DIRECTORY_TOP_AD_SLOT}
+          className="mt-8"
+          label="Sponsored"
+        />
+
         <div className="mt-10 space-y-6">
           {years.map((year) => (
             <details
@@ -179,6 +189,12 @@ export default function ConferencesClient({
             </details>
           ))}
         </div>
+
+        <GoogleAdSlot
+          slot={DIRECTORY_INLINE_AD_SLOT}
+          className="mt-10"
+          label="Advertisement"
+        />
       </div>
     </main>
   );

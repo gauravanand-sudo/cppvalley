@@ -1,24 +1,18 @@
-import RegularPageLayout from "@/components/RegularPageLayout";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import { listContent } from "@/lib/content";
-import ContentCard from "@/components/ContentCard";
+import { getBlogViewCounts } from "@/lib/blogViews";
+import BlogClient from "./BlogClient";
 
-export default function BlogPage() {
+export default async function BlogPage() {
   const posts = listContent("blog");
+  const viewCounts = await getBlogViewCounts(posts.map((post) => post.slug));
 
   return (
-    <RegularPageLayout>
-      <main className="mx-auto max-w-4xl px-6 py-12">
-        <h1 className="text-3xl font-bold">Blog</h1>
-        <p className="mt-2 text-gray-600">
-          Systems-first C++ articles beyond DSA.
-        </p>
-
-        <div className="mt-8 grid gap-6">
-          {posts.map((item) => (
-            <ContentCard key={item.slug} item={item} />
-          ))}
-        </div>
-      </main>
-    </RegularPageLayout>
+    <>
+      <SiteHeader />
+      <BlogClient posts={posts} viewCounts={Object.fromEntries(viewCounts)} />
+      <SiteFooter />
+    </>
   );
 }

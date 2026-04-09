@@ -5,6 +5,10 @@ import { requireContent } from "@/lib/content";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import OnThisPage from "@/components/OnThisPage";
+import GoogleAdSlot from "@/components/GoogleAdSlot";
+
+const ARTICLE_TOP_AD_SLOT = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SLOT_ARTICLE_TOP;
+const ARTICLE_INLINE_AD_SLOT = process.env.NEXT_PUBLIC_GOOGLE_ADSENSE_SLOT_ARTICLE_INLINE;
 
 export default async function InterviewSlugPage({
   params,
@@ -34,6 +38,12 @@ export default async function InterviewSlugPage({
           <div className="flex items-start gap-10">
             {/* main */}
             <div className="min-w-0 flex-1">
+              <GoogleAdSlot
+                slot={ARTICLE_TOP_AD_SLOT}
+                className="mb-8"
+                label="Advertisement"
+              />
+
               <Link
                 href="/interviews"
                 className="inline-flex items-center gap-1 text-sm font-mono text-cyan-600 hover:text-cyan-700"
@@ -78,6 +88,12 @@ export default async function InterviewSlugPage({
               >
                 <MdxRenderer source={content} />
               </article>
+
+              <GoogleAdSlot
+                slot={ARTICLE_INLINE_AD_SLOT}
+                className="mt-10"
+                label="Sponsored"
+              />
 
               <div className="mt-16 flex items-center justify-between border-t border-gray-200 pt-6">
                 <Link

@@ -279,8 +279,8 @@ const components = {
 
 export default function MdxRenderer({ source }: { source: string }) {
   return (
-    <article className="max-w-none text-[#6A5058]">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <article className="max-w-none text-[var(--reader-body)]">
+      <div className="mx-auto max-w-[50rem] px-5 py-7 sm:px-7 sm:py-8">
         <MDXRemote
           source={source}
           components={components}

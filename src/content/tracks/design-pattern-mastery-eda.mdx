@@ -1,150 +1,476 @@
 ---
-title: "Design Patterns Mastery for Systems Engineers"
+title: "Design Patterns for EDA & Adobe-Style C++ Systems"
 slug: "design-pattern-mastery-eda"
 access: "free"
-live: false
+live: true
 price: 0
-duration: "45 days"
-level: "Intermediate → Senior"
-lessonCount: 58
-description: "Every design pattern that comes up at Adobe, Synopsys, Cadence, Jane Street, Google, and Nvidia — taught with C++ implementation, real interview questions, and systems context. Not just what patterns are, but when to use them and why."
-tags: ["Design Patterns", "C++", "Adobe", "Synopsys", "Google", "Nvidia", "HFT", "Systems Programming", "OOP", "Architecture"]
+currency: "INR"
+priceLabel: "Free"
+duration: "4 weeks"
+level: "Intermediate/Advanced"
+lessonCount: 36
+description: "A curated design-pattern course focused on the patterns that actually show up in EDA tools, simulation engines, plugin-heavy desktop products, and Adobe-style C++ architectures."
+tags: ["C++", "Design Patterns", "EDA", "Adobe", "Systems Design", "Architecture", "Plugins", "Concurrency"]
+order: 4
 ---
 
-## PHASE 1 — Foundations: Why Patterns Exist
+## Module 1
+
 - {
-  "title": "PHASE 1 — Foundations: Why Patterns Exist",
+  "title": "Foundations for Real Product Code",
+  "slug": "foundations-for-real-product-code",
+  "description": "The design pressure behind patterns: coupling, extensibility, SOLID, and how to recognize architecture problems in interview-style prompts",
   "access": "free",
+  "live": true,
+  "order": 1,
   "children": [
-    { "title": "What a design pattern actually is (and isn't)", "slug": "what-is-a-design-pattern", "access": "free" },
-    { "title": "The cost of bad design: coupling, rigidity, fragility", "slug": "cost-of-bad-design", "access": "free" },
-    { "title": "SOLID principles — the foundation every pattern builds on", "slug": "solid-principles-cpp", "access": "free" },
-    { "title": "Composition vs inheritance — the most important tradeoff", "slug": "composition-vs-inheritance", "access": "free" },
-    { "title": "How to spot a pattern problem in an interview", "slug": "spotting-pattern-problems-interview", "access": "free" }
+    {
+      "id": "what-is-a-design-pattern",
+      "title": "What a Design Pattern Actually Is",
+      "slug": "what-is-a-design-pattern",
+      "access": "free",
+      "live": true,
+      "duration": "25 min",
+      "level": "Beginner",
+      "summary": "How to think about patterns as reusable design tradeoffs instead of a memorized catalog of names.",
+      "practice": 3
+    },
+    {
+      "id": "cost-of-bad-design",
+      "title": "The Cost of Bad Design",
+      "slug": "cost-of-bad-design",
+      "access": "free",
+      "live": true,
+      "duration": "30 min",
+      "level": "Beginner",
+      "summary": "Why fragile coupling and rigid module boundaries become expensive in large desktop and systems codebases.",
+      "practice": 4
+    },
+    {
+      "id": "solid-principles-cpp",
+      "title": "SOLID Principles in C++",
+      "slug": "solid-principles-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "45 min",
+      "level": "Intermediate",
+      "summary": "The subset of SOLID thinking that matters when building extensible simulation tools and plugin-oriented products.",
+      "practice": 6
+    },
+    {
+      "id": "composition-vs-inheritance",
+      "title": "Composition vs Inheritance",
+      "slug": "composition-vs-inheritance",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "How to avoid brittle class hierarchies when features, file formats, and behaviors evolve over time.",
+      "practice": 5
+    },
+    {
+      "id": "dependency-inversion-cpp",
+      "title": "Dependency Inversion in C++",
+      "slug": "dependency-inversion-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Keeping core engines isolated from UI, infrastructure, and plugins through cleaner abstraction boundaries.",
+      "practice": 5
+    },
+    {
+      "id": "spotting-pattern-problems-interview",
+      "title": "How to Spot Pattern Problems in Interviews",
+      "slug": "spotting-pattern-problems-interview",
+      "access": "free",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Turning vague design prompts into the right pattern conversations for product and systems interviews.",
+      "practice": 4
+    }
   ]
 }
 
----
+## Module 2
 
-## PHASE 2 — Creational Patterns
 - {
-  "title": "PHASE 2 — Creational Patterns",
+  "title": "Creational Patterns Used in Tools & Engines",
+  "slug": "creational-patterns-used-in-tools-and-engines",
+  "description": "Patterns for constructing schedulers, factories, registries, plugin objects, and complex product state safely",
   "access": "free",
+  "live": true,
+  "order": 2,
   "children": [
-    { "title": "Singleton — implementation, pitfalls, and why to avoid it", "slug": "singleton-design-pattern", "access": "free" },
-    { "title": "Singleton — thread-safe via call_once and static local", "slug": "singleton-thread-safe", "access": "free" },
-    { "title": "Singleton — Meyers singleton and SIOF", "slug": "singleton-meyers-siof", "access": "free" },
-    { "title": "Factory Method — decoupling creation from use", "slug": "factory-design-pattern", "access": "free" },
-    { "title": "Factory Method — returning unique_ptr, ownership semantics", "slug": "factory-ownership-unique-ptr", "access": "free" },
-    { "title": "Abstract Factory — families of related objects", "slug": "abstract-factory-pattern", "access": "free" },
-    { "title": "Abstract Factory — plugin architecture in EDA tools", "slug": "abstract-factory-plugin-eda", "access": "free" },
-    { "title": "Builder — constructing complex objects step by step", "slug": "builder-design-pattern", "access": "free" },
-    { "title": "Builder — fluent interface and method chaining in C++", "slug": "builder-fluent-interface", "access": "free" },
-    { "title": "Prototype — clone() and deep copy semantics", "slug": "prototype-pattern-cpp", "access": "free" },
-    { "title": "Object Pool — reuse over allocation (HFT critical)", "slug": "object-pool-pattern", "access": "free" },
-    { "title": "Object Pool — thread-safe pool with lock-free freelist", "slug": "object-pool-lockfree", "access": "free" }
+    {
+      "id": "singleton-design-pattern",
+      "title": "Singleton Pattern",
+      "slug": "singleton-design-pattern",
+      "access": "free",
+      "live": true,
+      "duration": "40 min",
+      "level": "Intermediate",
+      "summary": "Where singletons show up in report servers, registries, and process-wide coordinators, and where they become dangerous.",
+      "practice": 5
+    },
+    {
+      "id": "singleton-thread-safe",
+      "title": "Thread-Safe Singleton",
+      "slug": "singleton-thread-safe",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "How to implement one-instance coordinators safely in multithreaded desktop and systems software.",
+      "practice": 5
+    },
+    {
+      "id": "factory-design-pattern",
+      "title": "Factory Method",
+      "slug": "factory-design-pattern",
+      "access": "free",
+      "live": true,
+      "duration": "40 min",
+      "level": "Intermediate",
+      "summary": "The core pattern behind format loaders, backend selection, and subsystem instantiation in large products.",
+      "practice": 5
+    },
+    {
+      "id": "factory-ownership-unique-ptr",
+      "title": "Factory Ownership with unique_ptr",
+      "slug": "factory-ownership-unique-ptr",
+      "access": "free",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Using factories with explicit ownership semantics so extension points stay safe and unsurprising.",
+      "practice": 4
+    },
+    {
+      "id": "abstract-factory-pattern",
+      "title": "Abstract Factory",
+      "slug": "abstract-factory-pattern",
+      "access": "free",
+      "live": true,
+      "duration": "40 min",
+      "level": "Intermediate",
+      "summary": "A strong fit when one product family must stay internally consistent across rendering, simulation, or export backends.",
+      "practice": 5
+    },
+    {
+      "id": "builder-design-pattern",
+      "title": "Builder Pattern",
+      "slug": "builder-design-pattern",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Useful for constructing complex config objects, command payloads, and scene or design state step by step.",
+      "practice": 4
+    },
+    {
+      "id": "object-pool-pattern",
+      "title": "Object Pool Pattern",
+      "slug": "object-pool-pattern",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Advanced",
+      "summary": "A practical fit for event objects, reusable buffers, and high-churn allocations in simulation and media pipelines.",
+      "practice": 5
+    }
   ]
 }
 
----
+## Module 3
 
-## PHASE 3 — Structural Patterns
 - {
-  "title": "PHASE 3 — Structural Patterns",
+  "title": "Structural Patterns for Large Codebases",
+  "slug": "structural-patterns-for-large-codebases",
+  "description": "Patterns that help desktop apps and simulators isolate legacy APIs, hide unstable internals, and keep subsystems navigable",
   "access": "free",
+  "live": true,
+  "order": 3,
   "children": [
-    { "title": "Adapter — wrapping legacy C APIs in modern C++ interfaces", "slug": "adapter-pattern-cpp", "access": "free" },
-    { "title": "Adapter — object vs class adapter tradeoffs", "slug": "adapter-object-vs-class", "access": "free" },
-    { "title": "Bridge — separating abstraction from implementation", "slug": "bridge-pattern-cpp", "access": "free" },
-    { "title": "Bridge — PImpl idiom as a Bridge for ABI stability", "slug": "bridge-pimpl-abi", "access": "free" },
-    { "title": "Composite — tree structures, scene graphs, and ASTs", "slug": "composite-pattern-cpp", "access": "free" },
-    { "title": "Composite — used in Nvidia shader graphs and EDA netlists", "slug": "composite-netlist-shader-graph", "access": "free" },
-    { "title": "Decorator — adding behaviour without subclassing", "slug": "decorator-pattern-cpp", "access": "free" },
-    { "title": "Decorator — wrapping streams, logging, and telemetry", "slug": "decorator-streams-logging", "access": "free" },
-    { "title": "Facade — simplifying complex subsystems (Adobe SDK style)", "slug": "facade-pattern-cpp", "access": "free" },
-    { "title": "Flyweight — shared immutable state for memory efficiency", "slug": "flyweight-pattern-cpp", "access": "free" },
-    { "title": "Flyweight — interned strings and symbol tables in compilers", "slug": "flyweight-interned-strings", "access": "free" },
-    { "title": "Proxy — lazy loading, access control, and remote objects", "slug": "proxy-pattern-cpp", "access": "free" },
-    { "title": "Proxy — smart pointers as proxies (unique_ptr, shared_ptr)", "slug": "proxy-smart-pointers", "access": "free" }
+    {
+      "id": "adapter-pattern-cpp",
+      "title": "Adapter Pattern",
+      "slug": "adapter-pattern-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Wrapping old C APIs, vendor SDKs, or legacy engines with cleaner C++ interfaces.",
+      "practice": 4
+    },
+    {
+      "id": "bridge-pattern-cpp",
+      "title": "Bridge Pattern",
+      "slug": "bridge-pattern-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Separating the public abstraction from backend-specific implementation when products support multiple engines or platforms.",
+      "practice": 4
+    },
+    {
+      "id": "bridge-pimpl-abi",
+      "title": "PImpl as a Bridge for ABI Stability",
+      "slug": "bridge-pimpl-abi",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Advanced",
+      "summary": "A pattern that matters when large shipped products need binary compatibility and cleaner rebuild boundaries.",
+      "practice": 5
+    },
+    {
+      "id": "composite-pattern-cpp",
+      "title": "Composite Pattern",
+      "slug": "composite-pattern-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Useful for ASTs, scene graphs, layer trees, and hierarchical design data.",
+      "practice": 4
+    },
+    {
+      "id": "decorator-pattern-cpp",
+      "title": "Decorator Pattern",
+      "slug": "decorator-pattern-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Adding logging, telemetry, validation, or feature-specific behavior without subclass explosion.",
+      "practice": 4
+    },
+    {
+      "id": "facade-pattern-cpp",
+      "title": "Facade Pattern",
+      "slug": "facade-pattern-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "30 min",
+      "level": "Beginner",
+      "summary": "Simplifying sprawling subsystems so the rest of the product calls into one stable entry point.",
+      "practice": 3
+    },
+    {
+      "id": "proxy-pattern-cpp",
+      "title": "Proxy Pattern",
+      "slug": "proxy-pattern-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Useful for lazy loading, remote calls, guarded access, and heavyweight resources in product pipelines.",
+      "practice": 4
+    }
   ]
 }
 
----
+## Module 4
 
-## PHASE 4 — Behavioural Patterns
 - {
-  "title": "PHASE 4 — Behavioural Patterns",
+  "title": "Behavioral Patterns That Show Up Constantly",
+  "slug": "behavioral-patterns-that-show-up-constantly",
+  "description": "Patterns for algorithm swapping, event propagation, command history, state changes, and graph traversal",
   "access": "free",
+  "live": true,
+  "order": 4,
   "children": [
-    { "title": "Strategy — swappable algorithms at runtime", "slug": "strategy-pattern-cpp", "access": "free" },
-    { "title": "Strategy — std::function vs virtual dispatch vs templates", "slug": "strategy-function-vs-virtual-vs-template", "access": "free" },
-    { "title": "Observer — event systems and signal/slot pattern", "slug": "observer-pattern-cpp", "access": "free" },
-    { "title": "Observer — avoiding dangling observers (weak_ptr pattern)", "slug": "observer-dangling-weakptr", "access": "free" },
-    { "title": "Observer — used in EDA simulation sensitivity lists", "slug": "observer-eda-sensitivity", "access": "free" },
-    { "title": "Command — encapsulating actions as objects", "slug": "command-pattern-cpp", "access": "free" },
-    { "title": "Command — undo/redo in Adobe-style tools", "slug": "command-undo-redo-adobe", "access": "free" },
-    { "title": "Command — task queues and deferred execution in HFT", "slug": "command-task-queue-hft", "access": "free" },
-    { "title": "Chain of Responsibility — passing requests down a chain", "slug": "chain-of-responsibility-cpp", "access": "free" },
-    { "title": "Iterator — custom iterators over complex data structures", "slug": "iterator-pattern-cpp", "access": "free" },
-    { "title": "Iterator — range-based for and C++20 ranges integration", "slug": "iterator-ranges-cpp20", "access": "free" },
-    { "title": "Mediator — decoupling components via a central hub", "slug": "mediator-pattern-cpp", "access": "free" },
-    { "title": "Mediator — event bus design in simulation engines", "slug": "mediator-event-bus-simulation", "access": "free" },
-    { "title": "Memento — capturing and restoring state (snapshots)", "slug": "memento-pattern-cpp", "access": "free" },
-    { "title": "State — modelling explicit state machines", "slug": "state-pattern-cpp", "access": "free" },
-    { "title": "State — hierarchical state machines in EDA controllers", "slug": "state-machine-eda-controllers", "access": "free" },
-    { "title": "Template Method — fixed algorithm skeleton, variable steps", "slug": "template-method-pattern-cpp", "access": "free" },
-    { "title": "Visitor — adding operations to a type hierarchy without changing it", "slug": "visitor-pattern-cpp", "access": "free" },
-    { "title": "Visitor — AST traversal in compilers (Clang, LLVM style)", "slug": "visitor-ast-traversal", "access": "free" },
-    { "title": "Null Object — eliminating null checks with a do-nothing implementation", "slug": "null-object-pattern-cpp", "access": "free" }
+    {
+      "id": "strategy-pattern-cpp",
+      "title": "Strategy Pattern",
+      "slug": "strategy-pattern-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Common when products need swappable algorithms, policies, and heuristics without changing the caller.",
+      "practice": 4
+    },
+    {
+      "id": "observer-pattern-cpp",
+      "title": "Observer Pattern",
+      "slug": "observer-pattern-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "One of the most common patterns in UI frameworks, event systems, and simulation change propagation.",
+      "practice": 4
+    },
+    {
+      "id": "observer-dangling-weakptr",
+      "title": "Avoiding Dangling Observers with weak_ptr",
+      "slug": "observer-dangling-weakptr",
+      "access": "free",
+      "live": true,
+      "duration": "30 min",
+      "level": "Advanced",
+      "summary": "A practical lesson in making observer-heavy systems safe in long-lived desktop applications.",
+      "practice": 4
+    },
+    {
+      "id": "command-pattern-cpp",
+      "title": "Command Pattern",
+      "slug": "command-pattern-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "A strong fit for tool actions, queued work, menu operations, and action abstraction in rich products.",
+      "practice": 4
+    },
+    {
+      "id": "command-undo-redo-cpp",
+      "title": "Undo/Redo with Command",
+      "slug": "command-undo-redo-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "Especially relevant for Adobe-style editing workflows where reversible operations are a first-class product feature.",
+      "practice": 4
+    },
+    {
+      "id": "mediator-pattern-cpp",
+      "title": "Mediator Pattern",
+      "slug": "mediator-pattern-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Useful when many UI panels, subsystems, or engine components would otherwise talk to each other directly.",
+      "practice": 4
+    },
+    {
+      "id": "state-pattern-cpp",
+      "title": "State Pattern",
+      "slug": "state-pattern-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Intermediate",
+      "summary": "A practical fit for workflow state, tool modes, controller state, and simulation lifecycle transitions.",
+      "practice": 5
+    },
+    {
+      "id": "visitor-pattern-cpp",
+      "title": "Visitor Pattern",
+      "slug": "visitor-pattern-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "40 min",
+      "level": "Advanced",
+      "summary": "Shows up in AST traversal, design-rule passes, and operations over hierarchical object graphs.",
+      "practice": 5
+    }
   ]
 }
 
----
+## Module 5
 
-## PHASE 5 — Concurrency Patterns (HFT & Systems Critical)
 - {
-  "title": "PHASE 5 — Concurrency Patterns (HFT & Systems Critical)",
+  "title": "Concurrency & Architecture Patterns That Matter",
+  "slug": "concurrency-and-architecture-patterns-that-matter",
+  "description": "Patterns that help products process events, integrate plugins, schedule work, and scale subsystem boundaries cleanly",
   "access": "free",
+  "live": true,
+  "order": 5,
   "children": [
-    { "title": "Active Object — decoupling method call from execution", "slug": "active-object-pattern", "access": "free" },
-    { "title": "Monitor Object — synchronised method access", "slug": "monitor-object-pattern", "access": "free" },
-    { "title": "Half-Sync/Half-Async — separating sync and async processing", "slug": "half-sync-half-async", "access": "free" },
-    { "title": "Thread Pool — reusing threads for task dispatch", "slug": "thread-pool-pattern", "access": "free" },
-    { "title": "Producer-Consumer — decoupled data pipeline with a queue", "slug": "producer-consumer-pattern", "access": "free" },
-    { "title": "Disruptor — lock-free ring buffer for ultra-low latency", "slug": "disruptor-pattern-cpp", "access": "free" },
-    { "title": "Read-Write Lock pattern — maximising read concurrency", "slug": "read-write-lock-pattern", "access": "free" },
-    { "title": "Double-Checked Locking — pitfalls and the correct C++11 fix", "slug": "double-checked-locking-cpp11", "access": "free" }
-  ]
-}
-
----
-
-## PHASE 6 — Modern C++ Pattern Idioms
-- {
-  "title": "PHASE 6 — Modern C++ Pattern Idioms",
-  "access": "free",
-  "children": [
-    { "title": "CRTP — compile-time polymorphism without vtable overhead", "slug": "crtp-pattern-cpp", "access": "free" },
-    { "title": "CRTP — mixin classes and static interfaces", "slug": "crtp-mixin-static-interface", "access": "free" },
-    { "title": "Type Erasure — std::any, std::function, and custom vtable", "slug": "type-erasure-cpp", "access": "free" },
-    { "title": "Policy-Based Design — behaviour via template parameters", "slug": "policy-based-design-cpp", "access": "free" },
-    { "title": "RAII as a design pattern — resource safety by construction", "slug": "raii-as-design-pattern", "access": "free" },
-    { "title": "Expression Templates — lazy evaluation without overhead", "slug": "expression-templates-cpp", "access": "free" },
-    { "title": "Tag Dispatch — compile-time branching without if-else", "slug": "tag-dispatch-cpp", "access": "free" }
-  ]
-}
-
----
-
-## PHASE 7 — Architecture Patterns for Senior Interviews
-- {
-  "title": "PHASE 7 — Architecture Patterns for Senior Interviews",
-  "access": "free",
-  "children": [
-    { "title": "Layered architecture — separation of concerns at scale", "slug": "layered-architecture-cpp", "access": "free" },
-    { "title": "Pipeline architecture — stage-by-stage data processing", "slug": "pipeline-architecture-cpp", "access": "free" },
-    { "title": "Plugin architecture — dynamic extension without recompilation", "slug": "plugin-architecture-cpp", "access": "free" },
-    { "title": "Event-Driven architecture — loose coupling via events", "slug": "event-driven-architecture-cpp", "access": "free" },
-    { "title": "How to answer 'design a system' using patterns (mock interview)", "slug": "design-system-using-patterns-mock", "access": "free" }
+    {
+      "id": "active-object-pattern",
+      "title": "Active Object Pattern",
+      "slug": "active-object-pattern",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Advanced",
+      "summary": "Relevant when work submission and execution should be decoupled inside engines or desktop products.",
+      "practice": 5
+    },
+    {
+      "id": "producer-consumer-pattern",
+      "title": "Producer-Consumer Pattern",
+      "slug": "producer-consumer-pattern",
+      "access": "free",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Useful for queued pipelines such as parsing, rendering, simulation events, and background processing.",
+      "practice": 4
+    },
+    {
+      "id": "thread-pool-pattern",
+      "title": "Thread Pool Pattern",
+      "slug": "thread-pool-pattern",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Advanced",
+      "summary": "Common in products that need predictable background execution without unbounded thread creation.",
+      "practice": 5
+    },
+    {
+      "id": "event-bus-pattern-cpp",
+      "title": "Event Bus Pattern",
+      "slug": "event-bus-pattern-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Useful when tools and subsystems need a shared event channel, but with discipline around hidden control flow.",
+      "practice": 4
+    },
+    {
+      "id": "plugin-architecture-cpp",
+      "title": "Plugin Architecture",
+      "slug": "plugin-architecture-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "35 min",
+      "level": "Advanced",
+      "summary": "Directly relevant to extensible EDA tools and Adobe-style products with external integrations and modules.",
+      "practice": 5
+    },
+    {
+      "id": "event-driven-architecture-cpp",
+      "title": "Event-Driven Architecture",
+      "slug": "event-driven-architecture-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "A natural fit for products organized around user actions, engine notifications, and subsystem events.",
+      "practice": 4
+    },
+    {
+      "id": "pipeline-architecture-cpp",
+      "title": "Pipeline Architecture",
+      "slug": "pipeline-architecture-cpp",
+      "access": "free",
+      "live": true,
+      "duration": "30 min",
+      "level": "Intermediate",
+      "summary": "Useful for staged processing such as import, parse, analyze, transform, render, or export flows.",
+      "practice": 4
+    },
+    {
+      "id": "design-system-using-patterns-mock",
+      "title": "Mock Interview: Design a System Using Patterns",
+      "slug": "design-system-using-patterns-mock",
+      "access": "free",
+      "live": true,
+      "duration": "45 min",
+      "level": "Advanced",
+      "summary": "A capstone that ties the curated pattern set back to realistic product and systems design prompts.",
+      "practice": 6
+    }
   ]
 }

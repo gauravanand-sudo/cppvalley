@@ -238,35 +238,53 @@ export default function TrackSidebar({
   };
 
   return (
-    <div className="p-4">
+    <div className="p-3">
 
-      {/* Progress */}
       {allSlugs.length > 0 && (
         <div
-          className="mb-5 rounded-2xl border p-4 shadow-sm"
+          className="mb-4 overflow-hidden rounded-[1.2rem] border shadow-sm"
           style={{
             borderColor: "var(--reader-border)",
-            backgroundColor: "var(--reader-surface)",
+            background:
+              "linear-gradient(180deg, color-mix(in srgb, var(--reader-surface) 96%, white) 0%, color-mix(in srgb, var(--reader-surface-soft) 88%, transparent) 100%)",
           }}
         >
-          <div className="mb-1.5 flex justify-between text-xs" style={{ color: "var(--reader-muted)" }}>
-            <span>{completedCount} / {allSlugs.length} completed</span>
-            <span>{progressPct}%</span>
+          <div className="border-b px-4 py-2.5" style={{ borderColor: "var(--reader-border)" }}>
+            <div className="text-sm font-semibold" style={{ color: "var(--reader-heading)" }}>
+              {completedCount} of {allSlugs.length} lessons completed
+            </div>
           </div>
-          <div
-            className="h-1.5 w-full rounded-full"
-            style={{ backgroundColor: "color-mix(in srgb, var(--reader-accent) 14%, var(--reader-surface))" }}
-          >
+          <div className="space-y-2.5 px-4 py-3">
+            <div className="flex justify-between text-xs" style={{ color: "var(--reader-muted)" }}>
+              <span>Progress</span>
+              <span>{progressPct}%</span>
+            </div>
             <div
-              className="h-1.5 rounded-full transition-all duration-500"
-              style={{ width: `${progressPct}%`, backgroundColor: "var(--reader-accent)" }}
-            />
+              className="h-2 w-full rounded-full"
+              style={{ backgroundColor: "color-mix(in srgb, var(--reader-accent) 12%, var(--reader-surface))" }}
+            >
+              <div
+                className="h-2 rounded-full transition-all duration-500"
+                style={{ width: `${progressPct}%`, backgroundColor: "var(--reader-accent)" }}
+              />
+            </div>
+            {lastLessonSlug ? (
+              <div
+                className="rounded-xl border px-3 py-2 text-xs"
+                style={{
+                  borderColor: "var(--reader-border)",
+                  backgroundColor: "color-mix(in srgb, var(--reader-accent) 6%, transparent)",
+                  color: "var(--reader-body)",
+                }}
+              >
+                Resume marker active.
+              </div>
+            ) : null}
           </div>
         </div>
       )}
 
-      {/* Search */}
-      <div className="sticky top-0 z-10 pb-3" style={{ backgroundColor: "var(--reader-surface-soft)" }}>
+      <div className="sticky top-0 z-10 pb-2" style={{ backgroundColor: "var(--reader-surface-soft)" }}>
         <div className="relative">
           <Search className="absolute left-3 top-2.5 h-3.5 w-3.5" style={{ color: "var(--reader-muted)" }} />
           <input
@@ -283,17 +301,23 @@ export default function TrackSidebar({
         </div>
       </div>
 
-      {/* Syllabus */}
       <div className="space-y-5">
         {(filtered || []).map((sec) => (
-          <div key={sec.title} className="space-y-1">
+          <div
+            key={sec.title}
+            className="space-y-2 rounded-[1.25rem] border p-3"
+            style={{
+              borderColor: "color-mix(in srgb, var(--reader-border) 92%, transparent)",
+              backgroundColor: "color-mix(in srgb, var(--reader-surface) 72%, transparent)",
+            }}
+          >
             <div className="px-1 py-1 text-[10px] font-mono uppercase tracking-widest" style={{ color: "var(--reader-muted)" }}>
               {sec.title}
             </div>
             {(sec.items || []).map((it, idx) => {
               if (isNode(it)) {
                 return (
-                  <div key={it.title + idx} className="space-y-0.5">
+                  <div key={it.title + idx} className="space-y-1">
                     <div className="px-3 pt-2 pb-1 text-xs font-semibold" style={{ color: "var(--reader-muted)" }}>
                       {it.title}
                     </div>

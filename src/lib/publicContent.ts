@@ -1,6 +1,7 @@
 export const PUBLIC_TRACK_SLUGS = [
   "core-cpp-for-interviews",
   "low-latency-and-systems",
+  "design-pattern-mastery-eda",
 ] as const;
 
 export function isPublicTrackSlug(trackSlug: string) {

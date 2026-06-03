@@ -15,7 +15,8 @@ export default function SiteHeader() {
     <>
       <div className="h-[68px]" />
 
-      <header className="fixed inset-x-0 top-0 z-[140] border-b border-gray-100 bg-white/95 backdrop-blur">
+      <header className="fixed inset-x-0 top-0 z-[140] overflow-hidden border-b border-[#eadfe3] bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,255,255,0.82))] backdrop-blur-xl">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_left,rgba(155,28,58,0.08),transparent_20%),radial-gradient(circle_at_right,rgba(39,93,122,0.08),transparent_22%)]" />
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
 
           <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
@@ -28,14 +29,14 @@ export default function SiteHeader() {
                 v0.1
               </span>
             </div>
-            <span
-              className="hidden rounded-full border px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] lg:inline"
-              style={{
-                borderColor: "rgba(212, 104, 134, 0.35)",
-                color: "#d46886",
+              <span
+                className="hidden rounded-full border px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] lg:inline"
+                style={{
+                borderColor: "rgba(212, 104, 134, 0.25)",
+                color: "#b45d78",
                 background:
-                  "linear-gradient(180deg, rgba(212, 104, 134, 0.12) 0%, rgba(212, 104, 134, 0.06) 100%)",
-                boxShadow: "0 0 18px rgba(212, 104, 134, 0.18), inset 0 0 18px rgba(212, 104, 134, 0.06)",
+                  "linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(248,239,242,0.72) 100%)",
+                boxShadow: "0 10px 30px rgba(212, 104, 134, 0.1), inset 0 0 18px rgba(212, 104, 134, 0.04)",
               }}
             >
               Zero to architect level
@@ -108,7 +109,7 @@ export default function SiteHeader() {
           <div className="flex items-center gap-2">
             <Link
               href="/learn/tracks/core-cpp-for-interviews/what-happens-when-you-compile-cpp"
-              className="hidden rounded-full border border-[#D8BDC6] bg-[#FCF5F7] px-3 py-1.5 text-xs font-semibold text-[#7F1730] transition hover:border-[#C69EAB] hover:bg-[#F8ECEF] sm:inline-flex"
+              className="hidden rounded-full border border-[#e3cfd6] bg-[linear-gradient(180deg,#fffdfd_0%,#f9eef2_100%)] px-3 py-1.5 text-xs font-semibold text-[#7F1730] shadow-[0_8px_20px_rgba(127,23,48,0.06)] transition hover:border-[#C69EAB] hover:bg-[#F8ECEF] sm:inline-flex"
             >
               Start Free
             </Link>

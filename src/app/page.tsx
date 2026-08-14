@@ -3,24 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { lessons, masteryTracks, phases } from "@/data/curriculum";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
 const youtubeUrl = "https://www.youtube.com/@cppvalley?sub_confirmation=1";
-
-const phases = [
-  { number: "01", episodes: "01–08", focus: "Measurement", result: "Benchmark laboratory" },
-  { number: "02", episodes: "09–20", focus: "CPU & memory", result: "Locality evidence pack" },
-  { number: "03", episodes: "21–32", focus: "Linux determinism", result: "Low-jitter host profile" },
-  { number: "04", episodes: "33–44", focus: "Network datapaths", result: "Receiver bake-off" },
-  { number: "05", episodes: "45–56", focus: "Low-latency C++", result: "Protocol core" },
-  { number: "06", episodes: "57–68", focus: "Concurrency", result: "Queue library" },
-  { number: "07", episodes: "69–80", focus: "Trading systems", result: "Feed plant + gateway" },
-  { number: "08", episodes: "81–88", focus: "Production safety", result: "Operable platform" },
-  { number: "09", episodes: "89–96", focus: "Hiring conversion", result: "Public capstone" },
-] as const;
 
 const projects = [
   {
@@ -86,11 +75,11 @@ export default function Home() {
           </figure>
 
           <div className="home-intro-copy">
-            <p className="kicker">A PUBLIC HFT ENGINEERING CURRICULUM</p>
-            <h1>C++ for high-frequency trading, taught by building the system.</h1>
+            <p className="kicker">THE HFT ENGINEERING MASTERY PATH</p>
+            <h1>96 focused lessons. Four expert skill stacks. One serious portfolio.</h1>
             <p className="intro-lede">
-              A 96-episode path through measurement, CPU architecture, Linux, networking,
-              concurrency, market data, order entry, risk, and production operations.
+              Master modern C++, low-latency engineering, Linux systems and electronic trading
+              by learning every layer—and proving it with code an interviewer can inspect.
             </p>
             <div className="primary-actions">
               <Link className="action action-primary" href="/curriculum">
@@ -101,10 +90,10 @@ export default function Home() {
               </a>
             </div>
             <dl className="intro-stats">
-              <div><dt>Episodes</dt><dd>96</dd></div>
-              <div><dt>Phases</dt><dd>09</dd></div>
-              <div><dt>Systems</dt><dd>04</dd></div>
-              <div><dt>Target</dt><dd>HFT core</dd></div>
+              <div><dt>Mini-topics</dt><dd>96</dd></div>
+              <div><dt>Outcomes</dt><dd>288</dd></div>
+              <div><dt>Expert stacks</dt><dd>04</dd></div>
+              <div><dt>Capstone</dt><dd>Tick → trade</dd></div>
             </dl>
           </div>
         </section>
@@ -123,25 +112,67 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="page-section mastery-home" aria-labelledby="mastery-heading">
+          <div className="page-width">
+            <header className="section-header mastery-home-head">
+              <div>
+                <p className="section-label">01 / FOUR EXPERT STACKS</p>
+                <h2 id="mastery-heading">Go deep without losing the whole system.</h2>
+              </div>
+              <p>
+                Every mini-topic is tagged by the capability it strengthens, so you can see how
+                C++, latency, systems and trading knowledge compound into one engineering profile.
+              </p>
+            </header>
+
+            <div className="mastery-grid">
+              {masteryTracks.map((track, index) => {
+                const count = lessons.filter((lesson) => lesson.tracks.includes(track.id)).length;
+                return (
+                  <Link className={`mastery-card mastery-${track.id}`} href="/curriculum#curriculum-browser" key={track.id}>
+                    <div className="mastery-card-top">
+                      <span>0{index + 1}</span>
+                      <strong>{count} connected lessons</strong>
+                    </div>
+                    <h3>{track.name}</h3>
+                    <p>{track.promise}</p>
+                    <ul>
+                      {track.capabilities.map((capability) => <li key={capability}>{capability}</li>)}
+                    </ul>
+                    <small>Explore this stack →</small>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="value-ledger" aria-label="Curriculum deliverables">
+              <div><strong>96</strong><span>video-ready lesson pages</span></div>
+              <div><strong>288</strong><span>specific learning outcomes</span></div>
+              <div><strong>96</strong><span>focused mini-labs</span></div>
+              <div><strong>09</strong><span>portfolio-grade exit artifacts</span></div>
+            </div>
+          </div>
+        </section>
+
         <section className="page-section page-width" aria-labelledby="path-heading">
           <header className="section-header">
             <div>
-              <p className="section-label">01 / THE PATH</p>
+              <p className="section-label">02 / THE PATH</p>
               <h2 id="path-heading">Learn in dependency order.</h2>
             </div>
-            <p>Each phase ends with something inspectable. No badges, streaks, or fake completion metrics.</p>
+            <p>Each lesson adds a skill. Each phase turns those skills into an artifact worth showing.</p>
           </header>
 
           <div className="phase-table" role="list">
             <div className="table-head" aria-hidden="true">
               <span>Phase</span><span>Episodes</span><span>Focus</span><span>Exit artifact</span><span />
             </div>
-            {phases.map((phase, index) => (
-              <Link className="phase-row" href={`/curriculum#phase-${index}`} key={phase.number} role="listitem">
-                <span className="row-number">{phase.number}</span>
-                <span className="row-episodes">EP {phase.episodes}</span>
-                <strong>{phase.focus}</strong>
-                <span>{phase.result}</span>
+            {phases.map((phase) => (
+              <Link className="phase-row" href={`/curriculum#phase-${phase.number - 1}`} key={phase.number} role="listitem">
+                <span className="row-number">{String(phase.number).padStart(2, "0")}</span>
+                <span className="row-episodes">{phase.range}</span>
+                <strong>{phase.title}</strong>
+                <span>{phase.output}</span>
                 <Arrow />
               </Link>
             ))}
@@ -152,7 +183,7 @@ export default function Home() {
           <div className="page-width">
             <header className="section-header">
               <div>
-                <p className="section-label">02 / FLAGSHIP SYSTEMS</p>
+                <p className="section-label">03 / FLAGSHIP SYSTEMS</p>
                 <h2 id="projects-heading">Projects an interviewer can inspect.</h2>
               </div>
               <p>The curriculum converges on four repositories with explicit acceptance criteria.</p>
@@ -175,7 +206,7 @@ export default function Home() {
         <section className="page-section page-width" aria-labelledby="proof-heading">
           <header className="section-header">
             <div>
-              <p className="section-label">03 / HIRING PROOF</p>
+              <p className="section-label">04 / HIRING PROOF</p>
               <h2 id="proof-heading">Make the work defensible.</h2>
             </div>
             <p>A fast demo is not enough. Each build should answer the four questions below.</p>
@@ -202,7 +233,7 @@ export default function Home() {
 
         <section className="final-cta">
           <div className="page-width final-cta-inner">
-            <div><p className="section-label">START AT THE BEGINNING</p><h2>Measure first. Optimize second.</h2></div>
+            <div><p className="section-label">START YOUR FIRST MINI-TOPIC</p><h2>Watch it. Build it. Prove it.</h2></div>
             <div className="primary-actions">
               <Link className="action action-light" href="/curriculum#phase-0">Open Phase 01 <Arrow /></Link>
               <a className="action action-outline-light" href={youtubeUrl} target="_blank" rel="noreferrer">Subscribe ↗</a>

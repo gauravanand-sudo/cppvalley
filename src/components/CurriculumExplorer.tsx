@@ -1,88 +1,116 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
+import type { CurriculumPhase, MasteryTrack, MasteryTrackInfo } from "@/data/curriculum";
 
-export type CurriculumPhase = {
-  title: string;
-  range: string;
-  summary: string;
-  output: string;
-  episodes: string[];
+type VisiblePhase = CurriculumPhase & {
+  visibleLessons: CurriculumPhase["lessons"];
 };
 
-type NumberedPhase = CurriculumPhase & {
-  phaseIndex: number;
-  firstEpisode: number;
-  visibleEpisodes: { title: string; number: string; isGate: boolean }[];
-};
-
-export function CurriculumExplorer({ phases }: { phases: CurriculumPhase[] }) {
+export function CurriculumExplorer({
+  phases,
+  tracks,
+}: {
+  phases: CurriculumPhase[];
+  tracks: readonly MasteryTrackInfo[];
+}) {
   const [query, setQuery] = useState("");
   const [selectedPhase, setSelectedPhase] = useState("all");
+  const [selectedTrack, setSelectedTrack] = useState<"all" | MasteryTrack>("all");
 
   const normalizedQuery = query.trim().toLowerCase();
+  const trackById = useMemo(
+    () => new Map(tracks.map((track) => [track.id, track])),
+    [tracks],
+  );
 
-  const numberedPhases = useMemo<NumberedPhase[]>(() => {
-    return phases.flatMap((phase, phaseIndex) => {
-      const firstEpisode = phases
-        .slice(0, phaseIndex)
-        .reduce((total, previousPhase) => total + previousPhase.episodes.length, 0);
+  const visiblePhases = useMemo<VisiblePhase[]>(() => {
+    return phases.flatMap((phase) => {
+      if (selectedPhase !== "all" && selectedPhase !== String(phase.number)) return [];
 
-      if (selectedPhase !== "all" && selectedPhase !== String(phaseIndex)) return [];
+      const visibleLessons = phase.lessons.filter((lesson) => {
+        if (selectedTrack !== "all" && !lesson.tracks.includes(selectedTrack)) return false;
 
-      const visibleEpisodes = phase.episodes.flatMap((title, episodeIndex) => {
-        const searchable = `${title} ${phase.title} ${phase.summary} ${phase.output}`.toLowerCase();
-        if (normalizedQuery && !searchable.includes(normalizedQuery)) return [];
+        const searchable = [
+          lesson.title,
+          phase.title,
+          phase.summary,
+          phase.output,
+          lesson.lab,
+          lesson.proof,
+          ...lesson.learn,
+          ...lesson.tracks.map((track) => trackById.get(track)?.name ?? track),
+        ].join(" ").toLowerCase();
 
-        return [{
-          title,
-          number: String(firstEpisode + episodeIndex + 1).padStart(2, "0"),
-          isGate: title.startsWith("Phase gate"),
-        }];
+        return !normalizedQuery || searchable.includes(normalizedQuery);
       });
 
-      if (visibleEpisodes.length === 0) return [];
-      return [{ ...phase, phaseIndex, firstEpisode, visibleEpisodes }];
+      return visibleLessons.length ? [{ ...phase, visibleLessons }] : [];
     });
-  }, [normalizedQuery, phases, selectedPhase]);
+  }, [normalizedQuery, phases, selectedPhase, selectedTrack, trackById]);
 
-  const visibleCount = numberedPhases.reduce((total, phase) => total + phase.visibleEpisodes.length, 0);
+  const visibleCount = visiblePhases.reduce(
+    (total, phase) => total + phase.visibleLessons.length,
+    0,
+  );
+
+  const clearFilters = () => {
+    setQuery("");
+    setSelectedPhase("all");
+    setSelectedTrack("all");
+  };
 
   return (
-    <div className="curriculum-explorer">
+    <div className="curriculum-explorer" id="curriculum-browser">
       <div className="curriculum-tools" aria-label="Curriculum filters">
         <label className="search-field">
-          <span>Search topics</span>
+          <span>Search 96 mini-topics</span>
           <input
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Try: NUMA, ITCH, hazard pointers…"
+            placeholder="NUMA, ITCH, lock-free, risk…"
           />
+        </label>
+
+        <label className="phase-field">
+          <span>Expert stack</span>
+          <select
+            value={selectedTrack}
+            onChange={(event) => setSelectedTrack(event.target.value as "all" | MasteryTrack)}
+          >
+            <option value="all">All 4 expert stacks</option>
+            {tracks.map((track) => (
+              <option value={track.id} key={track.id}>{track.name}</option>
+            ))}
+          </select>
         </label>
 
         <label className="phase-field">
           <span>Phase</span>
           <select value={selectedPhase} onChange={(event) => setSelectedPhase(event.target.value)}>
             <option value="all">All 9 phases</option>
-            {phases.map((phase, index) => (
-              <option value={index} key={phase.title}>0{index + 1} — {phase.title}</option>
+            {phases.map((phase) => (
+              <option value={phase.number} key={phase.title}>
+                {String(phase.number).padStart(2, "0")} — {phase.title}
+              </option>
             ))}
           </select>
         </label>
 
         <p className="result-count" aria-live="polite">
-          <strong>{visibleCount}</strong> / 96 episodes
+          <strong>{visibleCount}</strong> / 96 lessons
         </p>
       </div>
 
-      {numberedPhases.length > 0 ? (
+      {visiblePhases.length > 0 ? (
         <div className="curriculum-results">
-          {numberedPhases.map((phase) => (
-            <section className="curriculum-phase" id={`phase-${phase.phaseIndex}`} key={phase.title}>
+          {visiblePhases.map((phase) => (
+            <section className="curriculum-phase" id={`phase-${phase.number - 1}`} key={phase.title}>
               <header className="curriculum-phase-head">
                 <div>
-                  <span>PHASE {String(phase.phaseIndex + 1).padStart(2, "0")} / {phase.range}</span>
+                  <span>PHASE {String(phase.number).padStart(2, "0")} / {phase.range}</span>
                   <h2>{phase.title}</h2>
                   <p>{phase.summary}</p>
                 </div>
@@ -92,16 +120,30 @@ export function CurriculumExplorer({ phases }: { phases: CurriculumPhase[] }) {
                 </div>
               </header>
 
-              <div className="episode-table">
-                <div className="episode-head" aria-hidden="true">
-                  <span>EP</span><span>Topic</span><span>Output</span>
-                </div>
-                {phase.visibleEpisodes.map((episode) => (
-                  <article className="episode-row" key={`${episode.number}-${episode.title}`}>
-                    <span className="episode-number">{episode.number}</span>
-                    <h3>{episode.title}</h3>
-                    <span>{episode.isGate ? "phase gate" : "lab + notes"}</span>
-                  </article>
+              <div className="lesson-list">
+                {phase.visibleLessons.map((lesson) => (
+                  <Link
+                    className="lesson-row"
+                    href={`/curriculum/${lesson.slug}`}
+                    key={lesson.slug}
+                  >
+                    <span className="episode-number">{String(lesson.number).padStart(2, "0")}</span>
+                    <div className="lesson-row-copy">
+                      <div className="lesson-row-title">
+                        <h3>{lesson.title}</h3>
+                        <div className="track-tags" aria-label="Expert tracks">
+                          {lesson.tracks.map((track) => (
+                            <span className={`track-tag track-${track}`} key={track}>
+                              {trackById.get(track)?.shortName ?? track}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <p>{lesson.learn[0]}</p>
+                      <small>3 learning outcomes · mini-lab · proof artifact</small>
+                    </div>
+                    <span className="lesson-arrow" aria-hidden="true">→</span>
+                  </Link>
                 ))}
               </div>
             </section>
@@ -109,9 +151,9 @@ export function CurriculumExplorer({ phases }: { phases: CurriculumPhase[] }) {
         </div>
       ) : (
         <div className="empty-results">
-          <strong>No matching episode.</strong>
-          <p>Try a broader term or switch the phase filter to “All 9 phases”.</p>
-          <button type="button" onClick={() => { setQuery(""); setSelectedPhase("all"); }}>Clear filters</button>
+          <strong>No matching lesson.</strong>
+          <p>Try a broader term or clear the stack and phase filters.</p>
+          <button type="button" onClick={clearFilters}>Clear filters</button>
         </div>
       )}
     </div>

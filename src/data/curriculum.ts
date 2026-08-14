@@ -128,6 +128,11 @@ const phaseMeta = [
   },
 ] as const;
 
+// Publish a video by adding its YouTube ID here. Example: 1: "dQw4w9WgXcQ"
+// The lesson page switches from the release placeholder to the privacy-enhanced player automatically.
+export const youtubeIds: Partial<Record<number, string>> = {
+};
+
 const pad = (value: number) => String(value).padStart(2, "0");
 
 const slugify = (value: string) =>
@@ -158,6 +163,8 @@ function lesson(
   lab: string,
   proof: string,
 ): Lesson {
+  const youtubeId = youtubeIds[number];
+
   return {
     number,
     code: `EP ${pad(number)}`,
@@ -169,6 +176,7 @@ function lesson(
     lab,
     proof,
     prerequisites: number === 1 ? [] : [`EP ${pad(number - 1)}`],
+    ...(youtubeId ? { youtubeId } : {}),
   };
 }
 
@@ -581,4 +589,3 @@ export function getTrack(track: MasteryTrack) {
 export function getPhase(number: number) {
   return phases.find((phase) => phase.number === number)!;
 }
-

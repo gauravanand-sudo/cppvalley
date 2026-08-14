@@ -114,8 +114,8 @@ export default async function LessonPage({ params }: LessonPageProps) {
                 <p className="section-label">YOUTUBE LESSON SLOT</p>
                 <h2>Video coming to cppvalley.</h2>
                 <p>
-                  This page is ready for the episode. Add its YouTube ID to this lesson and the
-                  privacy-enhanced player appears here automatically.
+                  This page is ready for the episode. Add its episode number and YouTube ID to
+                  the video map and the privacy-enhanced player appears here automatically.
                 </p>
                 <a href={youtubeUrl} target="_blank" rel="noreferrer">Subscribe before it drops ↗</a>
               </div>

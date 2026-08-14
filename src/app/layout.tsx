@@ -26,27 +26,28 @@ export const metadata: Metadata = {
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+    images: [{ url: "/cppvalley-logo.png", width: 1025, height: 1024, alt: "cppvalley logo" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "cppvalley — HFT Core Systems",
     description: "Build, break, measure, and defend low-latency trading infrastructure.",
-    images: ["/opengraph-image"],
+    images: ["/cppvalley-logo.png"],
   },
   robots: {
     index: true,
     follow: true,
   },
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/cppvalley-logo.png",
+    shortcut: "/cppvalley-logo.png",
+    apple: "/cppvalley-logo.png",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#070a0d",
-  colorScheme: "dark",
+  themeColor: "#faf9f5",
+  colorScheme: "light",
 };
 
 export default function RootLayout({
@@ -55,8 +56,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-[#070a0d]">
-      <body className="bg-[#070a0d] antialiased">{children}</body>
+    <html lang="en">
+      <body>{children}</body>
     </html>
   );
 }

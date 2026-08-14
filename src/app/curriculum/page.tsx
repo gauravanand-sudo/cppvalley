@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CurriculumExplorer, type CurriculumPhase } from "@/components/CurriculumExplorer";
+import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
   title: "96-Episode HFT Curriculum",
@@ -16,15 +19,7 @@ export const metadata: Metadata = {
 
 const youtubeUrl = "https://www.youtube.com/@cppvalley?sub_confirmation=1";
 
-type Phase = {
-  title: string;
-  range: string;
-  summary: string;
-  output: string;
-  episodes: string[];
-};
-
-const phases: Phase[] = [
+const phases: CurriculumPhase[] = [
   {
     title: "Measurement before optimization",
     range: "EP 01–08",
@@ -195,122 +190,53 @@ const phases: Phase[] = [
   },
 ];
 
-function ArrowIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4" fill="none">
-      <path d="M4 10h11m-4-4 4 4-4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 export default function CurriculumPage() {
   return (
-    <main className="curriculum-shell">
-      <header className="nav-wrap">
-        <nav className="nav-inner" aria-label="Primary navigation">
-          <Link href="/" className="wordmark" aria-label="cppvalley home">
-            <span className="wordmark-mark">cv</span>
-            <span>cppvalley</span>
-          </Link>
-          <div className="nav-links">
-            <Link href="/curriculum">Curriculum</Link>
-            <Link href="/#labs">Labs</Link>
-            <Link href="/#method">Method</Link>
-          </div>
-          <a className="nav-cta" href={youtubeUrl} target="_blank" rel="noreferrer">
-            <span className="status-dot" /> YouTube
-          </a>
-        </nav>
-      </header>
-
-      <section className="curriculum-hero">
-        <div className="content-grid curriculum-hero-grid">
+    <div className="page-shell">
+      <SiteHeader />
+      <main>
+        <section className="page-hero page-width">
           <div>
-            <span className="section-number">THE COMPLETE PATH / V1.0</span>
-            <h1>Build the system.<br /><span className="text-gradient">Earn the evidence.</span></h1>
+            <p className="kicker">CURRICULUM / 96 EPISODES / 9 PHASES</p>
+            <h1>The complete HFT core-systems path.</h1>
             <p>
-              A sequenced curriculum for engineers targeting low-latency C++, market-data,
-              exchange-connectivity, and core trading-platform roles. Each phase exits with a
-              public artifact—not a completion badge.
+              Search the syllabus, choose a dependency, and leave every phase with a public
+              artifact. The order is intentional: measurement before optimization, correctness
+              before lock-free code, and operations before “production-ready”.
             </p>
           </div>
-          <div className="curriculum-stats" aria-label="Curriculum statistics">
-            <div><strong>96</strong><span>episodes</span></div>
-            <div><strong>09</strong><span>phases</span></div>
-            <div><strong>04</strong><span>flagship labs</span></div>
-            <div><strong>01</strong><span>integrated system</span></div>
-          </div>
-        </div>
-      </section>
-
-      <nav className="phase-jump" aria-label="Jump to curriculum phase">
-        <div>
-          {phases.map((phase, index) => (
-            <a href={`#phase-${index}`} key={phase.title}>0{index} {phase.title}</a>
-          ))}
-        </div>
-      </nav>
-
-      <div className="content-grid curriculum-content">
-        {phases.map((phase, phaseIndex) => {
-          const firstEpisode = phases
-            .slice(0, phaseIndex)
-            .reduce((total, previousPhase) => total + previousPhase.episodes.length, 0);
-
-          return (
-            <section className="curriculum-phase" id={`phase-${phaseIndex}`} key={phase.title}>
-              <div className="phase-meta">
-                <span>{phase.range} / PHASE 0{phaseIndex}</span>
-                <h2>{phase.title}</h2>
-                <p>{phase.summary}</p>
-                <div className="phase-output">
-                  <span>EXIT ARTIFACT</span>
-                  <strong>{phase.output}</strong>
-                </div>
-              </div>
-
-              <div className="episode-list">
-                {phase.episodes.map((episode, episodeIndex) => {
-                  const number = String(firstEpisode + episodeIndex + 1).padStart(2, "0");
-                  const isGate = episode.startsWith("Phase gate");
-                  return (
-                    <article className="episode-item" key={`${number}-${episode}`}>
-                      <span className="episode-number">{number}</span>
-                      <h3>{episode}</h3>
-                      <em>{isGate ? "phase gate" : "lab + proof"}</em>
-                    </article>
-                  );
-                })}
-              </div>
-            </section>
-          );
-        })}
-
-        <section className="curriculum-cta">
-          <div>
-            <h2>Watch. Inspect. Build. Prove.</h2>
-            <p>Subscribe for the episode. Return here for the lab, evidence, and next dependency.</p>
-          </div>
-          <a className="button button-primary" href={youtubeUrl} target="_blank" rel="noreferrer">
-            Subscribe to cppvalley <ArrowIcon />
-          </a>
+          <dl className="page-hero-stats">
+            <div><dt>Topics</dt><dd>96</dd></div>
+            <div><dt>Exit gates</dt><dd>09</dd></div>
+            <div><dt>Capstone</dt><dd>Tick → trade</dd></div>
+          </dl>
         </section>
-      </div>
 
-      <footer className="footer">
-        <div className="content-grid footer-grid">
-          <div>
-            <Link href="/" className="wordmark"><span className="wordmark-mark">cv</span><span>cppvalley</span></Link>
-            <p>Low-latency systems, measured in public.</p>
+        <section className="how-to-use" aria-labelledby="how-to-use-heading">
+          <div className="page-width">
+            <h2 id="how-to-use-heading">How to use this curriculum</h2>
+            <ol>
+              <li><span>01</span><p><strong>Watch</strong> the episode for the mental model.</p></li>
+              <li><span>02</span><p><strong>Reproduce</strong> the benchmark or failure locally.</p></li>
+              <li><span>03</span><p><strong>Record</strong> environment, result, and limitation.</p></li>
+              <li><span>04</span><p><strong>Publish</strong> the phase artifact when its gate passes.</p></li>
+            </ol>
           </div>
-          <div className="footer-links">
-            <Link href="/">Home</Link>
-            <a href={youtubeUrl} target="_blank" rel="noreferrer">YouTube</a>
-            <a href="https://github.com/gauravanand-sudo/cppvalley" target="_blank" rel="noreferrer">GitHub</a>
-          </div>
-          <p className="footer-note">Engineering education, not trading advice.</p>
+        </section>
+
+        <div className="page-width curriculum-page-content">
+          <CurriculumExplorer phases={phases} />
+
+          <section className="curriculum-end">
+            <div><p className="section-label">VIDEO + LAB + EVIDENCE</p><h2>Use YouTube for the lesson. Use this site for the work.</h2></div>
+            <div className="primary-actions">
+              <a className="action action-primary" href={youtubeUrl} target="_blank" rel="noreferrer">Subscribe on YouTube ↗</a>
+              <Link className="action action-secondary" href="/projects">See the four projects →</Link>
+            </div>
+          </section>
         </div>
-      </footer>
-    </main>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

@@ -1,14 +1,18 @@
 import Link from "next/link";
+import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 
 export default function NotFound() {
   return (
-    <main className="not-found-shell">
-      <span className="section-number">404 / PACKET DROPPED</span>
-      <h1>This route left the hot path.</h1>
-      <p>The old cppvalley library has been replaced by the HFT Core Systems curriculum.</p>
-      <Link className="button button-primary" href="/curriculum">
-        Open the curriculum
-      </Link>
-    </main>
+    <div className="page-shell">
+      <SiteHeader />
+      <main className="not-found-shell page-width">
+        <p className="kicker">404 / PACKET DROPPED</p>
+        <h1>This route left the hot path.</h1>
+        <p>The page does not exist. The curriculum, projects, and hiring-proof checklist are still available.</p>
+        <Link className="action action-primary" href="/curriculum">Open the curriculum →</Link>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

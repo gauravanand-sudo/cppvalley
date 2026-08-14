@@ -26,22 +26,21 @@ export const metadata: Metadata = {
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
-    images: [{ url: "/cppvalley-logo.png", width: 1025, height: 1024, alt: "cppvalley logo" }],
+    images: [{ url: "/cppvalley-logo.webp", width: 1672, height: 941, alt: "cppvalley logo" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "cppvalley — HFT Core Systems",
     description: "Build, break, measure, and defend low-latency trading infrastructure.",
-    images: ["/cppvalley-logo.png"],
+    images: ["/cppvalley-logo.webp"],
   },
   robots: {
     index: true,
     follow: true,
   },
   icons: {
-    icon: "/cppvalley-logo.png",
-    shortcut: "/cppvalley-logo.png",
-    apple: "/cppvalley-logo.png",
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
   },
 };
 

@@ -74,11 +74,12 @@ export default function Home() {
           <figure className="home-logo-wrap">
             <Image
               className="home-logo"
-              src="/cppvalley-logo.png"
+              src="/cppvalley-logo.webp"
               alt="cppvalley logo"
-              width={1025}
-              height={1024}
-              sizes="(max-width: 760px) 240px, 340px"
+              width={1672}
+              height={941}
+              sizes="(max-width: 760px) calc(100vw - 28px), 480px"
+              quality={90}
               priority
             />
             <figcaption>BUILD LOG / C++ → HFT</figcaption>
@@ -214,4 +215,3 @@ export default function Home() {
     </div>
   );
 }
-

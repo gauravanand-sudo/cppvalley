@@ -8,18 +8,18 @@ export function SiteHeader() {
     <header className="site-header">
       <div className="site-header-inner">
         <Link className="brand" href="/" aria-label="cppvalley home">
-          <Image
-            className="brand-logo"
-            src="/cppvalley-logo.png"
-            alt=""
-            width={48}
-            height={48}
-            sizes="48px"
-          />
-          <span className="brand-copy">
-            <strong>cppvalley</strong>
-            <small>HFT systems lab</small>
+          <span className="brand-logo-frame" aria-hidden="true">
+            <Image
+              className="brand-logo"
+              src="/cppvalley-logo.webp"
+              alt=""
+              width={1672}
+              height={941}
+              sizes="228px"
+              priority
+            />
           </span>
+          <span className="sr-only">cppvalley</span>
         </Link>
 
         <nav className="site-nav" aria-label="Primary navigation">
@@ -35,4 +35,3 @@ export function SiteHeader() {
     </header>
   );
 }
-

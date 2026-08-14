@@ -8,9 +8,15 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div className="site-footer-inner">
         <div className="footer-brand">
-          <Image src="/cppvalley-logo.png" alt="" width={42} height={42} sizes="42px" />
+          <Image
+            className="footer-logo"
+            src="/cppvalley-logo.webp"
+            alt="cppvalley"
+            width={1672}
+            height={941}
+            sizes="180px"
+          />
           <div>
-            <strong>cppvalley</strong>
             <p>C++ · Linux · networks · trading systems</p>
           </div>
         </div>
@@ -28,4 +34,3 @@ export function SiteFooter() {
     </footer>
   );
 }
-

@@ -6,98 +6,72 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { lessons, masteryTracks, phases } from "@/data/curriculum";
 
 export const metadata: Metadata = {
-  title: "96-Lesson HFT Curriculum",
+  title: "All C++ & HFT Lessons",
   description:
-    "Build four expert skill stacks across C++, low latency, systems and HFT through 96 focused lessons, mini-labs and portfolio evidence.",
+    "Browse 96 lessons covering modern C++, low latency, Linux systems, networking, concurrency and electronic trading.",
   alternates: { canonical: "/curriculum" },
   openGraph: {
-    title: "96 Lessons. Four HFT Engineering Skill Stacks.",
-    description:
-      "A sequenced path from trustworthy measurement to an interview-ready tick-to-trade platform.",
+    title: "96 C++ & HFT Engineering Lessons",
+    description: "Search a dependency-ordered systems curriculum with hands-on labs and proof artifacts.",
     url: "/curriculum",
   },
 };
 
-const youtubeUrl = "https://www.youtube.com/@cppvalley?sub_confirmation=1";
-
 export default function CurriculumPage() {
   return (
-    <div className="page-shell">
+    <div className="page-shell market-page">
       <SiteHeader />
+
       <main>
-        <section className="page-hero curriculum-hero page-width">
-          <div>
-            <p className="kicker">96 MINI-TOPICS / 4 EXPERT STACKS / 9 PHASES</p>
-            <h1>Become the engineer who can explain the whole path.</h1>
+        <section className="market-catalog-hero">
+          <div className="market-container market-catalog-hero-inner">
+            <div>
+              <p className="market-eyebrow">CPPVALLEY COURSE CATALOG</p>
+              <h1>Build C++ and systems expertise that survives technical scrutiny</h1>
+              <p>
+                Browse the complete 96-lesson learning path. Filter by expert stack, search a
+                low-level topic, and open any lesson for its outcomes, mini-lab and proof target.
+              </p>
+              <div className="market-catalog-actions">
+                <a href="#curriculum-browser" className="market-button market-button-primary">Browse lessons</a>
+                <Link href="/projects" className="market-button market-button-ghost">See projects</Link>
+              </div>
+            </div>
+
+            <dl className="market-catalog-stats">
+              <div><dt>Focused lessons</dt><dd>{lessons.length}</dd></div>
+              <div><dt>Expert stacks</dt><dd>{masteryTracks.length}</dd></div>
+              <div><dt>Roadmap phases</dt><dd>{phases.length}</dd></div>
+              <div><dt>Outcomes</dt><dd>{lessons.length * 3}</dd></div>
+            </dl>
+          </div>
+        </section>
+
+        <section className="market-catalog-body market-container">
+          <div className="market-section-heading market-catalog-heading">
+            <p className="market-eyebrow">ALL LESSONS</p>
+            <h2>Explore the catalog</h2>
             <p>
-              Not a playlist of disconnected tricks. This is a dependency-ordered system for
-              mastering modern C++, low-latency engineering, Linux systems and electronic
-              trading—one inspectable build at a time.
+              Search for cache, NUMA, lock-free, ITCH, risk, clocks, Linux scheduling—or filter by
+              the capability stack you want to strengthen.
             </p>
           </div>
-          <dl className="page-hero-stats">
-            <div><dt>Focused lessons</dt><dd>96</dd></div>
-            <div><dt>Learning outcomes</dt><dd>288</dd></div>
-            <div><dt>Phase artifacts</dt><dd>09</dd></div>
-          </dl>
-        </section>
 
-        <section className="mastery-strip" aria-labelledby="mastery-strip-heading">
-          <div className="page-width">
-            <header className="mastery-strip-head">
-              <p className="section-label">YOUR FOUR EXPERT STACKS</p>
-              <h2 id="mastery-strip-heading">See exactly what compounds.</h2>
-            </header>
-            <div className="mastery-grid">
-              {masteryTracks.map((track, index) => {
-                const count = lessons.filter((lesson) => lesson.tracks.includes(track.id)).length;
-                return (
-                  <article className={`mastery-card mastery-${track.id}`} key={track.id}>
-                    <div className="mastery-card-top">
-                      <span>0{index + 1}</span>
-                      <strong>{count} lessons</strong>
-                    </div>
-                    <h3>{track.name}</h3>
-                    <p>{track.promise}</p>
-                    <ul>
-                      {track.capabilities.map((capability) => <li key={capability}>{capability}</li>)}
-                    </ul>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section className="how-to-use" aria-labelledby="how-to-use-heading">
-          <div className="page-width">
-            <h2 id="how-to-use-heading">Turn every video into capability</h2>
-            <ol>
-              <li><span>01</span><p><strong>Watch</strong> the concept and mental model.</p></li>
-              <li><span>02</span><p><strong>Build</strong> the focused mini-lab yourself.</p></li>
-              <li><span>03</span><p><strong>Prove</strong> the result with inspectable evidence.</p></li>
-              <li><span>04</span><p><strong>Compound</strong> it into the next system.</p></li>
-            </ol>
-          </div>
-        </section>
-
-        <div className="page-width curriculum-page-content">
           <CurriculumExplorer phases={phases} tracks={masteryTracks} />
+        </section>
 
-          <section className="curriculum-end">
+        <section className="market-catalog-bottom">
+          <div className="market-container">
             <div>
-              <p className="section-label">VIDEO → LAB → EVIDENCE</p>
-              <h2>YouTube teaches the lesson. cppvalley makes it stick.</h2>
+              <p className="market-eyebrow">THE CPPVALLEY STANDARD</p>
+              <h2>Completion is not the finish line. Evidence is.</h2>
+              <p>Each lesson ends in code, a measurement, an artifact or a defensible engineering decision.</p>
             </div>
-            <div className="primary-actions">
-              <a className="action action-primary" href={youtubeUrl} target="_blank" rel="noreferrer">
-                Subscribe on YouTube ↗
-              </a>
-              <Link className="action action-secondary" href="/projects">See the four systems →</Link>
-            </div>
-          </section>
-        </div>
+            <Link className="market-button market-button-light" href="/proof">Open the hiring-proof checklist</Link>
+          </div>
+        </section>
       </main>
+
       <SiteFooter />
     </div>
   );

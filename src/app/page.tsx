@@ -1,227 +1,128 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { CourseCta } from "@/components/CourseCta";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { lessons, masteryTracks, phases } from "@/data/curriculum";
 
 export const metadata: Metadata = {
-  title: "C++ & HFT Engineering Courses",
+  title: "HFT Core Systems Course",
   description:
-    "Learn modern C++, low-latency systems, Linux, networking and electronic trading through 96 focused lessons, mini-labs and portfolio projects.",
+    "One advanced HFT engineering course covering modern C++, low latency, Linux, networking, concurrency, market data, risk, and tick-to-trade systems.",
   alternates: { canonical: "/" },
 };
 
-const youtubeUrl = "https://www.youtube.com/@cppvalley?sub_confirmation=1";
-
-const featuredLessonNumbers = [1, 2, 9, 21, 33, 45, 57, 69];
-const featuredLessons = featuredLessonNumbers.map((number) => lessons[number - 1]);
-
-const goalCards = [
-  {
-    icon: "⌁",
-    title: "Hands-on mini-labs",
-    copy: "Turn each concept into code, measurements and a reproducible experiment.",
-    link: "Open the curriculum",
-    href: "/curriculum",
-    external: false,
-  },
-  {
-    icon: "◇",
-    title: "Portfolio-grade systems",
-    copy: "Build four inspectable repositories that connect low-level skills into complete systems.",
-    link: "See flagship projects",
-    href: "/projects",
-    external: false,
-  },
-  {
-    icon: "✓",
-    title: "Interview-ready proof",
-    copy: "Document correctness, performance, trade-offs and failure handling like a systems engineer.",
-    link: "Use the proof checklist",
-    href: "/proof",
-    external: false,
-  },
-  {
-    icon: "▶",
-    title: "Video-first learning",
-    copy: "Follow the lesson on YouTube, then return here for the lab, outcomes and evidence target.",
-    link: "Watch on YouTube",
-    href: youtubeUrl,
-    external: true,
-  },
-] as const;
-
-function CourseCard({ lesson, index }: { lesson: (typeof lessons)[number]; index: number }) {
-  const primaryTrack = lesson.tracks[0];
-  const phase = phases[lesson.phase - 1];
-
-  return (
-    <Link className="market-course-card" href={`/curriculum/${lesson.slug}`}>
-      <div className={`market-course-art market-course-art-${primaryTrack}`}>
-        <span className="market-course-art-code">{lesson.code}</span>
-        <strong>{String(index + 1).padStart(2, "0")}</strong>
-        <div>
-          {lesson.tracks.slice(0, 2).map((track) => (
-            <span key={track}>{track}</span>
-          ))}
-        </div>
-      </div>
-      <div className="market-course-card-body">
-        <h3>{lesson.title}</h3>
-        <p>cppvalley · {phase.title}</p>
-        <div className="market-course-meta">
-          <span>3 outcomes</span>
-          <span>Mini-lab</span>
-          <span>Proof artifact</span>
-        </div>
-        <div className="market-course-bottom">
-          <strong>Free learning path</strong>
-          <span>New</span>
-        </div>
-      </div>
-    </Link>
-  );
-}
+const previewLesson = lessons[0];
+const coursePrice = process.env.NEXT_PUBLIC_COURSE_PRICE?.trim();
 
 export default function Home() {
   return (
-    <div className="page-shell market-page">
+    <div className="page-shell single-course-page">
       <SiteHeader />
 
       <main>
-        <section className="market-hero market-container">
-          <div className="market-hero-copy">
-            <p className="market-eyebrow">C++ → SYSTEMS → HFT</p>
-            <h1>Skills that move your systems career forward</h1>
-            <p>
-              Learn the low-level engineering behind performance-critical software with a
-              dependency-ordered path through modern C++, CPU and memory, Linux, networks,
-              concurrency and electronic trading.
+        <section className="course-hero market-container">
+          <div className="course-hero-copy">
+            <p className="course-kicker">ONE COURSE · HFT CORE SYSTEMS</p>
+            <h1>Go from modern C++ to the full tick-to-trade engineering path.</h1>
+            <p className="course-hero-lede">
+              A dependency-ordered course for engineers who want to understand how performance,
+              Linux, networking, concurrency, market data, order flow, and risk fit together in a
+              serious HFT system.
             </p>
-            <div className="market-hero-actions">
-              <Link className="market-button market-button-primary" href="/curriculum">
-                Explore all 96 lessons
+
+            <div className="course-hero-actions">
+              <CourseCta
+                className="course-button course-button-primary"
+                checkoutLabel="Enroll in HFT Core Systems"
+                fallbackLabel="View the full curriculum"
+              />
+              <Link
+                className="course-button course-button-secondary"
+                href={`/curriculum/${previewLesson.slug}`}
+              >
+                Preview lesson 01
               </Link>
-              <a className="market-button market-button-ghost" href={youtubeUrl} target="_blank" rel="noreferrer">
-                Watch on YouTube ↗
-              </a>
             </div>
-            <div className="market-hero-proof">
-              <span><strong>96</strong> focused lessons</span>
-              <span><strong>288</strong> learning outcomes</span>
-              <span><strong>4</strong> expert skill stacks</span>
-            </div>
+
+            {coursePrice ? <p className="course-price-note">Course price: {coursePrice}</p> : null}
+
+            <dl className="course-facts" aria-label="Course facts">
+              <div><dt>Lessons</dt><dd>{lessons.length}</dd></div>
+              <div><dt>Phases</dt><dd>{phases.length}</dd></div>
+              <div><dt>Skill domains</dt><dd>{masteryTracks.length}</dd></div>
+              <div><dt>Format</dt><dd>Video + lab + proof</dd></div>
+            </dl>
           </div>
 
-          <div className="market-hero-visual" aria-label="cppvalley brand">
+          <div className="course-hero-visual">
             <Image
               src="/cppvalley-logo.webp"
               alt="cppvalley"
               width={1200}
               height={593}
               priority
-              sizes="(max-width: 900px) 100vw, 52vw"
+              sizes="(max-width: 900px) 100vw, 48vw"
             />
-            <div className="market-hero-visual-caption">
-              <span>HFT Core Systems</span>
-              <strong>Watch it. Build it. Prove it.</strong>
+            <div className="course-cover-caption">
+              <span>HFT CORE SYSTEMS</span>
+              <strong>C++ → Linux → Networks → Trading Systems</strong>
             </div>
           </div>
         </section>
 
-        <section className="market-section market-container" aria-labelledby="skills-heading">
-          <div className="market-section-heading market-section-heading-row">
-            <div>
-              <p className="market-eyebrow">CURATED FOR SYSTEMS ENGINEERS</p>
-              <h2 id="skills-heading">Skills to transform your engineering depth</h2>
-              <p>Start with the capability you need today. The roadmap keeps the dependencies connected.</p>
-            </div>
-            <Link href="/curriculum">Explore all lessons →</Link>
+        <section className="course-trust-strip" aria-label="Course approach">
+          <div className="market-container course-trust-grid">
+            <div><strong>One connected course</strong><span>No marketplace clutter or unrelated tracks.</span></div>
+            <div><strong>Hands-on by design</strong><span>Every lesson points to a focused build or experiment.</span></div>
+            <div><strong>Evidence over completion</strong><span>Explain, implement, measure, and defend the result.</span></div>
+          </div>
+        </section>
+
+        <section className="course-section market-container" id="course" aria-labelledby="course-heading">
+          <div className="course-section-heading">
+            <p className="course-kicker">WHAT THIS COURSE BUILDS</p>
+            <h2 id="course-heading">One HFT course, four engineering capabilities.</h2>
+            <p>
+              The course is organized as one system rather than a collection of separate products.
+              Each capability compounds into the next layer of the trading stack.
+            </p>
           </div>
 
-          <div className="market-skill-tabs" aria-label="Popular skill areas">
+          <div className="course-capability-grid">
             {masteryTracks.map((track, index) => (
-              <Link className={index === 0 ? "is-active" : ""} href="/curriculum#curriculum-browser" key={track.id}>
-                {track.shortName}
-              </Link>
-            ))}
-          </div>
-
-          <div className="market-course-grid">
-            {featuredLessons.slice(0, 4).map((lesson, index) => (
-              <CourseCard lesson={lesson} index={index} key={lesson.slug} />
-            ))}
-          </div>
-        </section>
-
-        <section className="market-goals-wrap">
-          <div className="market-section market-container" aria-labelledby="goals-heading">
-            <div className="market-section-heading">
-              <p className="market-eyebrow">LEARNING THAT COMPOUNDS</p>
-              <h2 id="goals-heading">Learning focused on your goals</h2>
-            </div>
-
-            <div className="market-goal-grid">
-              {goalCards.map((card) => {
-                const content = (
-                  <>
-                    <span className="market-goal-icon" aria-hidden="true">{card.icon}</span>
-                    <div>
-                      <h3>{card.title}</h3>
-                      <p>{card.copy}</p>
-                      <span className="market-inline-link">{card.link} →</span>
-                    </div>
-                  </>
-                );
-
-                return card.external ? (
-                  <a className="market-goal-card" href={card.href} target="_blank" rel="noreferrer" key={card.title}>
-                    {content}
-                  </a>
-                ) : (
-                  <Link className="market-goal-card" href={card.href} key={card.title}>
-                    {content}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section className="market-section market-container" aria-labelledby="trending-heading">
-          <div className="market-section-heading market-section-heading-row">
-            <div>
-              <p className="market-eyebrow">TRENDING IN CPPVALLEY</p>
-              <h2 id="trending-heading">Go deeper in performance-critical topics</h2>
-            </div>
-            <Link href="/curriculum#curriculum-browser">Browse the catalog →</Link>
-          </div>
-
-          <div className="market-course-grid">
-            {featuredLessons.slice(4).map((lesson, index) => (
-              <CourseCard lesson={lesson} index={index + 4} key={lesson.slug} />
+              <article key={track.id}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <h3>{track.name}</h3>
+                <p>{track.promise}</p>
+                <ul>
+                  {track.capabilities.slice(0, 3).map((capability) => (
+                    <li key={capability}>{capability}</li>
+                  ))}
+                </ul>
+              </article>
             ))}
           </div>
         </section>
 
-        <section className="market-path-wrap">
-          <div className="market-section market-container market-path-layout">
-            <div>
-              <p className="market-eyebrow">ONE CONNECTED ROADMAP</p>
-              <h2>From trustworthy benchmarks to a tick-to-trade capstone</h2>
+        <section className="course-roadmap-section" aria-labelledby="roadmap-heading">
+          <div className="market-container course-roadmap-layout">
+            <div className="course-roadmap-intro">
+              <p className="course-kicker">THE ROADMAP</p>
+              <h2 id="roadmap-heading">Nine phases. One path from measurement to tick-to-trade.</h2>
               <p>
-                Nine phases keep the learning dependency-ordered. Each phase finishes with an artifact
-                that proves more than completion: it proves engineering judgement.
+                The order matters. You start by learning how to measure honestly, then work through
+                hardware, Linux, networks, C++, concurrency, trading mechanics, and integrated systems.
               </p>
-              <Link className="market-button market-button-light" href="/curriculum">
-                See the full roadmap
+              <Link className="course-text-link" href="/curriculum">
+                Open the complete 96-lesson curriculum →
               </Link>
             </div>
 
-            <div className="market-path-list">
-              {phases.slice(0, 5).map((phase) => (
-                <Link href={`/curriculum#phase-${phase.number - 1}`} key={phase.number}>
+            <div className="course-roadmap-list">
+              {phases.map((phase) => (
+                <Link href={`/curriculum#phase-${phase.number}`} key={phase.number}>
                   <span>{String(phase.number).padStart(2, "0")}</span>
                   <div>
                     <strong>{phase.title}</strong>
@@ -234,39 +135,94 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="market-section market-container" aria-labelledby="popular-heading">
-          <div className="market-section-heading">
-            <p className="market-eyebrow">POPULAR SKILLS</p>
-            <h2 id="popular-heading">Build depth across the stack</h2>
+        <section className="course-section market-container" aria-labelledby="included-heading">
+          <div className="course-section-heading compact">
+            <p className="course-kicker">HOW YOU LEARN</p>
+            <h2 id="included-heading">Every lesson has a job.</h2>
           </div>
 
-          <div className="market-popular-grid">
-            {masteryTracks.map((track) => {
-              const count = lessons.filter((lesson) => lesson.tracks.includes(track.id)).length;
-              return (
-                <Link href="/curriculum#curriculum-browser" key={track.id}>
-                  <span>{track.shortName}</span>
-                  <strong>{track.name}</strong>
-                  <p>{track.promise}</p>
-                  <small>{count} connected lessons →</small>
-                </Link>
-              );
-            })}
+          <div className="course-included-grid">
+            <article>
+              <span>01</span>
+              <h3>Understand the mechanism</h3>
+              <p>Start with the systems concept and the mental model you need to reason about it.</p>
+            </article>
+            <article>
+              <span>02</span>
+              <h3>Build the mini-lab</h3>
+              <p>Reproduce the behavior in code instead of treating the lesson as passive viewing.</p>
+            </article>
+            <article>
+              <span>03</span>
+              <h3>Produce evidence</h3>
+              <p>Leave with a measurement, artifact, test, or engineering decision that can be inspected.</p>
+            </article>
           </div>
         </section>
 
-        <section className="market-cta">
-          <div className="market-container market-cta-inner">
+        <section className="course-audience" id="audience" aria-labelledby="audience-heading">
+          <div className="market-container course-audience-grid">
             <div>
-              <p className="market-eyebrow">START WHERE THE EVIDENCE STARTS</p>
-              <h2>Learn one concept. Build one experiment. Publish one proof.</h2>
+              <p className="course-kicker">WHO IT IS FOR</p>
+              <h2 id="audience-heading">Built for engineers who want depth, not trading hype.</h2>
             </div>
+            <div className="course-audience-copy">
+              <div>
+                <strong>A strong fit if you want to:</strong>
+                <ul>
+                  <li>Move from C++ knowledge into performance-critical systems engineering.</li>
+                  <li>Understand the end-to-end HFT stack instead of isolated interview tricks.</li>
+                  <li>Build projects and evidence you can explain under technical scrutiny.</li>
+                </ul>
+              </div>
+              <div>
+                <strong>Probably not the right course if you want:</strong>
+                <ul>
+                  <li>An introduction to programming from zero.</li>
+                  <li>Trading signals, strategies, or financial advice.</li>
+                  <li>A collection of disconnected shortcuts without hands-on engineering work.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="course-faq market-container" aria-labelledby="faq-heading">
+          <div className="course-section-heading compact">
+            <p className="course-kicker">QUICK ANSWERS</p>
+            <h2 id="faq-heading">Before you start.</h2>
+          </div>
+          <div className="course-faq-list">
+            <details>
+              <summary>Is cppvalley selling multiple courses?</summary>
+              <p>No. The site is centered on one course: HFT Core Systems, with 96 lessons across nine phases.</p>
+            </details>
+            <details>
+              <summary>Can I see the syllabus before enrolling?</summary>
+              <p>Yes. The complete curriculum is public so you can judge the depth and sequence before deciding.</p>
+            </details>
+            <details>
+              <summary>Is this course about trading strategies?</summary>
+              <p>No. It is engineering education focused on software, systems, market infrastructure, and technical evidence.</p>
+            </details>
+          </div>
+        </section>
+
+        <section className="course-final-cta">
+          <div className="market-container course-final-cta-inner">
             <div>
-              <Link className="market-button market-button-light" href={`/curriculum/${lessons[0].slug}`}>
-                Start lesson 01
-              </Link>
-              <Link className="market-button market-button-outline-light" href="/projects">
-                View flagship projects
+              <p className="course-kicker">HFT CORE SYSTEMS</p>
+              <h2>Stop browsing courses. Follow one serious engineering path.</h2>
+              <p>Review the syllabus, preview the first lesson, then move through the course in order.</p>
+            </div>
+            <div className="course-final-actions">
+              <CourseCta
+                className="course-button course-button-light"
+                checkoutLabel="Enroll now"
+                fallbackLabel="View the curriculum"
+              />
+              <Link className="course-button course-button-dark-outline" href={`/curriculum/${previewLesson.slug}`}>
+                Preview lesson 01
               </Link>
             </div>
           </div>

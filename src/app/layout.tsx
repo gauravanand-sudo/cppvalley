@@ -1,15 +1,17 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./marketplace.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cppvalley.com"),
   title: {
-    default: "cppvalley — HFT Core Systems",
+    default: "cppvalley — C++ & HFT Engineering",
     template: "%s · cppvalley",
   },
   description:
-    "Build low-latency C++, Linux, networking, and electronic-trading systems through 96 evidence-driven episodes and four flagship projects.",
+    "Learn modern C++, low-latency systems, Linux, networking and electronic trading through 96 focused lessons, hands-on labs and portfolio projects.",
   keywords: [
+    "C++ courses",
     "HFT engineering",
     "low latency C++",
     "trading systems",
@@ -20,18 +22,18 @@ export const metadata: Metadata = {
   authors: [{ name: "cppvalley", url: "https://www.youtube.com/@cppvalley" }],
   creator: "cppvalley",
   openGraph: {
-    title: "cppvalley — From cache line to executed order",
+    title: "cppvalley — C++ to HFT Core Systems",
     description:
-      "A public engineering lab for low-latency C++, market data, exchange connectivity, and HFT systems.",
+      "A systems-first learning platform for modern C++, low latency, Linux, networking and electronic trading.",
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
-    images: [{ url: "/cppvalley-logo.webp", width: 1672, height: 941, alt: "cppvalley logo" }],
+    images: [{ url: "/cppvalley-logo.webp", width: 1200, height: 593, alt: "cppvalley logo" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "cppvalley — HFT Core Systems",
-    description: "Build, break, measure, and defend low-latency trading infrastructure.",
+    title: "cppvalley — C++ & HFT Engineering",
+    description: "Watch it. Build it. Prove it.",
     images: ["/cppvalley-logo.webp"],
   },
   robots: {
@@ -45,7 +47,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#faf9f5",
+  themeColor: "#ffffff",
   colorScheme: "light",
 };
 

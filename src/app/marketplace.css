@@ -1,487 +1,296 @@
-/* cppvalley marketplace layer
-   Inspired by the information architecture and shopping/browsing clarity of large course marketplaces.
-   All selectors are prefixed to coexist with the existing lesson/project styles. */
+/* Single-course conversion and learning layer for cppvalley. */
 
 :root {
-  --market-ink: #2d2f31;
-  --market-muted: #6a6f73;
-  --market-line: #d1d7dc;
-  --market-soft: #f7f9fa;
-  --market-panel: #f3f4f6;
-  --market-dark: #1c1d1f;
-  --market-deep: #101112;
-  --market-crimson: #a50e46;
-  --market-crimson-dark: #7c0b35;
-  --market-crimson-soft: #f8e9ef;
-  --market-purple: #5624d0;
-  --market-white: #ffffff;
-  --market-yellow: #f3ca52;
-  --market-max: 1340px;
-  --market-shadow: 0 2px 8px rgba(28, 29, 31, 0.16);
+  --course-ink: #222226;
+  --course-muted: #67676f;
+  --course-line: #dedee3;
+  --course-soft: #f7f7f8;
+  --course-soft-warm: #fbf7f8;
+  --course-dark: #17171b;
+  --course-deep: #0d0d10;
+  --course-crimson: #a20d44;
+  --course-crimson-dark: #790a34;
+  --course-crimson-soft: #f7e9ee;
+  --course-white: #ffffff;
+  --course-max: 1180px;
+  --course-shadow: 0 12px 34px rgba(25, 25, 30, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  color: var(--market-ink);
-  background: var(--market-white);
+  margin: 0;
+  color: var(--course-ink);
+  background: var(--course-white);
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.market-page {
-  min-width: 0;
-  background: var(--market-white);
-}
-
-.market-container {
-  width: min(var(--market-max), calc(100% - 48px));
-  margin-inline: auto;
-}
-
-/* Brand */
-
-.market-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-width: max-content;
-  line-height: 1;
-}
-
-.market-brand-mark {
-  display: block;
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  border: 1px solid rgba(45, 47, 49, 0.22);
-  border-radius: 6px;
-  color: #fff;
-  background: linear-gradient(135deg, var(--market-crimson), #22252a);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.12em;
-}
-
-.market-brand-word {
-  display: inline-flex;
-  align-items: baseline;
-  font-size: 21px;
-  font-weight: 800;
-  letter-spacing: -0.055em;
-}
-
-.market-brand-word strong {
-  color: var(--market-crimson);
-}
-
-.market-brand-word span {
-  color: var(--market-ink);
-}
-
-.market-brand-dark .market-brand-word span {
-  color: #fff;
-}
-
-.market-brand-dark .market-brand-word strong {
-  color: #f49bbb;
-}
-
-.market-brand-dark .market-brand-mark {
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.market-brand-hero .market-brand-mark {
-  width: 88px;
-  height: 58px;
-}
-
-.market-brand-hero .market-brand-word {
-  font-size: clamp(36px, 7vw, 64px);
-}
-
-/* Header */
-
-.market-header {
-  position: relative;
-  z-index: 40;
-  background: #fff;
-  box-shadow: 0 1px 0 rgba(45, 47, 49, 0.14);
-}
-
-.market-announcement {
-  background: var(--market-crimson);
-  color: #fff;
-}
-
-.market-announcement .market-container {
-  display: flex;
-  min-height: 38px;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding-block: 7px;
-  font-size: 13px;
-  text-align: center;
-}
-
-.market-announcement strong {
-  font-weight: 800;
-}
-
-.market-announcement span {
-  color: rgba(255, 255, 255, 0.88);
-}
-
-.market-announcement a {
-  color: #fff;
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.market-main-nav {
-  display: flex;
-  min-height: 72px;
-  align-items: center;
-  gap: 14px;
-}
-
-.market-logo-link,
-.market-primary-links a,
-.market-explore-link,
-.market-login-button,
-.market-signup-button,
-.market-category-nav a,
-.market-search-launcher {
-  text-decoration: none;
-}
-
-.market-logo-link {
-  display: inline-flex;
+a {
   color: inherit;
 }
 
-.market-explore-link,
-.market-primary-links a {
-  color: var(--market-ink);
-  font-size: 13px;
-  white-space: nowrap;
+.market-container {
+  width: min(var(--course-max), calc(100% - 48px));
+  margin-inline: auto;
 }
 
-.market-explore-link:hover,
-.market-primary-links a:hover {
-  color: var(--market-crimson);
+.market-brand {
+  display: block;
 }
 
-.market-search-launcher {
-  display: flex;
-  min-width: 220px;
-  flex: 1 1 420px;
-  align-items: center;
-  gap: 10px;
-  min-height: 46px;
-  border: 1px solid var(--market-ink);
-  border-radius: 999px;
-  padding: 0 16px;
-  color: var(--market-muted);
-  background: #fff;
-  font-size: 14px;
-}
-
-.market-search-launcher > span:first-child {
-  color: var(--market-ink);
-  font-size: 26px;
-  line-height: 1;
-  transform: translateY(-1px);
-}
-
-.market-primary-links {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.market-login-button,
-.market-signup-button {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--market-ink);
-  padding: 0 15px;
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.market-login-button {
-  color: var(--market-ink);
-  background: #fff;
-}
-
-.market-login-button:hover {
-  background: var(--market-soft);
-}
-
-.market-signup-button {
-  color: #fff;
-  background: var(--market-ink);
-}
-
-.market-signup-button:hover {
-  background: #000;
-}
-
-.market-category-nav {
-  border-top: 1px solid #eceff1;
-  border-bottom: 1px solid #eceff1;
-  background: #fff;
-}
-
-.market-category-nav .market-container {
-  display: flex;
-  min-height: 42px;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(18px, 3vw, 38px);
-  overflow: auto;
-  scrollbar-width: none;
-}
-
-.market-category-nav .market-container::-webkit-scrollbar {
-  display: none;
-}
-
-.market-category-nav a {
-  color: var(--market-ink);
-  font-size: 13px;
-  white-space: nowrap;
-}
-
-.market-category-nav a:hover {
-  color: var(--market-crimson);
-}
-
-/* Shared market typography/buttons */
-
-.market-eyebrow {
+.course-kicker,
+.lesson-focus-kicker {
   margin: 0;
-  color: var(--market-crimson);
-  font-size: 12px;
+  color: var(--course-crimson);
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-.market-button {
+.course-button {
   display: inline-flex;
-  min-height: 48px;
+  min-height: 50px;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--market-ink);
+  border: 1px solid var(--course-ink);
   padding: 0 20px;
   font-size: 14px;
   font-weight: 800;
   text-decoration: none;
-  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
-.market-button-primary {
-  border-color: var(--market-crimson);
+.course-button-primary {
+  border-color: var(--course-crimson);
   color: #fff;
-  background: var(--market-crimson);
+  background: var(--course-crimson);
 }
 
-.market-button-primary:hover {
-  border-color: var(--market-crimson-dark);
-  background: var(--market-crimson-dark);
+.course-button-primary:hover {
+  border-color: var(--course-crimson-dark);
+  background: var(--course-crimson-dark);
 }
 
-.market-button-ghost {
-  color: var(--market-ink);
+.course-button-secondary {
+  color: var(--course-ink);
   background: #fff;
 }
 
-.market-button-ghost:hover {
-  background: var(--market-soft);
+.course-button-secondary:hover {
+  background: var(--course-soft);
 }
 
-.market-button-light {
+.course-button-light {
   border-color: #fff;
-  color: var(--market-dark);
+  color: var(--course-dark);
   background: #fff;
 }
 
-.market-button-light:hover {
-  background: #f2f2f2;
+.course-button-light:hover {
+  background: #f1f1f2;
 }
 
-.market-button-outline-light {
-  border-color: #fff;
+.course-button-dark-outline {
+  border-color: rgba(255, 255, 255, 0.7);
   color: #fff;
   background: transparent;
 }
 
-.market-button-outline-light:hover {
-  color: var(--market-dark);
+.course-button-dark-outline:hover {
+  color: var(--course-dark);
   background: #fff;
 }
 
-.market-section {
-  padding-block: 64px;
+/* Simplified global header */
+
+.simple-header {
+  position: sticky;
+  z-index: 50;
+  top: 0;
+  border-bottom: 1px solid var(--course-line);
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(12px);
 }
 
-.market-section-heading {
-  max-width: 760px;
-  margin-bottom: 28px;
-}
-
-.market-section-heading h2,
-.market-path-layout h2,
-.market-cta h2,
-.market-footer-band h2,
-.market-catalog-hero h1,
-.market-catalog-bottom h2 {
-  margin: 9px 0 0;
-  font-family: Georgia, "Times New Roman", serif;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-}
-
-.market-section-heading h2 {
-  color: var(--market-ink);
-  font-size: clamp(30px, 4vw, 42px);
-  line-height: 1.08;
-}
-
-.market-section-heading p:not(.market-eyebrow) {
-  margin: 12px 0 0;
-  color: var(--market-muted);
-  font-size: 16px;
-  line-height: 1.55;
-}
-
-.market-section-heading-row {
+.simple-header-inner {
   display: flex;
-  max-width: none;
-  align-items: end;
-  justify-content: space-between;
+  min-height: 72px;
+  align-items: center;
   gap: 28px;
 }
 
-.market-section-heading-row > div {
-  max-width: 760px;
-}
-
-.market-section-heading-row > a {
+.simple-logo {
+  display: inline-flex;
+  align-items: center;
   flex: 0 0 auto;
-  color: var(--market-crimson);
-  font-size: 14px;
-  font-weight: 800;
   text-decoration: none;
 }
 
-.market-section-heading-row > a:hover {
-  text-decoration: underline;
+.simple-logo .market-brand {
+  width: 142px !important;
+  height: 54px !important;
+  min-width: 142px !important;
+  background-size: 153% auto !important;
 }
 
-/* Hero */
-
-.market-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(460px, 1.1fr);
-  align-items: stretch;
-  gap: 0;
-  margin-top: 30px;
-  background: #f7f9fa;
-  box-shadow: var(--market-shadow);
-}
-
-.market-hero-copy {
+.simple-nav {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  margin-left: auto;
+}
+
+.simple-nav a {
+  color: #414148;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.simple-nav a:hover {
+  color: var(--course-crimson);
+}
+
+.simple-header-cta {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
   justify-content: center;
-  min-height: 470px;
-  padding: clamp(34px, 5vw, 68px);
+  border: 1px solid var(--course-crimson);
+  padding: 0 16px;
+  color: #fff;
+  background: var(--course-crimson);
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-.market-hero-copy h1 {
-  max-width: 620px;
-  margin: 10px 0 0;
-  color: var(--market-ink);
+.simple-header-cta:hover {
+  border-color: var(--course-crimson-dark);
+  background: var(--course-crimson-dark);
+}
+
+/* Homepage */
+
+.single-course-page {
+  min-width: 0;
+  background: #fff;
+}
+
+.course-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.96fr) minmax(420px, 1.04fr);
+  gap: 40px;
+  align-items: center;
+  padding-block: 68px 62px;
+}
+
+.course-hero-copy h1 {
+  max-width: 680px;
+  margin: 12px 0 0;
+  color: var(--course-ink);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(39px, 5vw, 58px);
-  line-height: 1.02;
-  letter-spacing: -0.035em;
+  font-size: clamp(42px, 5.8vw, 66px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.99;
 }
 
-.market-hero-copy > p:not(.market-eyebrow) {
-  max-width: 650px;
-  margin: 18px 0 0;
-  color: #3e4143;
+.course-hero-lede {
+  max-width: 680px;
+  margin: 22px 0 0;
+  color: #484850;
   font-size: 17px;
-  line-height: 1.55;
+  line-height: 1.65;
 }
 
-.market-hero-actions {
+.course-hero-actions,
+.curriculum-hero-actions,
+.course-final-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 26px;
+  margin-top: 28px;
 }
 
-.market-hero-proof {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px 24px;
-  margin-top: 30px;
-  color: var(--market-muted);
-  font-size: 12px;
+.course-price-note {
+  margin: 14px 0 0;
+  color: var(--course-crimson-dark);
+  font-size: 14px;
+  font-weight: 800;
 }
 
-.market-hero-proof span {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
+.course-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  max-width: 690px;
+  margin: 34px 0 0;
+  border-top: 1px solid var(--course-line);
+  border-bottom: 1px solid var(--course-line);
 }
 
-.market-hero-proof strong {
-  color: var(--market-ink);
-  font-size: 17px;
-}
-
-.market-hero-visual {
-  position: relative;
+.course-facts div {
   min-width: 0;
-  min-height: 470px;
-  overflow: hidden;
-  background: #b7b8ba;
+  padding: 16px 14px 16px 0;
 }
 
-.market-hero-visual > img {
+.course-facts dt {
+  color: var(--course-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.course-facts dd {
+  margin: 7px 0 0;
+  color: var(--course-ink);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.course-hero-visual {
+  position: relative;
+  overflow: hidden;
+  min-height: 470px;
+  border-radius: 2px;
+  background: #b9b9bc;
+  box-shadow: var(--course-shadow);
+}
+
+.course-hero-visual > img {
+  display: block;
   width: 100%;
   height: 100%;
   min-height: 470px;
   object-fit: cover;
-  object-position: center;
 }
 
-.market-hero-visual::after {
+.course-hero-visual::after {
   content: "";
   position: absolute;
   inset: auto 0 0;
-  height: 42%;
-  background: linear-gradient(to top, rgba(16, 17, 18, 0.8), transparent);
+  height: 34%;
+  background: linear-gradient(to top, rgba(13, 13, 16, 0.78), transparent);
   pointer-events: none;
 }
 
-.market-hero-visual-caption {
+.course-cover-caption {
   position: absolute;
   z-index: 2;
-  right: 24px;
-  bottom: 22px;
-  left: 24px;
+  right: 22px;
+  bottom: 20px;
+  left: 22px;
   display: flex;
   align-items: end;
   justify-content: space-between;
@@ -489,1138 +298,1705 @@ body {
   color: #fff;
 }
 
-.market-hero-visual-caption span {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
+.course-cover-caption span {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
 }
 
-.market-hero-visual-caption strong {
+.course-cover-caption strong {
+  max-width: 330px;
+  font-size: 14px;
+  line-height: 1.3;
+  text-align: right;
+}
+
+.course-trust-strip {
+  border-top: 1px solid var(--course-line);
+  border-bottom: 1px solid var(--course-line);
+  background: var(--course-soft);
+}
+
+.course-trust-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.course-trust-grid > div {
+  min-height: 112px;
+  border-right: 1px solid var(--course-line);
+  padding: 25px 28px;
+}
+
+.course-trust-grid > div:first-child {
+  padding-left: 0;
+}
+
+.course-trust-grid > div:last-child {
+  border-right: 0;
+  padding-right: 0;
+}
+
+.course-trust-grid strong,
+.course-trust-grid span {
+  display: block;
+}
+
+.course-trust-grid strong {
+  color: var(--course-ink);
+  font-size: 15px;
+}
+
+.course-trust-grid span {
+  margin-top: 7px;
+  color: var(--course-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.course-section {
+  padding-block: 84px;
+}
+
+.course-section-heading {
+  max-width: 780px;
+  margin-bottom: 34px;
+}
+
+.course-section-heading.compact {
+  max-width: 650px;
+}
+
+.course-section-heading h2,
+.course-roadmap-intro h2,
+.course-audience h2,
+.course-final-cta h2,
+.curriculum-hero h1,
+.curriculum-bottom-cta h2 {
+  margin: 10px 0 0;
   font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.course-section-heading h2 {
+  color: var(--course-ink);
+  font-size: clamp(34px, 4.3vw, 48px);
+  line-height: 1.05;
+}
+
+.course-section-heading > p:not(.course-kicker) {
+  margin: 16px 0 0;
+  color: var(--course-muted);
+  font-size: 16px;
+  line-height: 1.62;
+}
+
+.course-capability-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--course-line);
+  border-left: 1px solid var(--course-line);
+}
+
+.course-capability-grid article {
+  min-height: 300px;
+  border-right: 1px solid var(--course-line);
+  border-bottom: 1px solid var(--course-line);
+  padding: 30px;
+}
+
+.course-capability-grid article > span,
+.course-included-grid article > span {
+  color: var(--course-crimson);
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.course-capability-grid h3 {
+  margin: 28px 0 0;
+  color: var(--course-ink);
   font-size: 20px;
 }
 
-/* Skill tabs + course cards */
-
-.market-skill-tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 22px;
-  border-bottom: 1px solid var(--market-line);
-  overflow: auto;
-  scrollbar-width: none;
-}
-
-.market-skill-tabs::-webkit-scrollbar {
-  display: none;
-}
-
-.market-skill-tabs a {
-  position: relative;
-  flex: 0 0 auto;
-  padding: 12px 15px 14px;
-  color: var(--market-muted);
+.course-capability-grid p {
+  margin: 10px 0 0;
+  color: var(--course-muted);
   font-size: 14px;
+  line-height: 1.55;
+}
+
+.course-capability-grid ul {
+  margin: 22px 0 0;
+  padding-left: 18px;
+  color: #47474e;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.course-roadmap-section {
+  color: #fff;
+  background: var(--course-dark);
+}
+
+.course-roadmap-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(480px, 1.22fr);
+  gap: 72px;
+  align-items: start;
+  padding-block: 84px;
+}
+
+.course-roadmap-intro {
+  position: sticky;
+  top: 112px;
+}
+
+.course-roadmap-intro .course-kicker {
+  color: #f0a7c2;
+}
+
+.course-roadmap-intro h2 {
+  color: #fff;
+  font-size: clamp(35px, 4.5vw, 49px);
+  line-height: 1.04;
+}
+
+.course-roadmap-intro > p:not(.course-kicker) {
+  margin: 18px 0 0;
+  color: #c4c4ca;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.course-text-link {
+  display: inline-block;
+  margin-top: 24px;
+  color: #f3b1c9;
+  font-size: 13px;
   font-weight: 800;
   text-decoration: none;
 }
 
-.market-skill-tabs a:hover,
-.market-skill-tabs a.is-active {
-  color: var(--market-ink);
+.course-text-link:hover {
+  text-decoration: underline;
 }
 
-.market-skill-tabs a.is-active::after {
-  content: "";
-  position: absolute;
-  right: 10px;
-  bottom: -1px;
-  left: 10px;
-  height: 3px;
-  background: var(--market-ink);
+.course-roadmap-list {
+  border-top: 1px solid #424248;
 }
 
-.market-course-grid {
+.course-roadmap-list a {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 22px 16px;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  min-height: 82px;
+  border-bottom: 1px solid #424248;
+  color: #fff;
+  text-decoration: none;
 }
 
-.market-course-card {
+.course-roadmap-list a:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.course-roadmap-list > a > span {
+  color: #f0a7c2;
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.course-roadmap-list strong,
+.course-roadmap-list small {
+  display: block;
+}
+
+.course-roadmap-list strong {
+  font-size: 14px;
+}
+
+.course-roadmap-list small {
+  margin-top: 5px;
+  color: #aaaab1;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.course-roadmap-list b {
+  color: #d8d8dc;
+}
+
+.course-included-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.course-included-grid article {
+  min-height: 240px;
+  border: 1px solid var(--course-line);
+  padding: 28px;
+  background: #fff;
+}
+
+.course-included-grid h3 {
+  margin: 42px 0 0;
+  font-size: 18px;
+}
+
+.course-included-grid p {
+  margin: 11px 0 0;
+  color: var(--course-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.course-audience {
+  border-top: 1px solid var(--course-line);
+  border-bottom: 1px solid var(--course-line);
+  background: var(--course-soft-warm);
+}
+
+.course-audience-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(480px, 1.22fr);
+  gap: 70px;
+  padding-block: 80px;
+}
+
+.course-audience h2 {
+  max-width: 560px;
+  color: var(--course-ink);
+  font-size: clamp(34px, 4.3vw, 48px);
+  line-height: 1.04;
+}
+
+.course-audience-copy {
+  display: grid;
+  gap: 28px;
+}
+
+.course-audience-copy > div {
+  border-top: 1px solid #d7cdd1;
+  padding-top: 18px;
+}
+
+.course-audience-copy strong {
+  font-size: 14px;
+}
+
+.course-audience-copy ul {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  color: #505058;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.course-faq {
+  padding-block: 78px;
+}
+
+.course-faq-list {
+  max-width: 900px;
+  border-top: 1px solid var(--course-line);
+}
+
+.course-faq-list details {
+  border-bottom: 1px solid var(--course-line);
+}
+
+.course-faq-list summary {
+  position: relative;
+  padding: 22px 42px 22px 0;
+  color: var(--course-ink);
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  list-style: none;
+}
+
+.course-faq-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.course-faq-list summary::after {
+  content: "+";
+  position: absolute;
+  right: 4px;
+  top: 18px;
+  color: var(--course-crimson);
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.course-faq-list details[open] summary::after {
+  content: "−";
+}
+
+.course-faq-list p {
+  max-width: 760px;
+  margin: -5px 0 24px;
+  color: var(--course-muted);
+  font-size: 14px;
+  line-height: 1.62;
+}
+
+.course-final-cta {
+  color: #fff;
+  background: var(--course-crimson);
+}
+
+.course-final-cta-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 50px;
+  align-items: center;
+  padding-block: 62px;
+}
+
+.course-final-cta .course-kicker {
+  color: #ffd0e1;
+}
+
+.course-final-cta h2 {
+  max-width: 760px;
+  color: #fff;
+  font-size: clamp(34px, 4.5vw, 48px);
+  line-height: 1.03;
+}
+
+.course-final-cta p:not(.course-kicker) {
+  max-width: 720px;
+  margin: 14px 0 0;
+  color: #f5dce5;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.course-final-actions {
+  margin-top: 0;
+}
+
+/* Curriculum */
+
+.curriculum-hero {
+  border-bottom: 1px solid var(--course-line);
+  background: var(--course-soft);
+}
+
+.curriculum-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 64px;
+  align-items: center;
+  padding-block: 64px;
+}
+
+.curriculum-hero h1 {
+  max-width: 760px;
+  color: var(--course-ink);
+  font-size: clamp(40px, 5.3vw, 60px);
+  line-height: 1.02;
+}
+
+.curriculum-hero p:not(.course-kicker) {
+  max-width: 750px;
+  margin: 18px 0 0;
+  color: var(--course-muted);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.curriculum-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border: 1px solid var(--course-line);
+  background: #fff;
+}
+
+.curriculum-stats div {
+  min-height: 112px;
+  border-right: 1px solid var(--course-line);
+  border-bottom: 1px solid var(--course-line);
+  padding: 20px;
+}
+
+.curriculum-stats div:nth-child(2n) {
+  border-right: 0;
+}
+
+.curriculum-stats div:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.curriculum-stats dt {
+  color: var(--course-muted);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.curriculum-stats dd {
+  margin: 8px 0 0;
+  color: var(--course-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 34px;
+  font-weight: 700;
+}
+
+.curriculum-body {
+  padding-block: 72px 84px;
+}
+
+.curriculum-heading {
+  max-width: 800px;
+}
+
+.course-outline {
+  scroll-margin-top: 98px;
+}
+
+.course-outline-toolbar {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(230px, 320px) auto auto;
+  gap: 10px;
+  margin-bottom: 34px;
+}
+
+.course-outline-search {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--course-ink);
+  padding: 0 14px;
+  background: #fff;
+}
+
+.course-outline-search > span:first-child {
+  font-size: 23px;
+}
+
+.course-outline-search input {
+  width: 100%;
   min-width: 0;
+  border: 0;
+  outline: 0;
+  color: var(--course-ink);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+}
+
+.course-outline-select select {
+  width: 100%;
+  height: 100%;
+  min-height: 48px;
+  border: 1px solid var(--course-ink);
+  border-radius: 0;
+  padding: 0 36px 0 12px;
+  color: var(--course-ink);
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.course-outline-count {
+  display: grid;
+  min-width: 88px;
+  place-items: center;
+  align-content: center;
+  border: 1px solid var(--course-line);
+  padding: 4px 12px;
+  background: var(--course-soft);
+}
+
+.course-outline-count strong,
+.course-outline-count span {
+  display: block;
+}
+
+.course-outline-count strong {
+  font-size: 14px;
+}
+
+.course-outline-count span {
+  margin-top: 2px;
+  color: var(--course-muted);
+  font-size: 10px;
+}
+
+.course-outline-clear {
+  min-height: 48px;
+  border: 1px solid var(--course-ink);
+  padding: 0 14px;
+  color: var(--course-ink);
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.course-outline-clear:hover {
+  background: var(--course-soft);
+}
+
+.course-outline-phases {
+  display: grid;
+  gap: 34px;
+}
+
+.course-outline-phase {
+  scroll-margin-top: 100px;
+  border: 1px solid var(--course-line);
+  background: #fff;
+}
+
+.course-outline-phase-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
+  gap: 32px;
+  align-items: end;
+  border-bottom: 1px solid var(--course-line);
+  padding: 26px 28px;
+  background: var(--course-soft);
+}
+
+.course-outline-phase-header > div:first-child > span,
+.course-outline-output > span {
+  color: var(--course-crimson);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.course-outline-phase-header h2 {
+  margin: 7px 0 0;
+  color: var(--course-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 26px;
+}
+
+.course-outline-phase-header p {
+  max-width: 680px;
+  margin: 9px 0 0;
+  color: var(--course-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.course-outline-output {
+  border-left: 1px solid var(--course-line);
+  padding-left: 24px;
+}
+
+.course-outline-output strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--course-ink);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.course-outline-lessons > a {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 100px 18px;
+  gap: 14px;
+  align-items: center;
+  min-height: 76px;
+  border-bottom: 1px solid #ececf0;
+  padding: 12px 22px;
   color: inherit;
   text-decoration: none;
 }
 
-.market-course-card:hover h3 {
-  color: var(--market-crimson);
+.course-outline-lessons > a:last-child {
+  border-bottom: 0;
 }
 
-.market-course-art {
-  position: relative;
-  display: flex;
-  aspect-ratio: 1.78;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
-  border: 1px solid rgba(45, 47, 49, 0.22);
-  padding: 16px;
-  color: #fff;
+.course-outline-lessons > a:hover {
+  background: var(--course-soft-warm);
 }
 
-.market-course-art::before,
-.market-course-art::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-}
-
-.market-course-art::before {
-  top: -45%;
-  right: -20%;
-  width: 70%;
-  aspect-ratio: 1;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 50%;
-  box-shadow: 0 0 0 24px rgba(255, 255, 255, 0.04), 0 0 0 50px rgba(255, 255, 255, 0.03);
-}
-
-.market-course-art::after {
-  right: -18%;
-  bottom: -42%;
-  width: 62%;
-  aspect-ratio: 1;
-  border: 1px solid rgba(255, 255, 255, 0.13);
-  transform: rotate(45deg);
-}
-
-.market-course-art-cpp {
-  background: linear-gradient(135deg, #8b0d3a, #31101e);
-}
-
-.market-course-art-latency {
-  background: linear-gradient(135deg, #5b247a, #24113b);
-}
-
-.market-course-art-systems {
-  background: linear-gradient(135deg, #155267, #102f3a);
-}
-
-.market-course-art-hft {
-  background: linear-gradient(135deg, #292b31, #08090b);
-}
-
-.market-course-art-code,
-.market-course-art > strong,
-.market-course-art > div {
-  position: relative;
-  z-index: 1;
-}
-
-.market-course-art-code {
+.course-outline-number {
+  color: var(--course-crimson);
   font-family: "Courier New", monospace;
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-.market-course-art > strong {
-  align-self: flex-end;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(46px, 6vw, 76px);
-  line-height: 0.8;
-  opacity: 0.3;
-}
-
-.market-course-art > div {
-  display: flex;
-  gap: 6px;
-}
-
-.market-course-art > div span {
-  border: 1px solid rgba(255, 255, 255, 0.42);
-  padding: 3px 6px;
-  font-size: 9px;
   font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
 }
 
-.market-course-card-body {
-  padding-top: 11px;
+.course-outline-lessons strong,
+.course-outline-lessons small {
+  display: block;
 }
 
-.market-course-card-body h3 {
+.course-outline-lessons strong {
+  color: var(--course-ink);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.course-outline-lessons small {
   display: -webkit-box;
   overflow: hidden;
-  margin: 0;
-  color: var(--market-ink);
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 1.28;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.market-course-card-body > p {
-  display: -webkit-box;
-  overflow: hidden;
-  margin: 6px 0 0;
-  color: var(--market-muted);
-  font-size: 12px;
+  margin-top: 5px;
+  color: var(--course-muted);
+  font-size: 11px;
   line-height: 1.35;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
 }
 
-.market-course-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px 10px;
-  margin-top: 7px;
-  color: #4d5155;
+.course-outline-format {
+  color: var(--course-muted);
+  font-size: 10px;
+  text-align: right;
+}
+
+.course-outline-lessons b {
+  color: #7b7b82;
+}
+
+.course-outline-empty {
+  display: grid;
+  min-height: 280px;
+  place-items: center;
+  align-content: center;
+  border: 1px solid var(--course-line);
+  padding: 30px;
+  text-align: center;
+}
+
+.course-outline-empty strong {
+  font-size: 20px;
+}
+
+.course-outline-empty p {
+  margin: 8px 0 16px;
+  color: var(--course-muted);
+}
+
+.course-outline-empty button {
+  min-height: 42px;
+  border: 1px solid var(--course-ink);
+  padding: 0 14px;
+  background: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.curriculum-bottom-cta {
+  color: #fff;
+  background: var(--course-dark);
+}
+
+.curriculum-bottom-cta-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 40px;
+  align-items: center;
+  padding-block: 54px;
+}
+
+.curriculum-bottom-cta .course-kicker {
+  color: #f0a7c2;
+}
+
+.curriculum-bottom-cta h2 {
+  max-width: 760px;
+  color: #fff;
+  font-size: clamp(31px, 4vw, 42px);
+  line-height: 1.04;
+}
+
+/* Focused lesson player */
+
+.lesson-focus-page {
+  min-height: 100vh;
+  color: #efeff2;
+  background: #0f0f12;
+}
+
+.lesson-focus-header {
+  position: sticky;
+  z-index: 60;
+  top: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  min-height: 68px;
+  border-bottom: 1px solid #333338;
+  padding: 7px 20px;
+  background: rgba(15, 15, 18, 0.98);
+}
+
+.lesson-focus-logo {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.lesson-focus-logo .market-brand {
+  width: 126px !important;
+  height: 48px !important;
+  min-width: 126px !important;
+  background-size: 154% auto !important;
+}
+
+.lesson-focus-course-name {
+  min-width: 0;
+  border-left: 1px solid #3c3c42;
+  padding-left: 18px;
+}
+
+.lesson-focus-course-name span,
+.lesson-focus-course-name strong {
+  display: block;
+}
+
+.lesson-focus-course-name span {
+  color: #e18aaa;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.lesson-focus-course-name strong {
+  overflow: hidden;
+  margin-top: 4px;
+  color: #b9b9c0;
   font-size: 11px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.market-course-meta span:not(:last-child)::after {
-  content: "•";
-  margin-left: 10px;
-  color: #a3a7aa;
+.lesson-focus-curriculum-link {
+  border: 1px solid #59595f;
+  padding: 10px 13px;
+  color: #efeff2;
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
 }
 
-.market-course-bottom {
+.lesson-focus-curriculum-link:hover {
+  border-color: #fff;
+}
+
+.lesson-focus-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 350px;
+  width: min(1600px, 100%);
+  margin-inline: auto;
+}
+
+.lesson-focus-main {
+  min-width: 0;
+  border-right: 1px solid #343439;
+  background: #111114;
+}
+
+.lesson-focus-video {
+  padding: 24px;
+  background: #08080a;
+}
+
+.lesson-focus-video .video-embed {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.lesson-focus-video .video-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.lesson-focus-placeholder {
+  display: grid;
+  min-height: min(620px, 66vh);
+  place-items: center;
+  align-content: center;
+  border: 1px solid #2f2f35;
+  padding: 50px;
+  text-align: center;
+  background: radial-gradient(circle at 50% 20%, #24242a, #101013 62%);
+}
+
+.lesson-focus-placeholder > span {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  border: 1px solid #5c5c64;
+  border-radius: 50%;
+  color: #f0a7c2;
+  font-size: 22px;
+}
+
+.lesson-focus-placeholder > p:first-of-type {
+  margin: 20px 0 0;
+  color: #d27a9b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.lesson-focus-placeholder h2 {
+  margin: 8px 0 0;
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 34px;
+}
+
+.lesson-focus-placeholder > p:last-of-type {
+  max-width: 520px;
+  margin: 12px 0 0;
+  color: #a9a9b0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.lesson-focus-placeholder a {
+  margin-top: 20px;
+  color: #f0a7c2;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.lesson-focus-title {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 30px;
+  align-items: end;
+  border-bottom: 1px solid #343439;
+  padding: 32px 36px 34px;
+}
+
+.lesson-focus-title > div > p {
+  margin: 0;
+  color: #d27a9b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.lesson-focus-title h1 {
+  max-width: 900px;
+  margin: 10px 0 0;
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(34px, 4.7vw, 56px);
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+.lesson-focus-title > div > span {
+  display: block;
+  max-width: 780px;
+  margin-top: 14px;
+  color: #a9a9af;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.lesson-step-nav {
+  display: flex;
+  gap: 7px;
+}
+
+.lesson-step-nav a,
+.lesson-step-nav > span {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid #59595f;
+  color: #fff;
+  text-decoration: none;
+}
+
+.lesson-step-nav a:hover {
+  border-color: #e28aaa;
+  color: #f0a7c2;
+}
+
+.lesson-focus-content {
+  color: var(--course-ink);
+  background: #fff;
+}
+
+.lesson-content-block {
+  padding: 56px 36px;
+}
+
+.lesson-content-block h2,
+.lesson-practice-grid h2 {
+  margin: 8px 0 0;
+  color: var(--course-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 31px;
+}
+
+.lesson-outcome-list {
+  display: grid;
+  gap: 0;
+  max-width: 900px;
+  margin: 28px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--course-line);
+  list-style: none;
+}
+
+.lesson-outcome-list li {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  border-bottom: 1px solid var(--course-line);
+  padding: 20px 0;
+}
+
+.lesson-outcome-list li > span {
+  color: var(--course-crimson);
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.lesson-outcome-list p {
+  margin: 0;
+  color: #44444b;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.lesson-practice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--course-line);
+  border-bottom: 1px solid var(--course-line);
+}
+
+.lesson-practice-grid article {
+  min-height: 270px;
+  padding: 42px 36px;
+}
+
+.lesson-practice-grid article:first-child {
+  border-right: 1px solid var(--course-line);
+}
+
+.lesson-practice-grid article > p:last-child {
+  max-width: 620px;
+  margin: 16px 0 0;
+  color: var(--course-muted);
+  font-size: 14px;
+  line-height: 1.62;
+}
+
+.lesson-prerequisite {
+  display: flex;
+  gap: 20px;
+  align-items: baseline;
+  padding: 22px 36px;
+  background: var(--course-soft);
+}
+
+.lesson-prerequisite span {
+  color: var(--course-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.lesson-prerequisite strong {
+  font-size: 12px;
+}
+
+.lesson-bottom-nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid #343439;
+  background: #111114;
+}
+
+.lesson-bottom-nav > a {
+  min-height: 116px;
+  padding: 26px 34px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.lesson-bottom-nav > a:first-child {
+  border-right: 1px solid #343439;
+}
+
+.lesson-bottom-nav > a:last-child {
+  text-align: right;
+}
+
+.lesson-bottom-nav > a:hover {
+  background: #17171b;
+}
+
+.lesson-bottom-nav span,
+.lesson-bottom-nav strong {
+  display: block;
+}
+
+.lesson-bottom-nav > a > span {
+  color: #d27a9b;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.lesson-bottom-nav > a > strong {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.lesson-focus-sidebar {
+  min-width: 0;
+  background: #17171b;
+}
+
+.lesson-sidebar-sticky {
+  position: sticky;
+  top: 68px;
+  display: flex;
+  max-height: calc(100vh - 68px);
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.lesson-sidebar-header {
+  flex: 0 0 auto;
+  border-bottom: 1px solid #36363b;
+  padding: 20px 18px 16px;
+  background: #1b1b20;
+}
+
+.lesson-sidebar-header > div:first-child {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-top: 9px;
+  gap: 12px;
 }
 
-.market-course-bottom strong {
-  color: var(--market-ink);
-  font-size: 13px;
+.lesson-sidebar-header span,
+.lesson-sidebar-header strong {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
 }
 
-.market-course-bottom > span {
-  padding: 4px 7px;
-  color: #3d2f09;
-  background: #eceb98;
+.lesson-sidebar-header span {
+  color: #c0c0c6;
+}
+
+.lesson-sidebar-header strong {
+  color: #efeff2;
+}
+
+.lesson-sidebar-progress {
+  height: 4px;
+  margin-top: 12px;
+  overflow: hidden;
+  background: #414147;
+}
+
+.lesson-sidebar-progress i {
+  display: block;
+  height: 100%;
+  background: #ca4779;
+}
+
+.lesson-sidebar-list {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: #55555c #1a1a1f;
+  scrollbar-width: thin;
+}
+
+.lesson-sidebar-list details {
+  border-bottom: 1px solid #333338;
+}
+
+.lesson-sidebar-list summary {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 15px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.lesson-sidebar-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.lesson-sidebar-list summary:hover {
+  background: #202025;
+}
+
+.lesson-sidebar-list summary > span {
+  color: #d27a9b;
+  font-family: "Courier New", monospace;
   font-size: 10px;
   font-weight: 800;
 }
 
-/* Goal cards */
-
-.market-goals-wrap {
-  background: var(--market-soft);
-}
-
-.market-goal-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.market-goal-card {
-  display: grid;
-  grid-template-columns: 54px 1fr;
-  gap: 18px;
-  min-height: 190px;
-  border: 1px solid var(--market-line);
-  border-left: 6px solid transparent;
-  padding: 24px;
-  color: inherit;
-  background: #fff;
-  text-decoration: none;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
-}
-
-.market-goal-card:hover {
-  border-left-color: var(--market-crimson);
-  box-shadow: 0 2px 8px rgba(28, 29, 31, 0.08);
-}
-
-.market-goal-icon {
-  display: grid;
-  width: 48px;
-  height: 48px;
-  place-items: center;
-  border: 1px solid #d9b6c4;
-  border-radius: 50%;
-  color: var(--market-crimson);
-  background: var(--market-crimson-soft);
-  font-size: 23px;
-  font-weight: 800;
-}
-
-.market-goal-card h3 {
-  margin: 0;
-  color: var(--market-ink);
-  font-size: 18px;
-}
-
-.market-goal-card p {
-  margin: 10px 0 18px;
-  color: var(--market-muted);
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.market-inline-link {
-  color: var(--market-crimson);
-  font-size: 13px;
-  font-weight: 800;
-}
-
-/* Roadmap */
-
-.market-path-wrap {
-  background: var(--market-dark);
-  color: #fff;
-}
-
-.market-path-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(460px, 1.15fr);
-  gap: clamp(54px, 7vw, 94px);
-  align-items: center;
-}
-
-.market-path-layout > div:first-child > p:not(.market-eyebrow) {
-  max-width: 620px;
-  margin: 18px 0 26px;
-  color: #d2d6d9;
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-.market-path-layout h2 {
-  max-width: 650px;
-  color: #fff;
-  font-size: clamp(34px, 4.5vw, 48px);
-  line-height: 1.04;
-}
-
-.market-path-list {
-  border-top: 1px solid #4a4d50;
-}
-
-.market-path-list a {
-  display: grid;
-  grid-template-columns: 44px 1fr auto;
-  align-items: center;
-  gap: 16px;
-  min-height: 76px;
-  border-bottom: 1px solid #4a4d50;
-  color: #fff;
-  text-decoration: none;
-}
-
-.market-path-list a:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.market-path-list > a > span {
-  color: #f49bbb;
-  font-family: "Courier New", monospace;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.market-path-list strong,
-.market-path-list small {
+.lesson-sidebar-list summary strong,
+.lesson-sidebar-list summary small {
   display: block;
 }
 
-.market-path-list strong {
-  font-size: 14px;
-}
-
-.market-path-list small {
-  margin-top: 5px;
-  color: #b8bdc1;
+.lesson-sidebar-list summary strong {
+  color: #ececf0;
   font-size: 11px;
+  line-height: 1.3;
 }
 
-.market-path-list b {
-  color: #fff;
-  font-size: 17px;
+.lesson-sidebar-list summary small {
+  margin-top: 4px;
+  color: #8e8e95;
+  font-size: 9px;
 }
 
-/* Popular skills */
+.lesson-sidebar-lessons {
+  border-top: 1px solid #2f2f34;
+  background: #121216;
+}
 
-.market-popular-grid {
+.lesson-sidebar-lessons a {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border: 1px solid var(--market-line);
-}
-
-.market-popular-grid a {
-  min-height: 230px;
-  border-right: 1px solid var(--market-line);
-  padding: 24px;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  min-height: 58px;
+  align-items: start;
+  border-bottom: 1px solid #26262b;
+  padding: 11px 16px;
   color: inherit;
   text-decoration: none;
 }
 
-.market-popular-grid a:last-child {
-  border-right: 0;
-}
-
-.market-popular-grid a:hover {
-  background: var(--market-soft);
-}
-
-.market-popular-grid > a > span {
-  display: inline-block;
-  margin-bottom: 20px;
-  color: var(--market-crimson);
-  font-family: "Courier New", monospace;
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-.market-popular-grid strong {
-  display: block;
-  color: var(--market-ink);
-  font-size: 19px;
-}
-
-.market-popular-grid p {
-  margin: 10px 0 24px;
-  color: var(--market-muted);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.market-popular-grid small {
-  color: var(--market-crimson);
-  font-size: 12px;
-  font-weight: 800;
-}
-
-/* CTA */
-
-.market-cta {
-  background: var(--market-crimson);
-  color: #fff;
-}
-
-.market-cta-inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 40px;
-  align-items: center;
-  min-height: 250px;
-  padding-block: 48px;
-}
-
-.market-cta .market-eyebrow {
-  color: #ffd1e2;
-}
-
-.market-cta h2 {
-  max-width: 800px;
-  color: #fff;
-  font-size: clamp(32px, 4vw, 45px);
-  line-height: 1.05;
-}
-
-.market-cta-inner > div:last-child {
-  display: flex;
-  gap: 10px;
-}
-
-/* Catalog */
-
-.market-catalog-hero {
-  border-bottom: 1px solid #e6e9eb;
-  background: var(--market-soft);
-}
-
-.market-catalog-hero-inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 430px;
-  gap: 70px;
-  align-items: center;
-  padding-block: 58px;
-}
-
-.market-catalog-hero h1 {
-  max-width: 820px;
-  color: var(--market-ink);
-  font-size: clamp(38px, 5vw, 58px);
-  line-height: 1.02;
-}
-
-.market-catalog-hero p:not(.market-eyebrow) {
-  max-width: 760px;
-  margin: 18px 0 0;
-  color: var(--market-muted);
-  font-size: 17px;
-  line-height: 1.55;
-}
-
-.market-catalog-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 26px;
-}
-
-.market-catalog-stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin: 0;
-  border: 1px solid var(--market-line);
-  background: #fff;
-}
-
-.market-catalog-stats div {
-  min-height: 120px;
-  border-right: 1px solid var(--market-line);
-  border-bottom: 1px solid var(--market-line);
-  padding: 22px;
-}
-
-.market-catalog-stats div:nth-child(2n) {
-  border-right: 0;
-}
-
-.market-catalog-stats div:nth-last-child(-n + 2) {
+.lesson-sidebar-lessons a:last-child {
   border-bottom: 0;
 }
 
-.market-catalog-stats dt {
-  color: var(--market-muted);
-  font-size: 12px;
+.lesson-sidebar-lessons a:hover,
+.lesson-sidebar-lessons a.is-current {
+  background: #24242a;
 }
 
-.market-catalog-stats dd {
-  margin: 8px 0 0;
-  color: var(--market-ink);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 36px;
-  font-weight: 700;
+.lesson-sidebar-lessons a.is-current {
+  box-shadow: inset 3px 0 0 #ca4779;
 }
 
-.market-catalog-body {
-  padding-block: 58px 78px;
-}
-
-.market-catalog-heading {
-  max-width: 840px;
-}
-
-.market-explorer {
-  scroll-margin-top: 140px;
-}
-
-.market-explorer-tabs {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 18px;
-  border-bottom: 1px solid var(--market-line);
-  overflow: auto;
-}
-
-.market-explorer-tabs button {
-  position: relative;
-  flex: 0 0 auto;
-  border: 0;
-  padding: 12px 15px 14px;
-  color: var(--market-muted);
-  background: transparent;
-  font: inherit;
-  font-size: 14px;
+.lesson-sidebar-lessons > a > span {
+  color: #7f7f87;
+  font-family: "Courier New", monospace;
+  font-size: 9px;
   font-weight: 800;
-  cursor: pointer;
 }
 
-.market-explorer-tabs button:hover,
-.market-explorer-tabs button.is-active {
-  color: var(--market-ink);
+.lesson-sidebar-lessons strong,
+.lesson-sidebar-lessons small {
+  display: block;
 }
 
-.market-explorer-tabs button.is-active::after {
-  content: "";
-  position: absolute;
-  right: 10px;
-  bottom: -1px;
-  left: 10px;
-  height: 3px;
-  background: var(--market-ink);
+.lesson-sidebar-lessons strong {
+  color: #d8d8dd;
+  font-size: 10px;
+  line-height: 1.35;
 }
 
-.market-explorer-toolbar {
-  display: grid;
-  grid-template-columns: minmax(280px, 1fr) minmax(220px, 330px) auto auto;
-  gap: 10px;
-  align-items: stretch;
-  margin-bottom: 28px;
+.lesson-sidebar-lessons small {
+  margin-top: 4px;
+  color: #777780;
+  font-size: 8px;
 }
 
-.market-explorer-search {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  border: 1px solid var(--market-ink);
-  padding: 0 14px;
-  background: #fff;
-}
+/* Simple footer */
 
-.market-explorer-search > span:first-child {
-  font-size: 24px;
-  line-height: 1;
-}
-
-.market-explorer-search input {
-  width: 100%;
-  min-width: 0;
-  border: 0;
-  outline: 0;
-  color: var(--market-ink);
-  background: transparent;
-  font: inherit;
-  font-size: 14px;
-}
-
-.market-explorer-select select {
-  width: 100%;
-  height: 100%;
-  min-height: 48px;
-  border: 1px solid var(--market-ink);
-  border-radius: 0;
-  padding: 0 38px 0 14px;
-  color: var(--market-ink);
-  background: #fff;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.market-explorer-count {
-  display: flex;
-  min-width: 95px;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  border: 1px solid var(--market-line);
-  padding: 0 12px;
-  background: var(--market-soft);
-  font-size: 12px;
-}
-
-.market-explorer-count strong {
-  font-size: 15px;
-}
-
-.market-clear-button {
-  border: 1px solid var(--market-ink);
-  padding: 0 14px;
-  color: var(--market-ink);
-  background: #fff;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.market-clear-button:hover {
-  background: var(--market-soft);
-}
-
-.market-catalog-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  row-gap: 34px;
-}
-
-.market-empty-results {
-  display: grid;
-  min-height: 320px;
-  place-items: center;
-  align-content: center;
-  border: 1px solid var(--market-line);
-  padding: 40px;
-  text-align: center;
-}
-
-.market-empty-results > span {
-  color: var(--market-crimson);
-  font-size: 42px;
-}
-
-.market-empty-results h3 {
-  margin: 10px 0 0;
-  font-size: 22px;
-}
-
-.market-empty-results p {
-  margin: 9px 0 18px;
-  color: var(--market-muted);
-}
-
-.market-empty-results button {
-  min-height: 42px;
-  border: 1px solid var(--market-ink);
-  padding: 0 16px;
-  background: #fff;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.market-catalog-bottom {
-  background: var(--market-dark);
+.simple-footer {
   color: #fff;
+  background: var(--course-deep);
 }
 
-.market-catalog-bottom > .market-container {
+.simple-footer-main {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 40px;
-  align-items: center;
-  min-height: 260px;
+  grid-template-columns: minmax(280px, 1.3fr) minmax(150px, 0.55fr) minmax(260px, 0.85fr);
+  gap: 52px;
   padding-block: 48px;
 }
 
-.market-catalog-bottom .market-eyebrow {
-  color: #f49bbb;
+.simple-footer-brand .market-brand {
+  width: 140px !important;
+  height: 54px !important;
+  min-width: 140px !important;
+  background-size: 154% auto !important;
 }
 
-.market-catalog-bottom h2 {
-  max-width: 760px;
-  color: #fff;
-  font-size: clamp(32px, 4vw, 44px);
+.simple-footer-brand p {
+  max-width: 520px;
+  margin: 15px 0 0;
+  color: #a9a9b0;
+  font-size: 12px;
+  line-height: 1.6;
 }
 
-.market-catalog-bottom p:not(.market-eyebrow) {
-  max-width: 720px;
-  margin: 14px 0 0;
-  color: #c8cdd0;
-  line-height: 1.55;
-}
-
-/* Footer */
-
-.market-footer {
-  color: #fff;
-  background: var(--market-deep);
-}
-
-.market-footer-band {
-  border-bottom: 1px solid #3a3d40;
-  background: #202225;
-}
-
-.market-footer-band-inner {
-  display: flex;
-  min-height: 150px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 34px;
-  padding-block: 28px;
-}
-
-.market-footer-band h2 {
-  margin: 0;
-  color: #fff;
-  font-size: clamp(24px, 3vw, 32px);
-}
-
-.market-footer-band p {
-  margin: 8px 0 0;
-  color: #b7bdc1;
-  font-size: 13px;
-}
-
-.market-footer-band a {
-  flex: 0 0 auto;
-  min-height: 46px;
-  border: 1px solid #fff;
-  padding: 13px 17px;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.market-footer-band a:hover {
-  color: var(--market-deep);
-  background: #fff;
-}
-
-.market-footer-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(150px, 0.7fr)) minmax(260px, 1.4fr);
-  gap: 34px;
-  padding-block: 46px;
-}
-
-.market-footer-column {
+.simple-footer-links {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
+  gap: 11px;
 }
 
-.market-footer-column h3 {
-  margin: 0 0 4px;
-  color: #fff;
-  font-size: 14px;
-}
-
-.market-footer-column > a {
-  color: #d8dcdf;
+.simple-footer-links a {
+  color: #d6d6db;
   font-size: 12px;
   text-decoration: none;
 }
 
-.market-footer-column > a:hover {
+.simple-footer-links a:hover {
   color: #fff;
   text-decoration: underline;
 }
 
-.market-footer-about {
-  padding-left: 24px;
-  border-left: 1px solid #3a3d40;
+.simple-footer-action strong {
+  display: block;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.4;
 }
 
-.market-footer-about p {
-  max-width: 420px;
-  margin: 8px 0 0;
-  color: #b7bdc1;
+.simple-footer-cta {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  margin-top: 14px;
+  border: 1px solid #fff;
+  padding: 0 14px;
+  color: #fff;
   font-size: 12px;
-  line-height: 1.55;
+  font-weight: 800;
+  text-decoration: none;
 }
 
-.market-footer-about small {
-  margin-top: 8px;
-  color: #8f969b;
-  font-size: 10px;
+.simple-footer-cta:hover {
+  color: var(--course-deep);
+  background: #fff;
 }
 
-.market-footer-bottom {
+.simple-footer-bottom {
   display: flex;
-  min-height: 76px;
+  min-height: 70px;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  border-top: 1px solid #3a3d40;
-  color: #a5abb0;
-  font-size: 11px;
+  border-top: 1px solid #303035;
+  color: #818188;
+  font-size: 10px;
 }
 
-/* Give existing detail/project/proof pages a compatible marketplace shell without rewriting their content. */
-
-.page-shell > main {
-  min-width: 0;
-}
+/* Keep legacy project/proof pages readable under the simplified chrome. */
 
 .page-width {
-  width: min(1180px, calc(100% - 48px));
-}
-
-.page-hero,
-.lesson-learning,
-.lesson-compounds,
-.lesson-navigation {
-  scroll-margin-top: 130px;
+  width: min(var(--course-max), calc(100% - 48px));
 }
 
 /* Responsive */
 
-@media (max-width: 1180px) {
-  .market-primary-links {
+@media (max-width: 1050px) {
+  .simple-nav-secondary {
     display: none;
   }
 
-  .market-main-nav {
-    gap: 10px;
-  }
-
-  .market-course-grid,
-  .market-catalog-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .market-popular-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .market-popular-grid a {
-    border-bottom: 1px solid var(--market-line);
-  }
-
-  .market-popular-grid a:nth-child(2n) {
-    border-right: 0;
-  }
-
-  .market-popular-grid a:nth-last-child(-n + 2) {
-    border-bottom: 0;
-  }
-
-  .market-catalog-hero-inner {
-    grid-template-columns: minmax(0, 1fr) 360px;
-    gap: 40px;
-  }
-}
-
-@media (max-width: 980px) {
-  .market-announcement span {
-    display: none;
-  }
-
-  .market-explore-link,
-  .market-login-button {
-    display: none;
-  }
-
-  .market-category-nav .market-container {
-    justify-content: flex-start;
-  }
-
-  .market-hero {
+  .course-hero,
+  .curriculum-hero-grid {
     grid-template-columns: 1fr;
   }
 
-  .market-hero-copy,
-  .market-hero-visual,
-  .market-hero-visual > img {
-    min-height: 400px;
-  }
-
-  .market-hero-visual {
+  .course-hero-visual {
     order: -1;
+    min-height: 420px;
   }
 
-  .market-path-layout,
-  .market-catalog-hero-inner {
+  .course-hero-visual > img {
+    min-height: 420px;
+  }
+
+  .course-roadmap-layout,
+  .course-audience-grid {
     grid-template-columns: 1fr;
+    gap: 42px;
   }
 
-  .market-path-list {
-    margin-top: 10px;
+  .course-roadmap-intro {
+    position: static;
   }
 
-  .market-catalog-stats {
+  .curriculum-stats {
     max-width: 620px;
   }
 
-  .market-footer-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .lesson-focus-layout {
+    grid-template-columns: minmax(0, 1fr) 320px;
   }
 
-  .market-footer-about {
-    padding-left: 0;
-    border-left: 0;
-  }
-
-  .market-explorer-toolbar {
-    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.5fr) auto;
-  }
-
-  .market-clear-button {
-    grid-column: 1 / -1;
-    min-height: 42px;
+  .simple-footer-main {
+    grid-template-columns: 1.2fr 0.6fr 0.9fr;
+    gap: 34px;
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 860px) {
   .market-container,
   .page-width {
-    width: min(100% - 28px, var(--market-max));
+    width: min(100% - 32px, var(--course-max));
   }
 
-  .market-announcement .market-container {
-    min-height: 42px;
-    gap: 7px;
-    font-size: 11px;
+  .simple-header-inner {
+    min-height: 64px;
+    gap: 16px;
   }
 
-  .market-main-nav {
-    min-height: 62px;
+  .simple-logo .market-brand {
+    width: 124px !important;
+    height: 48px !important;
+    min-width: 124px !important;
   }
 
-  .market-brand-mark {
-    width: 30px;
-    height: 30px;
+  .simple-nav {
+    gap: 16px;
   }
 
-  .market-brand-word {
-    font-size: 18px;
+  .course-hero {
+    padding-block: 40px 46px;
   }
 
-  .market-search-launcher {
-    display: none;
+  .course-hero-copy h1 {
+    font-size: clamp(40px, 9vw, 58px);
   }
 
-  .market-signup-button {
-    margin-left: auto;
-  }
-
-  .market-category-nav .market-container {
-    min-height: 38px;
-    gap: 20px;
-  }
-
-  .market-hero {
-    width: 100%;
-    margin-top: 0;
-    box-shadow: none;
-  }
-
-  .market-hero-copy {
-    min-height: auto;
-    padding: 36px 20px 42px;
-  }
-
-  .market-hero-copy h1 {
-    font-size: clamp(36px, 11vw, 50px);
-  }
-
-  .market-hero-visual,
-  .market-hero-visual > img {
-    min-height: 320px;
-  }
-
-  .market-hero-visual-caption {
-    right: 16px;
-    bottom: 16px;
-    left: 16px;
-  }
-
-  .market-hero-visual-caption strong {
-    font-size: 16px;
-  }
-
-  .market-section {
-    padding-block: 48px;
-  }
-
-  .market-section-heading-row {
-    display: block;
-  }
-
-  .market-section-heading-row > a {
-    display: inline-block;
-    margin-top: 14px;
-  }
-
-  .market-course-grid,
-  .market-catalog-grid {
+  .course-facts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .market-goal-grid {
+  .course-trust-grid {
     grid-template-columns: 1fr;
   }
 
-  .market-path-layout {
-    gap: 38px;
-  }
-
-  .market-popular-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .market-popular-grid a,
-  .market-popular-grid a:nth-child(2n),
-  .market-popular-grid a:nth-last-child(-n + 2) {
+  .course-trust-grid > div,
+  .course-trust-grid > div:first-child,
+  .course-trust-grid > div:last-child {
     min-height: auto;
     border-right: 0;
-    border-bottom: 1px solid var(--market-line);
+    border-bottom: 1px solid var(--course-line);
+    padding: 20px 0;
   }
 
-  .market-popular-grid a:last-child {
+  .course-trust-grid > div:last-child {
     border-bottom: 0;
   }
 
-  .market-cta-inner,
-  .market-catalog-bottom > .market-container {
+  .course-section {
+    padding-block: 62px;
+  }
+
+  .course-capability-grid,
+  .course-included-grid {
     grid-template-columns: 1fr;
   }
 
-  .market-cta-inner > div:last-child {
-    flex-wrap: wrap;
+  .course-capability-grid article,
+  .course-included-grid article {
+    min-height: auto;
   }
 
-  .market-catalog-hero-inner {
-    padding-block: 44px;
+  .course-roadmap-layout,
+  .course-audience-grid {
+    padding-block: 62px;
   }
 
-  .market-explorer-toolbar {
+  .course-final-cta-inner,
+  .curriculum-bottom-cta-inner {
     grid-template-columns: 1fr;
   }
 
-  .market-explorer-count {
-    min-height: 42px;
+  .course-outline-toolbar {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 300px) auto;
   }
 
-  .market-footer-band-inner {
-    display: block;
+  .course-outline-clear {
+    grid-column: 1 / -1;
   }
 
-  .market-footer-band a {
-    display: inline-flex;
-    align-items: center;
-    margin-top: 18px;
+  .course-outline-phase-header {
+    grid-template-columns: 1fr;
   }
 
-  .market-footer-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 34px 22px;
+  .course-outline-output {
+    border-top: 1px solid var(--course-line);
+    border-left: 0;
+    padding-top: 16px;
+    padding-left: 0;
   }
-}
 
-@media (max-width: 520px) {
-  .market-logo-link .market-brand-word {
+  .lesson-focus-header {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .lesson-focus-curriculum-link {
     display: none;
   }
 
-  .market-signup-button {
-    padding-inline: 12px;
-    font-size: 12px;
+  .lesson-focus-layout {
+    display: block;
   }
 
-  .market-course-grid,
-  .market-catalog-grid {
-    grid-template-columns: 1fr;
+  .lesson-focus-main {
+    border-right: 0;
   }
 
-  .market-course-art > strong {
-    font-size: 86px;
+  .lesson-focus-sidebar {
+    border-top: 1px solid #343439;
   }
 
-  .market-goal-card {
-    grid-template-columns: 1fr;
+  .lesson-sidebar-sticky {
+    position: static;
+    max-height: none;
   }
 
-  .market-path-list a {
-    grid-template-columns: 34px 1fr auto;
+  .lesson-sidebar-list {
+    max-height: 520px;
   }
 
-  .market-catalog-stats {
+  .simple-footer-main {
     grid-template-columns: 1fr 1fr;
   }
 
-  .market-footer-grid {
+  .simple-footer-action {
+    grid-column: 1 / -1;
+    border-top: 1px solid #303035;
+    padding-top: 26px;
+  }
+}
+
+@media (max-width: 620px) {
+  .market-container,
+  .page-width {
+    width: min(100% - 24px, var(--course-max));
+  }
+
+  .simple-nav {
+    display: none;
+  }
+
+  .simple-header-cta {
+    margin-left: auto;
+    padding-inline: 12px;
+    font-size: 11px;
+  }
+
+  .course-hero-visual,
+  .course-hero-visual > img {
+    min-height: 300px;
+  }
+
+  .course-cover-caption {
+    right: 14px;
+    bottom: 13px;
+    left: 14px;
+    display: block;
+  }
+
+  .course-cover-caption strong {
+    display: block;
+    margin-top: 5px;
+    text-align: left;
+  }
+
+  .course-hero-actions,
+  .curriculum-hero-actions,
+  .course-final-actions {
+    flex-direction: column;
+  }
+
+  .course-button {
+    width: 100%;
+  }
+
+  .course-facts {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .course-capability-grid {
     grid-template-columns: 1fr;
   }
 
-  .market-footer-bottom {
+  .course-capability-grid article {
+    padding: 24px;
+  }
+
+  .course-roadmap-list a {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+  }
+
+  .curriculum-hero-grid {
+    gap: 36px;
+    padding-block: 44px;
+  }
+
+  .curriculum-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .curriculum-body {
+    padding-block: 50px 62px;
+  }
+
+  .course-outline-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .course-outline-count {
+    min-height: 44px;
+  }
+
+  .course-outline-lessons > a {
+    grid-template-columns: 34px minmax(0, 1fr) 16px;
+    padding: 12px 14px;
+  }
+
+  .course-outline-format {
+    display: none;
+  }
+
+  .course-outline-phase-header {
+    padding: 22px 18px;
+  }
+
+  .lesson-focus-header {
+    min-height: 60px;
+    padding: 6px 10px;
+  }
+
+  .lesson-focus-logo .market-brand {
+    width: 104px !important;
+    height: 42px !important;
+    min-width: 104px !important;
+  }
+
+  .lesson-focus-course-name {
+    padding-left: 10px;
+  }
+
+  .lesson-focus-video {
+    padding: 0;
+  }
+
+  .lesson-focus-placeholder {
+    min-height: 310px;
+    padding: 30px 18px;
+  }
+
+  .lesson-focus-title {
+    grid-template-columns: 1fr;
+    padding: 26px 20px;
+  }
+
+  .lesson-step-nav {
+    justify-content: flex-end;
+  }
+
+  .lesson-content-block {
+    padding: 42px 20px;
+  }
+
+  .lesson-practice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lesson-practice-grid article {
+    min-height: auto;
+    padding: 34px 20px;
+  }
+
+  .lesson-practice-grid article:first-child {
+    border-right: 0;
+    border-bottom: 1px solid var(--course-line);
+  }
+
+  .lesson-prerequisite {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px;
+  }
+
+  .lesson-bottom-nav {
+    grid-template-columns: 1fr;
+  }
+
+  .lesson-bottom-nav > a:first-child {
+    border-right: 0;
+    border-bottom: 1px solid #343439;
+  }
+
+  .lesson-bottom-nav > a:last-child {
+    text-align: left;
+  }
+
+  .simple-footer-main {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .simple-footer-action {
+    grid-column: auto;
+  }
+
+  .simple-footer-bottom {
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    padding-block: 20px;
+    padding-block: 18px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .market-button,
-  .market-goal-card {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .course-button {
     transition: none;
   }
 }

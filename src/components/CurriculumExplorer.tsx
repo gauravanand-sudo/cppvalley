@@ -2,97 +2,67 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import type { CurriculumPhase, MasteryTrack, MasteryTrackInfo } from "@/data/curriculum";
+import type { CurriculumPhase } from "@/data/curriculum";
 
-export function CurriculumExplorer({
-  phases,
-  tracks,
-}: {
-  phases: CurriculumPhase[];
-  tracks: readonly MasteryTrackInfo[];
-}) {
+export function CurriculumExplorer({ phases }: { phases: CurriculumPhase[] }) {
   const [query, setQuery] = useState("");
   const [selectedPhase, setSelectedPhase] = useState("all");
-  const [selectedTrack, setSelectedTrack] = useState<"all" | MasteryTrack>("all");
 
-  const trackById = useMemo(
-    () => new Map(tracks.map((track) => [track.id, track])),
-    [tracks],
-  );
-
-  const visibleLessons = useMemo(() => {
+  const visiblePhases = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
     return phases.flatMap((phase) => {
       if (selectedPhase !== "all" && selectedPhase !== String(phase.number)) return [];
 
-      return phase.lessons
-        .filter((lesson) => selectedTrack === "all" || lesson.tracks.includes(selectedTrack))
-        .filter((lesson) => {
-          if (!normalizedQuery) return true;
+      const visibleLessons = phase.lessons.filter((lesson) => {
+        if (!normalizedQuery) return true;
 
-          const searchable = [
-            lesson.code,
-            lesson.title,
-            phase.title,
-            phase.summary,
-            phase.output,
-            lesson.lab,
-            lesson.proof,
-            ...lesson.learn,
-            ...lesson.tracks.map((track) => trackById.get(track)?.name ?? track),
-          ].join(" ").toLowerCase();
+        return [
+          lesson.code,
+          lesson.title,
+          phase.title,
+          phase.summary,
+          lesson.lab,
+          lesson.proof,
+          ...lesson.learn,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedQuery);
+      });
 
-          return searchable.includes(normalizedQuery);
-        })
-        .map((lesson) => ({ lesson, phase }));
+      return visibleLessons.length ? [{ phase, visibleLessons }] : [];
     });
-  }, [phases, query, selectedPhase, selectedTrack, trackById]);
+  }, [phases, query, selectedPhase]);
+
+  const visibleCount = visiblePhases.reduce(
+    (total, group) => total + group.visibleLessons.length,
+    0,
+  );
 
   const clearFilters = () => {
     setQuery("");
     setSelectedPhase("all");
-    setSelectedTrack("all");
   };
 
   return (
-    <div className="market-explorer" id="curriculum-browser">
-      <div className="market-explorer-tabs" aria-label="Filter by expert stack">
-        <button
-          className={selectedTrack === "all" ? "is-active" : ""}
-          type="button"
-          onClick={() => setSelectedTrack("all")}
-        >
-          All skills
-        </button>
-        {tracks.map((track) => (
-          <button
-            className={selectedTrack === track.id ? "is-active" : ""}
-            type="button"
-            onClick={() => setSelectedTrack(track.id)}
-            key={track.id}
-          >
-            {track.shortName}
-          </button>
-        ))}
-      </div>
-
-      <div className="market-explorer-toolbar">
-        <label className="market-explorer-search">
+    <div className="course-outline" id="curriculum-browser">
+      <div className="course-outline-toolbar">
+        <label className="course-outline-search">
           <span aria-hidden="true">⌕</span>
-          <span className="sr-only">Search lessons</span>
+          <span className="sr-only">Search the course</span>
           <input
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search 96 lessons"
+            placeholder="Search lessons: cache, NUMA, ITCH, lock-free…"
           />
         </label>
 
-        <label className="market-explorer-select">
-          <span className="sr-only">Filter by phase</span>
+        <label className="course-outline-select">
+          <span className="sr-only">Choose a phase</span>
           <select value={selectedPhase} onChange={(event) => setSelectedPhase(event.target.value)}>
-            <option value="all">All 9 phases</option>
+            <option value="all">All {phases.length} phases</option>
             {phases.map((phase) => (
               <option value={phase.number} key={phase.number}>
                 Phase {String(phase.number).padStart(2, "0")} — {phase.title}
@@ -101,63 +71,57 @@ export function CurriculumExplorer({
           </select>
         </label>
 
-        <div className="market-explorer-count" aria-live="polite">
-          <strong>{visibleLessons.length}</strong>
-          <span>results</span>
+        <div className="course-outline-count" aria-live="polite">
+          <strong>{visibleCount}</strong>
+          <span>lessons</span>
         </div>
 
-        {(query || selectedPhase !== "all" || selectedTrack !== "all") && (
-          <button className="market-clear-button" type="button" onClick={clearFilters}>
-            Clear filters
+        {(query || selectedPhase !== "all") && (
+          <button className="course-outline-clear" type="button" onClick={clearFilters}>
+            Clear
           </button>
         )}
       </div>
 
-      {visibleLessons.length > 0 ? (
-        <div className="market-course-grid market-catalog-grid">
-          {visibleLessons.map(({ lesson, phase }) => {
-            const primaryTrack = lesson.tracks[0];
-
-            return (
-              <Link
-                className="market-course-card"
-                href={`/curriculum/${lesson.slug}`}
-                id={`lesson-${lesson.number}`}
-                key={lesson.slug}
-              >
-                <div className={`market-course-art market-course-art-${primaryTrack}`}>
-                  <span className="market-course-art-code">{lesson.code}</span>
-                  <strong>{String(lesson.number).padStart(2, "0")}</strong>
-                  <div>
-                    {lesson.tracks.slice(0, 2).map((track) => (
-                      <span key={track}>{trackById.get(track)?.shortName ?? track}</span>
-                    ))}
-                  </div>
+      {visiblePhases.length ? (
+        <div className="course-outline-phases">
+          {visiblePhases.map(({ phase, visibleLessons }) => (
+            <section className="course-outline-phase" id={`phase-${phase.number}`} key={phase.number}>
+              <header className="course-outline-phase-header">
+                <div>
+                  <span>PHASE {String(phase.number).padStart(2, "0")} · {phase.range}</span>
+                  <h2>{phase.title}</h2>
+                  <p>{phase.summary}</p>
                 </div>
-
-                <div className="market-course-card-body">
-                  <h3>{lesson.title}</h3>
-                  <p>cppvalley · Phase {String(phase.number).padStart(2, "0")}: {phase.title}</p>
-                  <div className="market-course-meta">
-                    <span>3 outcomes</span>
-                    <span>Mini-lab</span>
-                    <span>Proof</span>
-                  </div>
-                  <div className="market-course-bottom">
-                    <strong>Advanced systems</strong>
-                    <span>{lesson.youtubeId ? "Video ready" : "Course page"}</span>
-                  </div>
+                <div className="course-outline-output">
+                  <span>Exit artifact</span>
+                  <strong>{phase.output}</strong>
                 </div>
-              </Link>
-            );
-          })}
+              </header>
+
+              <div className="course-outline-lessons">
+                {visibleLessons.map((lesson) => (
+                  <Link href={`/curriculum/${lesson.slug}`} key={lesson.slug}>
+                    <span className="course-outline-number">{String(lesson.number).padStart(2, "0")}</span>
+                    <div>
+                      <strong>{lesson.title}</strong>
+                      <small>{lesson.learn[0]}</small>
+                    </div>
+                    <span className="course-outline-format">
+                      {lesson.youtubeId ? "Video + lab" : "Lesson + lab"}
+                    </span>
+                    <b aria-hidden="true">→</b>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
       ) : (
-        <div className="market-empty-results">
-          <span aria-hidden="true">⌕</span>
-          <h3>No lessons match those filters</h3>
-          <p>Try a broader search term or clear the selected stack and phase.</p>
-          <button type="button" onClick={clearFilters}>Clear filters</button>
+        <div className="course-outline-empty">
+          <strong>No matching lessons</strong>
+          <p>Try a broader search term or clear the phase filter.</p>
+          <button type="button" onClick={clearFilters}>Show all lessons</button>
         </div>
       )}
     </div>

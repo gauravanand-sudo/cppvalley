@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
-import { getPhase, getTrack, lessons, lessonsBySlug } from "@/data/curriculum";
+import { getPhase, getTrack, lessons, lessonsBySlug, phases } from "@/data/curriculum";
 
 const youtubeUrl = "https://www.youtube.com/@cppvalley?sub_confirmation=1";
 
@@ -70,35 +70,17 @@ export default async function LessonPage({ params }: LessonPageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
         />
 
-        <div className="page-width lesson-breadcrumb" aria-label="Breadcrumb">
-          <Link href="/curriculum">Curriculum</Link>
-          <span aria-hidden="true">/</span>
-          <Link href={`/curriculum#phase-${phase.number - 1}`}>Phase {String(phase.number).padStart(2, "0")}</Link>
-          <span aria-hidden="true">/</span>
-          <strong>{lesson.code}</strong>
-        </div>
-
-        <section className="lesson-hero page-width">
-          <div className="lesson-hero-copy">
-            <p className="kicker">{lesson.code} / PHASE {String(phase.number).padStart(2, "0")}</p>
-            <h1>{lesson.title}</h1>
-            <p className="lesson-deck">{lesson.learn[0]}—then prove it in a focused build.</p>
-            <div className="track-tags lesson-hero-tags" aria-label="Expert stacks strengthened">
-              {lesson.tracks.map((track) => (
-                <span className={`track-tag track-${track}`} key={track}>{getTrack(track).name}</span>
-              ))}
+        <section className="lesson-player-shell" aria-label="Course lesson player">
+          <div className="lesson-player-main">
+            <div className="lesson-player-bar">
+              <div>
+                <span>{lesson.code} / PHASE {String(phase.number).padStart(2, "0")}</span>
+                <strong>HFT Core Systems</strong>
+              </div>
+              <Link href="/curriculum">Course overview</Link>
             </div>
-          </div>
-          <aside className="lesson-phase-card">
-            <span>PART OF</span>
-            <strong>{phase.title}</strong>
-            <p>{phase.summary}</p>
-            <Link href={`/curriculum#phase-${phase.number - 1}`}>View phase {String(phase.number).padStart(2, "0")} →</Link>
-          </aside>
-        </section>
 
-        <section className="lesson-main page-width">
-          <div className="lesson-video-column">
+            <div className="lesson-player-media">
             {lesson.youtubeId ? (
               <div className="video-embed">
                 <iframe
@@ -120,9 +102,69 @@ export default async function LessonPage({ params }: LessonPageProps) {
                 <a href={youtubeUrl} target="_blank" rel="noreferrer">Subscribe before it drops ↗</a>
               </div>
             )}
+            </div>
+
+            <div className="lesson-player-copy">
+              <div>
+                <p className="kicker">{lesson.code} / LESSON {lesson.number} OF {lessons.length}</p>
+                <h1>{lesson.title}</h1>
+                <p>{lesson.learn[0]}—then prove it in a focused build.</p>
+              </div>
+              <nav className="lesson-player-nav" aria-label="Quick lesson navigation">
+                {previousLesson ? <Link href={`/curriculum/${previousLesson.slug}`} aria-label="Previous lesson">←</Link> : <span />}
+                {nextLesson ? <Link href={`/curriculum/${nextLesson.slug}`} aria-label="Next lesson">→</Link> : <Link href="/projects" aria-label="Open projects">→</Link>}
+              </nav>
+            </div>
+
+            <div className="lesson-player-phase">
+              <div>
+                <span>PART OF</span>
+                <strong>{phase.title}</strong>
+              </div>
+              <div className="track-tags" aria-label="Expert stacks strengthened">
+                {lesson.tracks.map((track) => (
+                  <span className={`track-tag track-${track}`} key={track}>{getTrack(track).name}</span>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <aside className="lesson-spec">
+          <aside className="lesson-course-panel" aria-label="Course content">
+            <header>
+              <div><span>COURSE CONTENT</span><strong>{lesson.number} / {lessons.length}</strong></div>
+              <h2>HFT Core Systems</h2>
+              <div className="lesson-course-progress"><i style={{ width: `${(lesson.number / lessons.length) * 100}%` }} /></div>
+            </header>
+
+            <div className="lesson-course-list">
+              {phases.map((coursePhase) => (
+                <details key={coursePhase.number} open={coursePhase.number === phase.number}>
+                  <summary>
+                    <span>PHASE {String(coursePhase.number).padStart(2, "0")}</span>
+                    <strong>{coursePhase.title}</strong>
+                    <em>{coursePhase.lessons.length} lessons</em>
+                  </summary>
+                  <div>
+                    {coursePhase.lessons.map((courseLesson) => (
+                      <Link
+                        className={courseLesson.slug === lesson.slug ? "is-current" : ""}
+                        href={`/curriculum/${courseLesson.slug}`}
+                        aria-current={courseLesson.slug === lesson.slug ? "page" : undefined}
+                        key={courseLesson.slug}
+                      >
+                        <span>{String(courseLesson.number).padStart(2, "0")}</span>
+                        <strong>{courseLesson.title}</strong>
+                        <small>{courseLesson.youtubeId ? "▶ Video + lab" : "◷ Coming soon"}</small>
+                      </Link>
+                    ))}
+                  </div>
+                </details>
+              ))}
+            </div>
+          </aside>
+        </section>
+
+        <aside className="lesson-spec page-width" aria-label="Lesson details">
             <div>
               <span>FORMAT</span>
               <strong>Video + mini-lab</strong>
@@ -139,8 +181,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
               <span>PREREQUISITE</span>
               <strong>{lesson.prerequisites.length ? lesson.prerequisites.join(", ") : "Start here"}</strong>
             </div>
-          </aside>
-        </section>
+        </aside>
 
         <section className="lesson-learning page-width" aria-labelledby="learn-heading">
           <header className="section-header lesson-section-head">

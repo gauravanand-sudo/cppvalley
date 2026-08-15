@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { BrandLockup } from "@/components/BrandLockup";
 
 const youtubeUrl = "https://www.youtube.com/@cppvalley?sub_confirmation=1";
 
@@ -8,17 +8,7 @@ export function SiteHeader() {
     <header className="site-header">
       <div className="site-header-inner">
         <Link className="brand" href="/" aria-label="cppvalley home">
-          <span className="brand-logo-frame" aria-hidden="true">
-            <Image
-              className="brand-logo"
-              src="/cppvalley-logo.webp"
-              alt=""
-              width={1672}
-              height={941}
-              sizes="228px"
-              priority
-            />
-          </span>
+          <BrandLockup />
           <span className="sr-only">cppvalley</span>
         </Link>
 

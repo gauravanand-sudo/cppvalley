@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
+import { BrandLockup } from "@/components/BrandLockup";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { lessons, masteryTracks, phases } from "@/data/curriculum";
@@ -61,16 +61,7 @@ export default function Home() {
       <main>
         <section className="home-intro page-width">
           <figure className="home-logo-wrap">
-            <Image
-              className="home-logo"
-              src="/cppvalley-logo.webp"
-              alt="cppvalley logo"
-              width={1672}
-              height={941}
-              sizes="(max-width: 760px) calc(100vw - 28px), 480px"
-              quality={90}
-              priority
-            />
+            <BrandLockup size="hero" />
             <figcaption>BUILD LOG / C++ → HFT</figcaption>
           </figure>
 

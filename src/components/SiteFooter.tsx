@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { BrandLockup } from "@/components/BrandLockup";
 
 const youtubeUrl = "https://www.youtube.com/@cppvalley?sub_confirmation=1";
 
@@ -8,14 +8,7 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div className="site-footer-inner">
         <div className="footer-brand">
-          <Image
-            className="footer-logo"
-            src="/cppvalley-logo.webp"
-            alt="cppvalley"
-            width={1672}
-            height={941}
-            sizes="180px"
-          />
+          <BrandLockup tone="dark" />
           <div>
             <p>C++ · Linux · networks · trading systems</p>
           </div>

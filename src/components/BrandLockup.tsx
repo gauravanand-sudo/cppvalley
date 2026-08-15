@@ -5,12 +5,11 @@ type BrandLockupProps = {
 
 export function BrandLockup({ tone = "light", size = "default" }: BrandLockupProps) {
   return (
-    <span className={`brand-lockup brand-lockup-${tone} brand-lockup-${size}`}>
-      <span className="brand-glyph" aria-hidden="true">cv</span>
-      <span className="brand-type">
+    <span className={`market-brand market-brand-${tone} market-brand-${size}`}>
+      <span className="market-brand-mark" aria-hidden="true">∞</span>
+      <span className="market-brand-word">
         <strong>cpp</strong><span>valley</span>
       </span>
-      <span className="brand-signal" aria-hidden="true" />
     </span>
   );
 }

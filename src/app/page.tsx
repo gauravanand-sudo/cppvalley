@@ -1,233 +1,273 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { BrandLockup } from "@/components/BrandLockup";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { lessons, masteryTracks, phases } from "@/data/curriculum";
 
 export const metadata: Metadata = {
+  title: "C++ & HFT Engineering Courses",
+  description:
+    "Learn modern C++, low-latency systems, Linux, networking and electronic trading through 96 focused lessons, mini-labs and portfolio projects.",
   alternates: { canonical: "/" },
 };
 
 const youtubeUrl = "https://www.youtube.com/@cppvalley?sub_confirmation=1";
 
-const projects = [
+const featuredLessonNumbers = [1, 2, 9, 21, 33, 45, 57, 69];
+const featuredLessons = featuredLessonNumbers.map((number) => lessons[number - 1]);
+
+const goalCards = [
   {
-    name: "latlab",
-    title: "Latency laboratory",
-    scope: "TSC calibration, histograms, PMU counters, topology manifests, OS-noise traces",
-    proves: "You can measure without lying to yourself.",
-    href: "/projects#latlab",
+    icon: "⌁",
+    title: "Hands-on mini-labs",
+    copy: "Turn each concept into code, measurements and a reproducible experiment.",
+    link: "Open the curriculum",
+    href: "/curriculum",
+    external: false,
   },
   {
-    name: "wirebook",
-    title: "Feed handler + order book",
-    scope: "ITCH parser, sequence recovery, deterministic replay, invariant-checked L2/L3 book",
-    proves: "You can turn hostile wire data into correct state.",
-    href: "/projects#wirebook",
+    icon: "◇",
+    title: "Portfolio-grade systems",
+    copy: "Build four inspectable repositories that connect low-level skills into complete systems.",
+    link: "See flagship projects",
+    href: "/projects",
+    external: false,
   },
   {
-    name: "ordergate",
-    title: "Order gateway + risk",
-    scope: "Order lifecycle, pre-trade limits, kill switch, journal, drop copy, reconciliation",
-    proves: "You understand exchange connectivity and control.",
-    href: "/projects#ordergate",
+    icon: "✓",
+    title: "Interview-ready proof",
+    copy: "Document correctness, performance, trade-offs and failure handling like a systems engineer.",
+    link: "Use the proof checklist",
+    href: "/proof",
+    external: false,
   },
   {
-    name: "tickforge",
-    title: "Tick-to-trade capstone",
-    scope: "Timestamp provenance, bounded queues, replay, failure injection, recovery",
-    proves: "You can own the whole trading-system path.",
-    href: "/projects#tickforge",
+    icon: "▶",
+    title: "Video-first learning",
+    copy: "Follow the lesson on YouTube, then return here for the lab, outcomes and evidence target.",
+    link: "Watch on YouTube",
+    href: youtubeUrl,
+    external: true,
   },
 ] as const;
 
-const proofRows = [
-  ["Correctness", "Invariants, property tests, sanitizers, recovery tests"],
-  ["Performance", "Distributions, machine manifest, flamegraphs, counters"],
-  ["Judgement", "Trade-offs, rejected designs, scope, known limitations"],
-  ["Communication", "Architecture note, demo video, incident write-up"],
-] as const;
+function CourseCard({ lesson, index }: { lesson: (typeof lessons)[number]; index: number }) {
+  const primaryTrack = lesson.tracks[0];
+  const phase = phases[lesson.phase - 1];
 
-function Arrow() {
-  return <span aria-hidden="true">→</span>;
+  return (
+    <Link className="market-course-card" href={`/curriculum/${lesson.slug}`}>
+      <div className={`market-course-art market-course-art-${primaryTrack}`}>
+        <span className="market-course-art-code">{lesson.code}</span>
+        <strong>{String(index + 1).padStart(2, "0")}</strong>
+        <div>
+          {lesson.tracks.slice(0, 2).map((track) => (
+            <span key={track}>{track}</span>
+          ))}
+        </div>
+      </div>
+      <div className="market-course-card-body">
+        <h3>{lesson.title}</h3>
+        <p>cppvalley · {phase.title}</p>
+        <div className="market-course-meta">
+          <span>3 outcomes</span>
+          <span>Mini-lab</span>
+          <span>Proof artifact</span>
+        </div>
+        <div className="market-course-bottom">
+          <strong>Free learning path</strong>
+          <span>New</span>
+        </div>
+      </div>
+    </Link>
+  );
 }
 
 export default function Home() {
   return (
-    <div className="page-shell">
+    <div className="page-shell market-page">
       <SiteHeader />
 
       <main>
-        <section className="home-intro page-width">
-          <figure className="home-logo-wrap">
-            <BrandLockup size="hero" />
-            <figcaption>BUILD LOG / C++ → HFT</figcaption>
-          </figure>
-
-          <div className="home-intro-copy">
-            <p className="kicker">THE HFT ENGINEERING MASTERY PATH</p>
-            <h1>96 focused lessons. Four expert skill stacks. One serious portfolio.</h1>
-            <p className="intro-lede">
-              Master modern C++, low-latency engineering, Linux systems and electronic trading
-              by learning every layer—and proving it with code an interviewer can inspect.
+        <section className="market-hero market-container">
+          <div className="market-hero-copy">
+            <p className="market-eyebrow">C++ → SYSTEMS → HFT</p>
+            <h1>Skills that move your systems career forward</h1>
+            <p>
+              Learn the low-level engineering behind performance-critical software with a
+              dependency-ordered path through modern C++, CPU and memory, Linux, networks,
+              concurrency and electronic trading.
             </p>
-            <div className="primary-actions">
-              <Link className="action action-primary" href="/curriculum">
-                Browse the curriculum <Arrow />
+            <div className="market-hero-actions">
+              <Link className="market-button market-button-primary" href="/curriculum">
+                Explore all 96 lessons
               </Link>
-              <a className="action action-secondary" href={youtubeUrl} target="_blank" rel="noreferrer">
+              <a className="market-button market-button-ghost" href={youtubeUrl} target="_blank" rel="noreferrer">
                 Watch on YouTube ↗
               </a>
             </div>
-            <dl className="intro-stats">
-              <div><dt>Mini-topics</dt><dd>96</dd></div>
-              <div><dt>Outcomes</dt><dd>288</dd></div>
-              <div><dt>Expert stacks</dt><dd>04</dd></div>
-              <div><dt>Capstone</dt><dd>Tick → trade</dd></div>
-            </dl>
-          </div>
-        </section>
-
-        <section className="utility-bar" aria-label="Quick links">
-          <div className="page-width utility-grid">
-            <Link href="/curriculum">
-              <span>01</span><strong>Find an episode</strong><small>Search all 96 topics</small><Arrow />
-            </Link>
-            <Link href="/projects">
-              <span>02</span><strong>Build a system</strong><small>Four portfolio-grade repos</small><Arrow />
-            </Link>
-            <Link href="/proof">
-              <span>03</span><strong>Prepare for hiring</strong><small>Turn work into evidence</small><Arrow />
-            </Link>
-          </div>
-        </section>
-
-        <section className="page-section mastery-home" aria-labelledby="mastery-heading">
-          <div className="page-width">
-            <header className="section-header mastery-home-head">
-              <div>
-                <p className="section-label">01 / FOUR EXPERT STACKS</p>
-                <h2 id="mastery-heading">Go deep without losing the whole system.</h2>
-              </div>
-              <p>
-                Every mini-topic is tagged by the capability it strengthens, so you can see how
-                C++, latency, systems and trading knowledge compound into one engineering profile.
-              </p>
-            </header>
-
-            <div className="mastery-grid">
-              {masteryTracks.map((track, index) => {
-                const count = lessons.filter((lesson) => lesson.tracks.includes(track.id)).length;
-                return (
-                  <Link className={`mastery-card mastery-${track.id}`} href="/curriculum#curriculum-browser" key={track.id}>
-                    <div className="mastery-card-top">
-                      <span>0{index + 1}</span>
-                      <strong>{count} connected lessons</strong>
-                    </div>
-                    <h3>{track.name}</h3>
-                    <p>{track.promise}</p>
-                    <ul>
-                      {track.capabilities.map((capability) => <li key={capability}>{capability}</li>)}
-                    </ul>
-                    <small>Explore this stack →</small>
-                  </Link>
-                );
-              })}
+            <div className="market-hero-proof">
+              <span><strong>96</strong> focused lessons</span>
+              <span><strong>288</strong> learning outcomes</span>
+              <span><strong>4</strong> expert skill stacks</span>
             </div>
+          </div>
 
-            <div className="value-ledger" aria-label="Curriculum deliverables">
-              <div><strong>96</strong><span>video-ready lesson pages</span></div>
-              <div><strong>288</strong><span>specific learning outcomes</span></div>
-              <div><strong>96</strong><span>focused mini-labs</span></div>
-              <div><strong>09</strong><span>portfolio-grade exit artifacts</span></div>
+          <div className="market-hero-visual" aria-label="cppvalley brand">
+            <Image
+              src="/cppvalley-logo.webp"
+              alt="cppvalley"
+              width={1200}
+              height={593}
+              priority
+              sizes="(max-width: 900px) 100vw, 52vw"
+            />
+            <div className="market-hero-visual-caption">
+              <span>HFT Core Systems</span>
+              <strong>Watch it. Build it. Prove it.</strong>
             </div>
           </div>
         </section>
 
-        <section className="page-section page-width" aria-labelledby="path-heading">
-          <header className="section-header">
+        <section className="market-section market-container" aria-labelledby="skills-heading">
+          <div className="market-section-heading market-section-heading-row">
             <div>
-              <p className="section-label">02 / THE PATH</p>
-              <h2 id="path-heading">Learn in dependency order.</h2>
+              <p className="market-eyebrow">CURATED FOR SYSTEMS ENGINEERS</p>
+              <h2 id="skills-heading">Skills to transform your engineering depth</h2>
+              <p>Start with the capability you need today. The roadmap keeps the dependencies connected.</p>
             </div>
-            <p>Each lesson adds a skill. Each phase turns those skills into an artifact worth showing.</p>
-          </header>
+            <Link href="/curriculum">Explore all lessons →</Link>
+          </div>
 
-          <div className="phase-table" role="list">
-            <div className="table-head" aria-hidden="true">
-              <span>Phase</span><span>Episodes</span><span>Focus</span><span>Exit artifact</span><span />
-            </div>
-            {phases.map((phase) => (
-              <Link className="phase-row" href={`/curriculum#phase-${phase.number - 1}`} key={phase.number} role="listitem">
-                <span className="row-number">{String(phase.number).padStart(2, "0")}</span>
-                <span className="row-episodes">{phase.range}</span>
-                <strong>{phase.title}</strong>
-                <span>{phase.output}</span>
-                <Arrow />
+          <div className="market-skill-tabs" aria-label="Popular skill areas">
+            {masteryTracks.map((track, index) => (
+              <Link className={index === 0 ? "is-active" : ""} href="/curriculum#curriculum-browser" key={track.id}>
+                {track.shortName}
               </Link>
+            ))}
+          </div>
+
+          <div className="market-course-grid">
+            {featuredLessons.slice(0, 4).map((lesson, index) => (
+              <CourseCard lesson={lesson} index={index} key={lesson.slug} />
             ))}
           </div>
         </section>
 
-        <section className="page-section section-contrast" aria-labelledby="projects-heading">
-          <div className="page-width">
-            <header className="section-header">
-              <div>
-                <p className="section-label">03 / FLAGSHIP SYSTEMS</p>
-                <h2 id="projects-heading">Projects an interviewer can inspect.</h2>
-              </div>
-              <p>The curriculum converges on four repositories with explicit acceptance criteria.</p>
-            </header>
+        <section className="market-goals-wrap">
+          <div className="market-section market-container" aria-labelledby="goals-heading">
+            <div className="market-section-heading">
+              <p className="market-eyebrow">LEARNING THAT COMPOUNDS</p>
+              <h2 id="goals-heading">Learning focused on your goals</h2>
+            </div>
 
-            <div className="project-table">
-              {projects.map((project, index) => (
-                <Link className="project-row" href={project.href} key={project.name}>
-                  <span className="row-number">0{index + 1}</span>
-                  <div className="project-name"><code>{project.name}</code><h3>{project.title}</h3></div>
-                  <p>{project.scope}</p>
-                  <strong>{project.proves}</strong>
-                  <Arrow />
+            <div className="market-goal-grid">
+              {goalCards.map((card) => {
+                const content = (
+                  <>
+                    <span className="market-goal-icon" aria-hidden="true">{card.icon}</span>
+                    <div>
+                      <h3>{card.title}</h3>
+                      <p>{card.copy}</p>
+                      <span className="market-inline-link">{card.link} →</span>
+                    </div>
+                  </>
+                );
+
+                return card.external ? (
+                  <a className="market-goal-card" href={card.href} target="_blank" rel="noreferrer" key={card.title}>
+                    {content}
+                  </a>
+                ) : (
+                  <Link className="market-goal-card" href={card.href} key={card.title}>
+                    {content}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="market-section market-container" aria-labelledby="trending-heading">
+          <div className="market-section-heading market-section-heading-row">
+            <div>
+              <p className="market-eyebrow">TRENDING IN CPPVALLEY</p>
+              <h2 id="trending-heading">Go deeper in performance-critical topics</h2>
+            </div>
+            <Link href="/curriculum#curriculum-browser">Browse the catalog →</Link>
+          </div>
+
+          <div className="market-course-grid">
+            {featuredLessons.slice(4).map((lesson, index) => (
+              <CourseCard lesson={lesson} index={index + 4} key={lesson.slug} />
+            ))}
+          </div>
+        </section>
+
+        <section className="market-path-wrap">
+          <div className="market-section market-container market-path-layout">
+            <div>
+              <p className="market-eyebrow">ONE CONNECTED ROADMAP</p>
+              <h2>From trustworthy benchmarks to a tick-to-trade capstone</h2>
+              <p>
+                Nine phases keep the learning dependency-ordered. Each phase finishes with an artifact
+                that proves more than completion: it proves engineering judgement.
+              </p>
+              <Link className="market-button market-button-light" href="/curriculum">
+                See the full roadmap
+              </Link>
+            </div>
+
+            <div className="market-path-list">
+              {phases.slice(0, 5).map((phase) => (
+                <Link href={`/curriculum#phase-${phase.number - 1}`} key={phase.number}>
+                  <span>{String(phase.number).padStart(2, "0")}</span>
+                  <div>
+                    <strong>{phase.title}</strong>
+                    <small>{phase.output}</small>
+                  </div>
+                  <b aria-hidden="true">→</b>
                 </Link>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="page-section page-width" aria-labelledby="proof-heading">
-          <header className="section-header">
-            <div>
-              <p className="section-label">04 / HIRING PROOF</p>
-              <h2 id="proof-heading">Make the work defensible.</h2>
-            </div>
-            <p>A fast demo is not enough. Each build should answer the four questions below.</p>
-          </header>
+        <section className="market-section market-container" aria-labelledby="popular-heading">
+          <div className="market-section-heading">
+            <p className="market-eyebrow">POPULAR SKILLS</p>
+            <h2 id="popular-heading">Build depth across the stack</h2>
+          </div>
 
-          <div className="proof-layout">
-            <div className="proof-list">
-              {proofRows.map(([label, evidence], index) => (
-                <div key={label}>
-                  <span>0{index + 1}</span><strong>{label}</strong><p>{evidence}</p>
-                </div>
-              ))}
-            </div>
-            <aside className="proof-callout">
-              <p className="kicker">THE CPPVALLEY STANDARD</p>
-              <blockquote>
-                Never claim fast, lock-free, zero-copy, deterministic, or production-ready
-                without defining the boundary and publishing the evidence.
-              </blockquote>
-              <Link className="text-action" href="/proof">Open the hiring-proof checklist <Arrow /></Link>
-            </aside>
+          <div className="market-popular-grid">
+            {masteryTracks.map((track) => {
+              const count = lessons.filter((lesson) => lesson.tracks.includes(track.id)).length;
+              return (
+                <Link href="/curriculum#curriculum-browser" key={track.id}>
+                  <span>{track.shortName}</span>
+                  <strong>{track.name}</strong>
+                  <p>{track.promise}</p>
+                  <small>{count} connected lessons →</small>
+                </Link>
+              );
+            })}
           </div>
         </section>
 
-        <section className="final-cta">
-          <div className="page-width final-cta-inner">
-            <div><p className="section-label">START YOUR FIRST MINI-TOPIC</p><h2>Watch it. Build it. Prove it.</h2></div>
-            <div className="primary-actions">
-              <Link className="action action-light" href="/curriculum#phase-0">Open Phase 01 <Arrow /></Link>
-              <a className="action action-outline-light" href={youtubeUrl} target="_blank" rel="noreferrer">Subscribe ↗</a>
+        <section className="market-cta">
+          <div className="market-container market-cta-inner">
+            <div>
+              <p className="market-eyebrow">START WHERE THE EVIDENCE STARTS</p>
+              <h2>Learn one concept. Build one experiment. Publish one proof.</h2>
+            </div>
+            <div>
+              <Link className="market-button market-button-light" href={`/curriculum/${lessons[0].slug}`}>
+                Start lesson 01
+              </Link>
+              <Link className="market-button market-button-outline-light" href="/projects">
+                View flagship projects
+              </Link>
             </div>
           </div>
         </section>

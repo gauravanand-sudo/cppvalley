@@ -5,13 +5,13 @@ import "./marketplace.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://cppvalley.com"),
   title: {
-    default: "cppvalley — C++ & HFT Engineering",
+    default: "cppvalley — HFT Core Systems",
     template: "%s · cppvalley",
   },
   description:
-    "Learn modern C++, low-latency systems, Linux, networking and electronic trading through 96 focused lessons, hands-on labs and portfolio projects.",
+    "HFT Core Systems is one advanced engineering course covering modern C++, low latency, Linux, networking, concurrency, market data, risk, and tick-to-trade systems.",
   keywords: [
-    "C++ courses",
+    "HFT course",
     "HFT engineering",
     "low latency C++",
     "trading systems",
@@ -22,9 +22,9 @@ export const metadata: Metadata = {
   authors: [{ name: "cppvalley", url: "https://www.youtube.com/@cppvalley" }],
   creator: "cppvalley",
   openGraph: {
-    title: "cppvalley — C++ to HFT Core Systems",
+    title: "cppvalley — HFT Core Systems",
     description:
-      "A systems-first learning platform for modern C++, low latency, Linux, networking and electronic trading.",
+      "One systems-first course from modern C++ and Linux to market data, risk, and tick-to-trade engineering.",
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
@@ -32,8 +32,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "cppvalley — C++ & HFT Engineering",
-    description: "Watch it. Build it. Prove it.",
+    title: "cppvalley — HFT Core Systems",
+    description: "One course. One path. C++ to tick-to-trade.",
     images: ["/cppvalley-logo.webp"],
   },
   robots: {

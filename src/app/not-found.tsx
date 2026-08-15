@@ -4,13 +4,16 @@ import { SiteHeader } from "@/components/SiteHeader";
 
 export default function NotFound() {
   return (
-    <div className="page-shell">
+    <div className="page-shell single-course-page">
       <SiteHeader />
       <main className="not-found-shell page-width">
-        <p className="kicker">404 / PACKET DROPPED</p>
-        <h1>This route left the hot path.</h1>
-        <p>The page does not exist. The curriculum, projects, and hiring-proof checklist are still available.</p>
-        <Link className="action action-primary" href="/curriculum">Open the curriculum →</Link>
+        <p className="course-kicker">404 · PAGE NOT FOUND</p>
+        <h1>This page is not part of the course.</h1>
+        <p>Return to HFT Core Systems or open the complete curriculum.</p>
+        <div className="course-hero-actions">
+          <Link className="course-button course-button-primary" href="/">Back to the course</Link>
+          <Link className="course-button course-button-secondary" href="/curriculum">View curriculum</Link>
+        </div>
       </main>
       <SiteFooter />
     </div>

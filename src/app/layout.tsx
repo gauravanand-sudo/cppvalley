@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s · cppvalley",
   },
   description:
-    "HFT Core Systems is one advanced engineering course covering modern C++, low latency, Linux, networking, concurrency, market data, risk, and tick-to-trade systems.",
+    "Advanced HFT engineering course covering C++, low latency, Linux, networking, concurrency, market data, order entry, and risk.",
   keywords: [
     "HFT course",
     "HFT engineering",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "cppvalley — HFT Core Systems",
     description:
-      "One systems-first course from modern C++ and Linux to market data, risk, and tick-to-trade engineering.",
+      "Advanced HFT engineering: C++, low latency, Linux, networking, concurrency, market data, order entry, and risk.",
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "cppvalley — HFT Core Systems",
-    description: "One course. One path. C++ to tick-to-trade.",
+    description: "Advanced HFT engineering course.",
     images: ["/cppvalley-logo.webp"],
   },
   robots: {

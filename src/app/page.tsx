@@ -8,7 +8,7 @@ import { lessons, phases } from "@/data/curriculum";
 export const metadata: Metadata = {
   title: "HFT Core Systems Course",
   description:
-    "An advanced HFT engineering course covering C++, low latency, Linux, networking, concurrency, market data, order entry, and risk.",
+    "Build low-latency systems, portfolio evidence, and interview readiness for HFT engineering roles.",
   alternates: { canonical: "/" },
 };
 
@@ -23,10 +23,14 @@ export default function Home() {
       <main>
         <section className="home-hero site-container">
           <p className="eyebrow">HFT Core Systems</p>
-          <h1>Build low-latency trading systems in C++.</h1>
+          <h1>Build HFT systems. Prepare for the job.</h1>
           <p className="home-lede">
-            96 lessons covering performance, Linux, networking, concurrency, market data,
-            order entry, risk, and tick-to-trade architecture.
+            96 lessons covering C++, performance, Linux, networking, concurrency, market data,
+            order entry, risk, and tick-to-trade architecture — with portfolio and interview
+            preparation for HFT engineering roles.
+          </p>
+          <p className="home-audience">
+            For engineers, students, and self-taught builders with a genuine passion for HFT.
           </p>
 
           <div className="action-row">
@@ -45,7 +49,7 @@ export default function Home() {
           <div className="home-meta" aria-label="Course facts">
             <span>{lessons.length} lessons</span>
             <span>{phases.length} phases</span>
-            <span>Video + lab</span>
+            <span>Portfolio + interview prep</span>
           </div>
         </section>
 

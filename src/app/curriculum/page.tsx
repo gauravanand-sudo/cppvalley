@@ -9,7 +9,7 @@ import { lessons, phases } from "@/data/curriculum";
 export const metadata: Metadata = {
   title: "HFT Core Systems Curriculum",
   description:
-    "The complete 96-lesson HFT Core Systems curriculum covering C++, low latency, Linux, networking, concurrency, market data, risk, and tick-to-trade engineering.",
+    "96 lessons from low-latency systems fundamentals through capstone work, portfolio evidence, and HFT interview preparation.",
   alternates: { canonical: "/curriculum" },
 };
 
@@ -22,7 +22,10 @@ export default function CurriculumPage() {
         <section className="curriculum-intro site-container">
           <p className="eyebrow">HFT Core Systems</p>
           <h1>Curriculum</h1>
-          <p>{lessons.length} lessons across {phases.length} phases.</p>
+          <p>
+            {lessons.length} lessons across {phases.length} phases, ending in capstone work,
+            HFT interview simulation, and portfolio launch.
+          </p>
 
           <div className="action-row">
             <CourseCta

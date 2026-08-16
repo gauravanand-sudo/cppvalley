@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./marketplace.css";
+import "./logo-theme.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cppvalley.com"),
@@ -48,7 +49,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: "#94959a",
   colorScheme: "light",
 };
 

@@ -4,23 +4,20 @@ import { CourseCta } from "@/components/CourseCta";
 
 export function SiteHeader() {
   return (
-    <header className="simple-header">
-      <div className="simple-header-inner market-container">
-        <Link className="simple-logo" href="/" aria-label="cppvalley home">
+    <header className="site-header">
+      <div className="site-header-inner site-container">
+        <Link className="site-logo" href="/" aria-label="cppvalley home">
           <BrandLockup />
         </Link>
 
-        <nav className="simple-nav" aria-label="Primary navigation">
-          <Link href="/#course">The course</Link>
+        <nav className="site-nav" aria-label="Primary navigation">
           <Link href="/curriculum">Curriculum</Link>
-          <Link className="simple-nav-secondary" href="/#audience">Who it is for</Link>
+          <CourseCta
+            className="site-enroll"
+            checkoutLabel="Enroll"
+            fallbackLabel="Start course"
+          />
         </nav>
-
-        <CourseCta
-          className="simple-header-cta"
-          checkoutLabel="Enroll now"
-          fallbackLabel="View curriculum"
-        />
       </div>
     </header>
   );

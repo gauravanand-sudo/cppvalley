@@ -9,10 +9,11 @@ export const metadata: Metadata = {
     template: "%s · cppvalley",
   },
   description:
-    "Advanced HFT engineering course covering C++, low latency, Linux, networking, concurrency, market data, order entry, and risk.",
+    "Advanced HFT engineering course for building low-latency systems, portfolio evidence, and interview readiness for HFT roles.",
   keywords: [
     "HFT course",
     "HFT engineering",
+    "HFT interview preparation",
     "low latency C++",
     "trading systems",
     "market data",
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "cppvalley — HFT Core Systems",
     description:
-      "Advanced HFT engineering: C++, low latency, Linux, networking, concurrency, market data, order entry, and risk.",
+      "Build low-latency systems, portfolio evidence, and interview readiness for HFT engineering roles.",
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "cppvalley — HFT Core Systems",
-    description: "Advanced HFT engineering course.",
+    description: "Build HFT systems. Prepare for the job.",
     images: ["/cppvalley-logo.webp"],
   },
   robots: {

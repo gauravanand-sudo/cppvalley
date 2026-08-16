@@ -6,9 +6,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { lessons, phases } from "@/data/curriculum";
 
 export const metadata: Metadata = {
-  title: "HFT Core Systems Course",
+  title: "HFT Engineering Course & Job Preparation",
   description:
-    "Build low-latency systems, portfolio evidence, and interview readiness for HFT engineering roles.",
+    "A 96-lesson path to build HFT engineering skills, portfolio evidence, and interview readiness for HFT roles.",
   alternates: { canonical: "/" },
 };
 
@@ -23,13 +23,16 @@ export default function Home() {
       <main>
         <section className="home-hero site-container">
           <p className="eyebrow">HFT Core Systems</p>
-          <h1>Build HFT systems. Prepare for the job.</h1>
+          <h1>Build the skills to break into HFT.</h1>
           <p className="home-lede">
-            96 lessons covering C++, performance, Linux, networking, concurrency, market data,
-            order entry, risk, and tick-to-trade architecture — with portfolio and interview
-            preparation for HFT engineering roles.
+            96 lessons across C++, performance, Linux, networking, concurrency, market data,
+            order entry, risk, and tick-to-trade systems — with portfolio work and interview
+            preparation designed around HFT engineering roles.
           </p>
-          <p className="home-audience">For builders at heart with a passion for HFT.</p>
+          <p>
+            For college students and working professionals looking to switch into HFT — builders
+            at heart with a passion for high-performance systems and markets.
+          </p>
 
           <div className="action-row">
             <CourseCta
@@ -77,7 +80,7 @@ export default function Home() {
           <div className="section-row">
             <div>
               <h2 id="path-heading">Course path</h2>
-              <p>{phases.length} phases, in order.</p>
+              <p>{phases.length} phases, from fundamentals to portfolio and interview preparation.</p>
             </div>
             <Link href="/curriculum">View all {lessons.length} lessons →</Link>
           </div>

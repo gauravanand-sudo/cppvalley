@@ -29,9 +29,7 @@ export default function Home() {
             order entry, risk, and tick-to-trade architecture — with portfolio and interview
             preparation for HFT engineering roles.
           </p>
-          <p className="home-audience">
-            For engineers, students, and self-taught builders with a genuine passion for HFT.
-          </p>
+          <p className="home-audience">For builders at heart with a passion for HFT.</p>
 
           <div className="action-row">
             <CourseCta

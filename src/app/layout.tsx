@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./marketplace.css";
-import "./logo-theme.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cppvalley.com"),
@@ -10,11 +9,12 @@ export const metadata: Metadata = {
     template: "%s · cppvalley",
   },
   description:
-    "Advanced HFT engineering course for building low-latency systems, portfolio evidence, and interview readiness for HFT roles.",
+    "A job-focused HFT engineering course covering low-latency C++, Linux, networking, concurrency, trading systems, portfolio work, and interview preparation.",
   keywords: [
     "HFT course",
     "HFT engineering",
     "HFT interview preparation",
+    "HFT jobs",
     "low latency C++",
     "trading systems",
     "market data",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "cppvalley — HFT Core Systems",
     description:
-      "Build low-latency systems, portfolio evidence, and interview readiness for HFT engineering roles.",
+      "Build HFT engineering skills, portfolio evidence, and interview readiness for HFT roles.",
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "cppvalley — HFT Core Systems",
-    description: "Build HFT systems. Prepare for the job.",
+    description: "Build the skills to break into HFT.",
     images: ["/cppvalley-logo.webp"],
   },
   robots: {
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#94959a",
+  themeColor: "#ffffff",
   colorScheme: "light",
 };
 

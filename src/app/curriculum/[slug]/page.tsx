@@ -44,7 +44,6 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const phase = getPhase(lesson.phase);
   const previousLesson = lessons[lesson.number - 2];
   const nextLesson = lessons[lesson.number];
-  const progress = Math.round((lesson.number / lessons.length) * 100);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -63,28 +62,23 @@ export default async function LessonPage({ params }: LessonPageProps) {
   };
 
   return (
-    <div className="lesson-focus-page">
+    <div className="lesson-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
       />
 
-      <header className="lesson-focus-header">
-        <Link className="lesson-focus-logo" href="/" aria-label="cppvalley home">
+      <header className="lesson-header">
+        <Link className="lesson-logo" href="/" aria-label="cppvalley home">
           <BrandLockup tone="dark" />
         </Link>
-        <div className="lesson-focus-course-name">
-          <span>HFT CORE SYSTEMS</span>
-          <strong>{lesson.code} · Lesson {lesson.number} of {lessons.length}</strong>
-        </div>
-        <Link className="lesson-focus-curriculum-link" href="/curriculum">
-          Course curriculum
-        </Link>
+        <span>{String(lesson.number).padStart(2, "0")} / {lessons.length}</span>
+        <Link href="/curriculum">Curriculum</Link>
       </header>
 
-      <div className="lesson-focus-layout">
-        <main className="lesson-focus-main">
-          <div className="lesson-focus-video">
+      <div className="lesson-layout">
+        <main className="lesson-main">
+          <div className="lesson-video">
             {lesson.youtubeId ? (
               <div className="video-embed">
                 <iframe
@@ -95,29 +89,23 @@ export default async function LessonPage({ params }: LessonPageProps) {
                 />
               </div>
             ) : (
-              <div className="lesson-focus-placeholder">
-                <span aria-hidden="true">▶</span>
-                <p>VIDEO LESSON</p>
-                <h2>Video coming soon.</h2>
-                <p>The lesson notes, mini-lab, and evidence target are ready below.</p>
-                <a href={youtubeUrl} target="_blank" rel="noreferrer">Follow cppvalley on YouTube ↗</a>
+              <div className="video-placeholder-minimal">
+                <strong>Video coming soon</strong>
+                <span>The lesson notes and lab are available below.</span>
+                <a href={youtubeUrl} target="_blank" rel="noreferrer">YouTube ↗</a>
               </div>
             )}
           </div>
 
-          <section className="lesson-focus-title">
+          <section className="lesson-title">
             <div>
-              <p>PHASE {String(phase.number).padStart(2, "0")} · {phase.title}</p>
+              <p>Phase {String(phase.number).padStart(2, "0")} · {phase.title}</p>
               <h1>{lesson.title}</h1>
-              <span>{lesson.learn[0]}</span>
             </div>
-
-            <nav className="lesson-step-nav" aria-label="Previous and next lesson">
+            <nav className="lesson-arrows" aria-label="Previous and next lesson">
               {previousLesson ? (
                 <Link href={`/curriculum/${previousLesson.slug}`} aria-label="Previous lesson">←</Link>
-              ) : (
-                <span aria-hidden="true" />
-              )}
+              ) : <span />}
               {nextLesson ? (
                 <Link href={`/curriculum/${nextLesson.slug}`} aria-label="Next lesson">→</Link>
               ) : (
@@ -126,37 +114,30 @@ export default async function LessonPage({ params }: LessonPageProps) {
             </nav>
           </section>
 
-          <section className="lesson-focus-content" aria-labelledby="learn-heading">
-            <div className="lesson-content-block">
-              <p className="lesson-focus-kicker">WHAT YOU WILL LEARN</p>
-              <h2 id="learn-heading">Three outcomes for this lesson</h2>
-              <ol className="lesson-outcome-list">
-                {lesson.learn.map((outcome, index) => (
-                  <li key={outcome}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <p>{outcome}</p>
-                  </li>
-                ))}
+          <section className="lesson-notes">
+            <div className="lesson-block">
+              <h2>You’ll learn</h2>
+              <ol>
+                {lesson.learn.map((outcome) => <li key={outcome}>{outcome}</li>)}
               </ol>
             </div>
 
-            <div className="lesson-practice-grid">
-              <article>
-                <p className="lesson-focus-kicker">BUILD</p>
-                <h2>Mini-lab</h2>
-                <p>{lesson.lab}</p>
-              </article>
-              <article>
-                <p className="lesson-focus-kicker">PROVE</p>
-                <h2>Evidence target</h2>
-                <p>{lesson.proof}</p>
-              </article>
+            <div className="lesson-task">
+              <span>Build</span>
+              <p>{lesson.lab}</p>
             </div>
 
-            <div className="lesson-prerequisite">
-              <span>Prerequisite</span>
-              <strong>{lesson.prerequisites.length ? lesson.prerequisites.join(", ") : "Start here"}</strong>
+            <div className="lesson-task">
+              <span>Evidence</span>
+              <p>{lesson.proof}</p>
             </div>
+
+            {lesson.prerequisites.length ? (
+              <div className="lesson-prereq">
+                <span>Prerequisite</span>
+                <strong>{lesson.prerequisites.join(", ")}</strong>
+              </div>
+            ) : null}
           </section>
 
           <nav className="lesson-bottom-nav" aria-label="Continue course">
@@ -174,37 +155,29 @@ export default async function LessonPage({ params }: LessonPageProps) {
               </Link>
             ) : (
               <Link href="/curriculum">
-                <span>Course complete →</span>
-                <strong>Return to the curriculum</strong>
+                <span>Done →</span>
+                <strong>Curriculum</strong>
               </Link>
             )}
           </nav>
         </main>
 
-        <aside className="lesson-focus-sidebar" aria-label="Course content">
-          <div className="lesson-sidebar-sticky">
-            <header className="lesson-sidebar-header">
-              <div>
-                <span>COURSE CONTENT</span>
-                <strong>{lesson.number} / {lessons.length}</strong>
-              </div>
-              <div className="lesson-sidebar-progress" aria-label={`${progress}% course progress`}>
-                <i style={{ width: `${progress}%` }} />
-              </div>
-            </header>
+        <aside className="lesson-sidebar" aria-label="Course lessons">
+          <div className="lesson-sidebar-inner">
+            <div className="lesson-sidebar-top">
+              <strong>HFT Core Systems</strong>
+              <span>{lesson.number} of {lessons.length}</span>
+            </div>
 
-            <div className="lesson-sidebar-list">
+            <div className="lesson-sidebar-phases">
               {phases.map((coursePhase) => (
                 <details key={coursePhase.number} open={coursePhase.number === phase.number}>
                   <summary>
                     <span>{String(coursePhase.number).padStart(2, "0")}</span>
-                    <div>
-                      <strong>{coursePhase.title}</strong>
-                      <small>{coursePhase.lessons.length} lessons</small>
-                    </div>
+                    <strong>{coursePhase.title}</strong>
                   </summary>
 
-                  <div className="lesson-sidebar-lessons">
+                  <div>
                     {coursePhase.lessons.map((courseLesson) => (
                       <Link
                         className={courseLesson.slug === lesson.slug ? "is-current" : ""}
@@ -213,10 +186,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
                         key={courseLesson.slug}
                       >
                         <span>{String(courseLesson.number).padStart(2, "0")}</span>
-                        <div>
-                          <strong>{courseLesson.title}</strong>
-                          <small>{courseLesson.youtubeId ? "Video + lab" : "Lesson + lab"}</small>
-                        </div>
+                        <strong>{courseLesson.title}</strong>
                       </Link>
                     ))}
                   </div>

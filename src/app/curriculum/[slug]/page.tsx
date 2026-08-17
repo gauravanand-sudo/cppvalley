@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: LessonPageProps): Promise<Met
 
   if (!lesson) return {};
 
-  const description = `${lesson.learn[0]}. Build: ${lesson.lab}`;
+  const description = `${lesson.learn[0]}. Lab: ${lesson.lab}`;
 
   return {
     title: `${lesson.code}: ${lesson.title}`,
@@ -70,10 +70,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
       <header className="lesson-header">
         <Link className="lesson-logo" href="/" aria-label="cppvalley home">
-          <BrandLockup tone="dark" />
+          <BrandLockup />
         </Link>
-        <span>{String(lesson.number).padStart(2, "0")} / {lessons.length}</span>
-        <Link href="/curriculum">Curriculum</Link>
+        <span>LESSON {String(lesson.number).padStart(2, "0")} / {lessons.length}</span>
+        <Link href="/curriculum">Course index</Link>
       </header>
 
       <div className="lesson-layout">
@@ -91,15 +91,15 @@ export default async function LessonPage({ params }: LessonPageProps) {
             ) : (
               <div className="video-placeholder-minimal">
                 <strong>Video coming soon</strong>
-                <span>The lesson notes and lab are available below.</span>
-                <a href={youtubeUrl} target="_blank" rel="noreferrer">YouTube ↗</a>
+                <span>The system notes and lab specification are available below.</span>
+                <a href={youtubeUrl} target="_blank" rel="noreferrer">cppvalley on YouTube ↗</a>
               </div>
             )}
           </div>
 
           <section className="lesson-title">
             <div>
-              <p>Phase {String(phase.number).padStart(2, "0")} · {phase.title}</p>
+              <p>PHASE {String(phase.number).padStart(2, "0")} / {phase.title}</p>
               <h1>{lesson.title}</h1>
             </div>
             <nav className="lesson-arrows" aria-label="Previous and next lesson">
@@ -116,14 +116,14 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
           <section className="lesson-notes">
             <div className="lesson-block">
-              <h2>You’ll learn</h2>
+              <h2>System objectives</h2>
               <ol>
                 {lesson.learn.map((outcome) => <li key={outcome}>{outcome}</li>)}
               </ol>
             </div>
 
             <div className="lesson-task">
-              <span>Build</span>
+              <span>Lab</span>
               <p>{lesson.lab}</p>
             </div>
 
@@ -155,8 +155,8 @@ export default async function LessonPage({ params }: LessonPageProps) {
               </Link>
             ) : (
               <Link href="/curriculum">
-                <span>Done →</span>
-                <strong>Curriculum</strong>
+                <span>Complete →</span>
+                <strong>Return to course index</strong>
               </Link>
             )}
           </nav>
@@ -165,8 +165,8 @@ export default async function LessonPage({ params }: LessonPageProps) {
         <aside className="lesson-sidebar" aria-label="Course lessons">
           <div className="lesson-sidebar-inner">
             <div className="lesson-sidebar-top">
-              <strong>HFT Core Systems</strong>
-              <span>{lesson.number} of {lessons.length}</span>
+              <strong>PROGRAM INDEX</strong>
+              <span>{lesson.number} / {lessons.length}</span>
             </div>
 
             <div className="lesson-sidebar-phases">

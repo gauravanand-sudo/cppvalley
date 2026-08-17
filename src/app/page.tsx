@@ -8,12 +8,75 @@ import { lessons, phases } from "@/data/curriculum";
 export const metadata: Metadata = {
   title: "HFT Core Systems — C++, Systems, Low Latency & HFT",
   description:
-    "Learn the C++, Linux, networking, concurrency, low-latency and trading-system skills used in HFT engineering. 96 lessons, hands-on projects and interview preparation.",
+    "Learn C++, Linux, networking, concurrency, low latency, market microstructure and trading systems for HFT engineering. 96 lessons, hands-on projects and interview preparation.",
   alternates: { canonical: "/" },
 };
 
 const previewLesson = lessons[0];
 const coursePrice = process.env.NEXT_PUBLIC_COURSE_PRICE?.trim();
+
+const hftRoadmap = [
+  {
+    number: "01",
+    title: "Measurement + probability basics",
+    detail: "Distributions · percentiles · tail latency · benchmark confidence",
+    href: "/curriculum/05-histograms-and-tails-not-averages",
+  },
+  {
+    number: "02",
+    title: "CPU + memory systems",
+    detail: "Caches · branch prediction · TLBs · NUMA · memory bandwidth",
+    href: "/curriculum#phase-2",
+  },
+  {
+    number: "03",
+    title: "Linux for low latency",
+    detail: "Scheduling · affinity · interrupts · memory · host tuning",
+    href: "/curriculum#phase-3",
+  },
+  {
+    number: "04",
+    title: "Networking + packet paths",
+    detail: "UDP · multicast · sockets · AF_XDP · DPDK · NIC locality",
+    href: "/curriculum#phase-4",
+  },
+  {
+    number: "05",
+    title: "Low-latency C++",
+    detail: "Memory layout · allocation · parsing · SIMD · fixed-point types",
+    href: "/curriculum#phase-5",
+  },
+  {
+    number: "06",
+    title: "Concurrency + lock-free engineering",
+    detail: "Atomics · memory ordering · queues · reclamation · contention",
+    href: "/curriculum#phase-6",
+  },
+  {
+    number: "07",
+    title: "Markets + microstructure",
+    detail: "Orders · venues · spreads · matching · product vocabulary · order books",
+    href: "/curriculum/69-market-microstructure-for-systems-engineers",
+  },
+  {
+    number: "08",
+    title: "Market data + execution + risk",
+    detail: "Feeds · sequencing · order entry · executions · limits · reconciliation",
+    href: "/curriculum#phase-7",
+  },
+  {
+    number: "09",
+    title: "Tick-to-trade + production systems",
+    detail: "Architecture · latency attribution · recovery · observability · operations",
+    href: "/curriculum#phase-8",
+  },
+  {
+    number: "10",
+    title: "HFT interviews + job preparation",
+    detail: "C++/DSA coding · systems design · mock interviews · resume + portfolio",
+    href: "/curriculum/95-hft-interview-loop-simulation",
+  },
+] as const;
 
 export default function Home() {
   return (
@@ -28,7 +91,7 @@ export default function Home() {
             <p className="program-lede">
               A hands-on course for people who want to understand how fast trading systems are
               actually built. Learn C++, CPU and memory, Linux, networking, concurrency, market
-              data, order entry, risk and tick-to-trade design.
+              microstructure, market data, order entry, execution, risk and tick-to-trade design.
             </p>
             <p className="program-audience">
               For college students, job seekers and software engineers who want to break into HFT
@@ -52,9 +115,9 @@ export default function Home() {
             <div><span>LESSONS</span><strong>{lessons.length}</strong></div>
             <div><span>PHASES</span><strong>{phases.length}</strong></div>
             <div><span>CORE</span><strong>C++ · Linux · Networking</strong></div>
-            <div><span>FOCUS</span><strong>Low latency · Concurrency · HFT</strong></div>
+            <div><span>HFT</span><strong>Microstructure · Execution · Risk</strong></div>
             <div><span>YOU BUILD</span><strong>Projects + tick-to-trade capstone</strong></div>
-            <div><span>CAREER</span><strong>Portfolio + interview preparation</strong></div>
+            <div><span>CAREER</span><strong>Mock interviews + portfolio preparation</strong></div>
             {coursePrice ? <div><span>PRICE</span><strong>{coursePrice}</strong></div> : null}
           </aside>
         </section>
@@ -82,13 +145,13 @@ export default function Home() {
               </div>
               <div>
                 <span>LOW LATENCY</span>
-                <strong>Reason about every microsecond</strong>
-                <p>Benchmarking, tail latency, networking, atomics, lock-free queues and packet paths.</p>
+                <strong>Measure before you optimize</strong>
+                <p>Distributions, percentiles, tail latency, benchmarking, networking and packet paths.</p>
               </div>
               <div>
                 <span>HFT</span>
-                <strong>Build trading-system knowledge</strong>
-                <p>Market data, order books, order entry, risk, replay, recovery and tick-to-trade architecture.</p>
+                <strong>Understand the trading system</strong>
+                <p>Market microstructure, order books, market data, execution, risk, replay and recovery.</p>
               </div>
             </div>
           </div>
@@ -135,7 +198,7 @@ export default function Home() {
               <div>
                 <span>BENCHMARKING</span>
                 <strong>Performance lab</strong>
-                <p>Measure latency correctly with clocks, histograms, counters and reproducible experiments.</p>
+                <p>Measure latency correctly with clocks, distributions, histograms, counters and reproducible experiments.</p>
               </div>
               <div>
                 <span>NETWORKING</span>
@@ -145,7 +208,7 @@ export default function Home() {
               <div>
                 <span>TRADING</span>
                 <strong>Market-data and order systems</strong>
-                <p>Decode feeds, maintain book state, model orders, enforce risk and recover from faults.</p>
+                <p>Decode feeds, maintain book state, model orders and executions, enforce risk and recover from faults.</p>
               </div>
               <div>
                 <span>CAPSTONE</span>
@@ -161,18 +224,18 @@ export default function Home() {
           <div className="section-body">
             <div className="section-heading-row">
               <div>
-                <p className="eyebrow">COURSE PATH</p>
-                <h2 id="path-heading">96 lessons. Start with performance. Finish with HFT.</h2>
+                <p className="eyebrow">HFT ENGINEERING ROADMAP</p>
+                <h2 id="path-heading">A focused path from low-level systems to HFT interviews.</h2>
               </div>
               <Link href="/curriculum">See every lesson ↗</Link>
             </div>
 
             <div className="phase-table">
-              {phases.map((phase) => (
-                <Link href={`/curriculum#phase-${phase.number}`} key={phase.number}>
-                  <span>{String(phase.number).padStart(2, "0")}</span>
-                  <strong>{phase.title}</strong>
-                  <small>{phase.range}</small>
+              {hftRoadmap.map((step) => (
+                <Link href={step.href} key={step.number}>
+                  <span>{step.number}</span>
+                  <strong>{step.title}</strong>
+                  <small>{step.detail}</small>
                   <b aria-hidden="true">↗</b>
                 </Link>
               ))}
@@ -190,8 +253,8 @@ export default function Home() {
               </div>
             </div>
             <p className="program-audience">
-              Study the full path from low-level performance to trading systems, then turn the work
-              into portfolio evidence and stronger interview conversations.
+              Study the full path from low-level performance to market microstructure and trading
+              systems, then turn the work into portfolio evidence and stronger interview conversations.
             </p>
             <div className="action-row">
               <CourseCta

@@ -1,0 +1,61 @@
+:root {
+  --ink: #27282d;
+  --accent: #9f1648;
+  --accent-dark: #7f1039;
+}
+
+.button-primary,
+.site-enroll {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+.button-primary:hover,
+.site-enroll:hover {
+  border-color: var(--accent-dark);
+  background: var(--accent-dark);
+}
+
+.button-secondary {
+  border-color: #b8b8bd;
+  color: var(--ink);
+}
+
+.button-secondary:hover {
+  border-color: #9f9fa5;
+  background: #f7f7f8;
+}
+
+.curriculum-phase > header {
+  border-bottom-color: #cfcfd3;
+}
+
+.video-placeholder-minimal {
+  background: #f1f1f3;
+  color: var(--ink);
+  border: 1px solid #dedee2;
+}
+
+.video-placeholder-minimal span {
+  color: #62636a;
+}
+
+.video-placeholder-minimal a {
+  color: var(--accent);
+}
+
+.lesson-sidebar-phases details > div a.is-current {
+  background: #f8edf1;
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.lesson-arrows a,
+.lesson-arrows > span,
+.lesson-bottom-nav > a {
+  border-color: #d9d9dd;
+}
+
+.site-footer {
+  background: #fff;
+}

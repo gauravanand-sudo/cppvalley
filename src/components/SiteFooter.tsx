@@ -1,11 +1,14 @@
 import Link from "next/link";
+import { BrandLockup } from "@/components/BrandLockup";
 
 export function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="site-container site-footer-inner">
         <div className="site-footer-mark">
-          <strong>cppvalley</strong>
+          <Link className="site-footer-logo" href="/" aria-label="cppvalley home">
+            <BrandLockup />
+          </Link>
           <span>HFT Core Systems</span>
         </div>
 

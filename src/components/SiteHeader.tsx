@@ -20,8 +20,8 @@ export function SiteHeader() {
           <CourseCta
             className="site-enroll"
             checkoutLabel="Enroll"
-            fallbackLabel="Start"
-            fallbackHref="/curriculum/01-define-latency-like-an-engineer"
+            fallbackLabel="View course"
+            fallbackHref="/curriculum"
           />
         </nav>
       </div>

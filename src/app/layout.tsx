@@ -55,6 +55,27 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
+const logoFitCss = `
+.site-logo .market-brand,
+.lesson-logo .market-brand {
+  width: 150px !important;
+  height: 64px !important;
+  min-width: 150px !important;
+  background-size: contain !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+
+@media (max-width: 720px) {
+  .site-logo .market-brand,
+  .lesson-logo .market-brand {
+    width: 116px !important;
+    height: 52px !important;
+    min-width: 116px !important;
+  }
+}
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -62,6 +83,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <style>{logoFitCss}</style>
+      </head>
       <body>{children}</body>
     </html>
   );

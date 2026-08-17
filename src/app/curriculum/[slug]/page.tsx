@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BrandLockup } from "@/components/BrandLockup";
+import { SiteFooter } from "@/components/SiteFooter";
 import { getPhase, lessons, lessonsBySlug, phases } from "@/data/curriculum";
 
 const youtubeUrl = "https://www.youtube.com/@cppvalley?sub_confirmation=1";
@@ -196,6 +197,8 @@ export default async function LessonPage({ params }: LessonPageProps) {
           </div>
         </aside>
       </div>
+
+      <SiteFooter />
     </div>
   );
 }

@@ -9,7 +9,7 @@ import { lessons, phases } from "@/data/curriculum";
 export const metadata: Metadata = {
   title: "HFT Core Systems Curriculum",
   description:
-    "See all 96 lessons covering C++, systems, Linux, networking, concurrency, low latency, market data, order entry, risk and HFT interview preparation.",
+    "See all 96 lessons covering C++, systems, Linux, networking, concurrency, probability and latency statistics, market microstructure, order books, execution, risk and HFT interview preparation.",
   alternates: { canonical: "/curriculum" },
 };
 
@@ -24,8 +24,9 @@ export default function CurriculumPage() {
             <p className="eyebrow">HFT CORE SYSTEMS</p>
             <h1>Curriculum</h1>
             <p className="curriculum-deck">
-              96 lessons that take you from performance basics and low-level C++ to Linux,
-              networking, concurrency, market data, order systems and a full HFT capstone.
+              96 lessons that take you from measurement, probability basics and low-level C++ to
+              Linux, networking, concurrency, market microstructure, market data, order books,
+              execution, risk and a full tick-to-trade capstone.
             </p>
 
             <div className="action-row">
@@ -44,8 +45,9 @@ export default function CurriculumPage() {
           <aside className="curriculum-spec" aria-label="Curriculum summary">
             <div><span>LESSONS</span><strong>{lessons.length}</strong></div>
             <div><span>PHASES</span><strong>{phases.length}</strong></div>
-            <div><span>TOPICS</span><strong>C++ · Systems · Low Latency · HFT</strong></div>
-            <div><span>FINISH WITH</span><strong>Capstone + interview preparation</strong></div>
+            <div><span>ENGINEERING</span><strong>C++ · Linux · Networking · Concurrency</strong></div>
+            <div><span>TRADING</span><strong>Microstructure · Order books · Execution · Risk</strong></div>
+            <div><span>CAREER</span><strong>Coding + systems interviews · Portfolio</strong></div>
           </aside>
         </section>
 

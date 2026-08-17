@@ -10,24 +10,25 @@ export const metadata: Metadata = {
     template: "%s · cppvalley",
   },
   description:
-    "A job-focused HFT engineering course covering low-latency C++, Linux, networking, concurrency, trading systems, portfolio work, and interview preparation.",
+    "Learn C++, Linux, networking, concurrency, low latency and trading systems for HFT engineering, with hands-on projects and interview preparation.",
   keywords: [
     "HFT course",
+    "C++ systems course",
+    "low latency C++",
     "HFT engineering",
     "HFT interview preparation",
-    "HFT jobs",
-    "low latency C++",
+    "Linux performance",
+    "network programming",
+    "lock-free programming",
     "trading systems",
     "market data",
-    "lock-free programming",
-    "Linux performance",
   ],
   authors: [{ name: "cppvalley", url: "https://www.youtube.com/@cppvalley" }],
   creator: "cppvalley",
   openGraph: {
     title: "cppvalley — HFT Core Systems",
     description:
-      "Build HFT engineering skills, portfolio evidence, and interview readiness for HFT roles.",
+      "Learn C++, systems and low latency for HFT — from CPU and Linux to networking, concurrency and trading systems.",
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "cppvalley — HFT Core Systems",
-    description: "Build the skills to break into HFT.",
+    description: "Learn C++, systems and low latency for HFT.",
     images: ["/cppvalley-logo.webp"],
   },
   robots: {

@@ -10,8 +10,13 @@ export function SiteHeader() {
           <BrandLockup />
         </Link>
 
+        <span className="site-program">HFT Core Systems</span>
+
         <nav className="site-nav" aria-label="Primary navigation">
           <Link href="/curriculum">Curriculum</Link>
+          <Link className="site-preview" href="/curriculum/01-define-latency-like-an-engineer">
+            Preview
+          </Link>
           <CourseCta
             className="site-enroll"
             checkoutLabel="Enroll"

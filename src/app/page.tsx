@@ -24,14 +24,14 @@ export default function Home() {
         <section className="program-hero site-container">
           <div className="program-hero-main">
             <p className="eyebrow">HFT CORE SYSTEMS / 96 LESSONS / 9 PHASES</p>
-            <h1>Engineer for HFT.<br />Interview for HFT.</h1>
+            <h1>HFT systems engineering + job preparation.</h1>
             <p className="program-lede">
               One rigorous path from low-latency C++ and Linux to market data, order entry,
               risk, portfolio evidence, and interview readiness for HFT engineering roles.
             </p>
             <p className="program-audience">
-              For college students and working professionals moving into HFT — builders at heart
-              with a passion for high-performance systems and markets.
+              For college students and working professionals looking to switch into HFT —
+              builders at heart with a passion for HFT.
             </p>
 
             <div className="action-row">

@@ -1,0 +1,70 @@
+.site-logo .market-brand,
+.lesson-logo .market-brand {
+  width: 108px !important;
+  height: 60px !important;
+  min-width: 108px !important;
+  border-radius: 0 !important;
+  background-size: contain !important;
+  background-position: left center !important;
+}
+
+.site-footer {
+  color: var(--ink);
+  background: var(--white);
+}
+
+.site-footer-mark {
+  align-items: start;
+  gap: 7px;
+}
+
+.site-footer-logo {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  text-decoration: none;
+}
+
+.site-footer-logo .market-brand {
+  width: 142px !important;
+  height: 80px !important;
+  min-width: 142px !important;
+  border-radius: 0 !important;
+  background-size: contain !important;
+  background-position: left center !important;
+}
+
+.site-footer-mark span,
+.site-footer-meta,
+.site-footer-nav {
+  color: var(--muted);
+}
+
+.site-footer-nav a {
+  color: var(--ink);
+}
+
+.site-footer-nav a:hover {
+  color: var(--accent);
+}
+
+.lesson-page > .site-footer {
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 720px) {
+  .site-logo .market-brand,
+  .lesson-logo .market-brand {
+    width: 94px !important;
+    height: 52px !important;
+    min-width: 94px !important;
+    background-size: contain !important;
+  }
+
+  .site-footer-logo .market-brand {
+    width: 128px !important;
+    height: 72px !important;
+    min-width: 128px !important;
+  }
+}

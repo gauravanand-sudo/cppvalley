@@ -63,7 +63,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
   };
 
   return (
-    <div className="lesson-reading-page">
+    <div className="lesson-academic-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
@@ -71,210 +71,225 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
       <SiteHeader />
 
-      <main className="lesson-reading-main">
-        <div className="site-container lesson-reading-shell">
-          <nav className="lesson-breadcrumb" aria-label="Breadcrumb">
+      <main className="lesson-academic-main">
+        <div className="site-container lesson-academic-shell">
+          <nav className="lesson-academic-breadcrumb" aria-label="Breadcrumb">
             <Link href="/curriculum">Curriculum</Link>
-            <span>/</span>
+            <span>›</span>
             <Link href={`/curriculum#phase-${phase.number}`}>Phase {String(phase.number).padStart(2, "0")}</Link>
-            <span>/</span>
+            <span>›</span>
             <span>Lesson {String(lesson.number).padStart(2, "0")}</span>
           </nav>
 
-          <header className="lesson-reading-hero">
-            <p className="lesson-reading-kicker">
-              LESSON {String(lesson.number).padStart(2, "0")} OF {lessons.length}
-            </p>
+          <header className="lesson-academic-hero">
+            <div className="lesson-academic-rule" />
+            <p className="lesson-academic-program">HFT CORE SYSTEMS</p>
             <h1>{lesson.title}</h1>
-            <p className="lesson-reading-phase">
-              Phase {String(phase.number).padStart(2, "0")} · {phase.title}
-            </p>
+            <div className="lesson-academic-meta">
+              <span>Lesson {String(lesson.number).padStart(2, "0")} of {lessons.length}</span>
+              <span>Phase {String(phase.number).padStart(2, "0")}: {phase.title}</span>
+            </div>
           </header>
 
-          <section className="lesson-media" aria-label="Lesson video">
-            {lesson.youtubeId ? (
-              <div className="lesson-player">
-                <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${lesson.youtubeId}`}
-                  title={`${lesson.code}: ${lesson.title}`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-              </div>
-            ) : (
-              <div className="lesson-video-note">
-                <div>
-                  <span>VIDEO LESSON</span>
-                  <strong>Coming soon</strong>
-                  <p>The lesson notes and hands-on lab are ready below.</p>
+          <div className="lesson-academic-column">
+            <section className="lesson-academic-media" aria-label="Lesson video">
+              {lesson.youtubeId ? (
+                <div className="lesson-academic-player">
+                  <iframe
+                    src={`https://www.youtube-nocookie.com/embed/${lesson.youtubeId}`}
+                    title={`${lesson.code}: ${lesson.title}`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
                 </div>
-                <a href={youtubeUrl} target="_blank" rel="noreferrer">Visit cppvalley on YouTube ↗</a>
-              </div>
-            )}
-          </section>
-
-          <article className="lesson-reading-content">
-            <section className="lesson-learning">
-              <p className="lesson-section-label">WHAT YOU’LL LEARN</p>
-              <h2>By the end of this lesson</h2>
-              <ul>
-                {lesson.learn.map((outcome) => <li key={outcome}>{outcome}</li>)}
-              </ul>
+              ) : (
+                <div className="lesson-academic-video-note">
+                  <div>
+                    <strong>Video lesson coming soon</strong>
+                    <p>The written objectives and hands-on lab are available now.</p>
+                  </div>
+                  <a href={youtubeUrl} target="_blank" rel="noreferrer">cppvalley on YouTube ↗</a>
+                </div>
+              )}
             </section>
 
-            <div className="lesson-practice-grid">
-              <section className="lesson-practice-card">
-                <p className="lesson-section-label">HANDS-ON LAB</p>
-                <h2>Practice</h2>
+            <article className="lesson-academic-content">
+              <section className="lesson-academic-section">
+                <p className="lesson-academic-label">Learning objectives</p>
+                <h2>What you should understand</h2>
+                <ol className="lesson-academic-objectives">
+                  {lesson.learn.map((outcome) => <li key={outcome}>{outcome}</li>)}
+                </ol>
+              </section>
+
+              <section className="lesson-academic-section lesson-academic-assignment">
+                <p className="lesson-academic-label">Lab</p>
+                <h2>Hands-on exercise</h2>
                 <p>{lesson.lab}</p>
               </section>
 
-              <section className="lesson-practice-card">
-                <p className="lesson-section-label">DELIVERABLE</p>
-                <h2>What to produce</h2>
+              <section className="lesson-academic-section lesson-academic-assignment">
+                <p className="lesson-academic-label">Deliverable</p>
+                <h2>Evidence of completion</h2>
                 <p>{lesson.proof}</p>
               </section>
-            </div>
 
-            {lesson.prerequisites.length ? (
-              <section className="lesson-prerequisite">
-                <span>Prerequisite</span>
-                <strong>{lesson.prerequisites.join(", ")}</strong>
-              </section>
-            ) : null}
-          </article>
+              {lesson.prerequisites.length ? (
+                <dl className="lesson-academic-prerequisite">
+                  <dt>Prerequisite</dt>
+                  <dd>{lesson.prerequisites.join(", ")}</dd>
+                </dl>
+              ) : null}
+            </article>
 
-          <nav className="lesson-reading-nav" aria-label="Continue course">
-            {previousLesson ? (
-              <Link href={`/curriculum/${previousLesson.slug}`}>
-                <span>← Previous lesson</span>
-                <strong>{previousLesson.title}</strong>
-              </Link>
-            ) : <span />}
-
-            {nextLesson ? (
-              <Link href={`/curriculum/${nextLesson.slug}`}>
-                <span>Next lesson →</span>
-                <strong>{nextLesson.title}</strong>
-              </Link>
-            ) : (
-              <Link href="/curriculum">
-                <span>Course complete →</span>
-                <strong>Return to the curriculum</strong>
-              </Link>
-            )}
-          </nav>
-
-          <section className="lesson-phase-list" aria-labelledby="phase-lessons-heading">
-            <div className="lesson-phase-heading">
-              <div>
-                <p className="lesson-section-label">PHASE {String(phase.number).padStart(2, "0")}</p>
-                <h2 id="phase-lessons-heading">{phase.title}</h2>
-              </div>
-              <Link href="/curriculum">View all 96 lessons</Link>
-            </div>
-
-            <div className="lesson-phase-links">
-              {phase.lessons.map((courseLesson) => (
-                <Link
-                  className={courseLesson.slug === lesson.slug ? "is-current" : ""}
-                  href={`/curriculum/${courseLesson.slug}`}
-                  aria-current={courseLesson.slug === lesson.slug ? "page" : undefined}
-                  key={courseLesson.slug}
-                >
-                  <span>{String(courseLesson.number).padStart(2, "0")}</span>
-                  <strong>{courseLesson.title}</strong>
+            <nav className="lesson-academic-nav" aria-label="Continue course">
+              {previousLesson ? (
+                <Link href={`/curriculum/${previousLesson.slug}`}>
+                  <span>← Previous</span>
+                  <strong>{previousLesson.title}</strong>
                 </Link>
-              ))}
-            </div>
-          </section>
+              ) : <span />}
+
+              {nextLesson ? (
+                <Link href={`/curriculum/${nextLesson.slug}`}>
+                  <span>Next →</span>
+                  <strong>{nextLesson.title}</strong>
+                </Link>
+              ) : (
+                <Link href="/curriculum">
+                  <span>Complete →</span>
+                  <strong>Return to the curriculum</strong>
+                </Link>
+              )}
+            </nav>
+
+            <section className="lesson-academic-phase" aria-labelledby="phase-lessons-heading">
+              <header>
+                <div>
+                  <p className="lesson-academic-label">Phase {String(phase.number).padStart(2, "0")}</p>
+                  <h2 id="phase-lessons-heading">{phase.title}</h2>
+                </div>
+                <Link href="/curriculum">Full curriculum</Link>
+              </header>
+
+              <div className="lesson-academic-phase-list">
+                {phase.lessons.map((courseLesson) => (
+                  <Link
+                    className={courseLesson.slug === lesson.slug ? "is-current" : ""}
+                    href={`/curriculum/${courseLesson.slug}`}
+                    aria-current={courseLesson.slug === lesson.slug ? "page" : undefined}
+                    key={courseLesson.slug}
+                  >
+                    <span>{String(courseLesson.number).padStart(2, "0")}</span>
+                    <strong>{courseLesson.title}</strong>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          </div>
         </div>
       </main>
 
       <SiteFooter />
 
       <style>{`
-        .lesson-reading-page {
+        .lesson-academic-page {
           min-height: 100vh;
           color: var(--ink);
           background: var(--paper);
         }
 
-        .lesson-reading-main {
+        .lesson-academic-main {
           background: var(--white);
         }
 
-        .lesson-reading-shell {
-          padding-top: 30px;
-          padding-bottom: 96px;
+        .lesson-academic-shell {
+          padding-top: 28px;
+          padding-bottom: 104px;
         }
 
-        .lesson-breadcrumb {
+        .lesson-academic-breadcrumb {
           display: flex;
           flex-wrap: wrap;
-          gap: 8px;
           align-items: center;
+          gap: 8px;
           color: var(--muted);
           font-size: 12px;
+          line-height: 1.5;
         }
 
-        .lesson-breadcrumb a {
-          color: var(--accent);
-          font-weight: 700;
+        .lesson-academic-breadcrumb a {
+          color: var(--muted);
+          font-weight: 600;
           text-decoration: none;
         }
 
-        .lesson-breadcrumb a:hover {
+        .lesson-academic-breadcrumb a:hover {
+          color: var(--accent);
           text-decoration: underline;
-          text-underline-offset: 4px;
+          text-underline-offset: 3px;
         }
 
-        .lesson-breadcrumb > span:not(:last-child) {
+        .lesson-academic-breadcrumb > span:not(:last-child) {
           color: var(--line-strong);
         }
 
-        .lesson-reading-hero {
-          max-width: 940px;
-          padding: 58px 0 46px;
+        .lesson-academic-hero {
+          max-width: 930px;
+          padding: 44px 0 52px;
         }
 
-        .lesson-reading-kicker,
-        .lesson-section-label {
+        .lesson-academic-rule {
+          width: 86px;
+          height: 5px;
+          margin-bottom: 24px;
+          background: var(--accent);
+        }
+
+        .lesson-academic-program,
+        .lesson-academic-label {
           margin: 0;
           color: var(--accent);
           font-size: 11px;
           font-weight: 800;
-          letter-spacing: .08em;
+          letter-spacing: .085em;
           line-height: 1.4;
           text-transform: uppercase;
         }
 
-        .lesson-reading-hero h1 {
+        .lesson-academic-hero h1 {
           max-width: 900px;
-          margin: 14px 0 0;
+          margin: 12px 0 0;
           font-family: var(--serif);
-          font-size: clamp(44px, 6vw, 72px);
+          font-size: clamp(42px, 5.3vw, 64px);
           font-weight: 700;
-          letter-spacing: -.045em;
-          line-height: 1.02;
+          letter-spacing: -.038em;
+          line-height: 1.04;
         }
 
-        .lesson-reading-phase {
-          margin: 22px 0 0;
+        .lesson-academic-meta {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px 26px;
+          margin-top: 24px;
           color: var(--muted);
           font-family: var(--serif);
-          font-size: 18px;
+          font-size: 16px;
           line-height: 1.5;
         }
 
-        .lesson-media {
-          max-width: 1040px;
-          border-top: 1px solid var(--line-strong);
-          border-bottom: 1px solid var(--line-strong);
-          padding: 28px 0;
+        .lesson-academic-column {
+          width: min(820px, 100%);
+          margin: 0 auto;
         }
 
-        .lesson-player {
+        .lesson-academic-media {
+          border-top: 1px solid var(--line-strong);
+          border-bottom: 1px solid var(--line-strong);
+          padding: 22px 0;
+        }
+
+        .lesson-academic-player {
           position: relative;
           width: 100%;
           overflow: hidden;
@@ -282,7 +297,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
           background: #111;
         }
 
-        .lesson-player iframe {
+        .lesson-academic-player iframe {
           position: absolute;
           inset: 0;
           width: 100%;
@@ -290,322 +305,303 @@ export default async function LessonPage({ params }: LessonPageProps) {
           border: 0;
         }
 
-        .lesson-video-note {
+        .lesson-academic-video-note {
           display: flex;
-          min-height: 150px;
-          align-items: end;
+          align-items: baseline;
           justify-content: space-between;
-          gap: 36px;
-          padding: 26px 28px;
-          background: var(--sand);
+          gap: 28px;
         }
 
-        .lesson-video-note > div {
-          min-width: 0;
-        }
-
-        .lesson-video-note span {
-          color: var(--accent);
-          font-size: 10px;
-          font-weight: 800;
-          letter-spacing: .08em;
-        }
-
-        .lesson-video-note strong {
-          display: block;
-          margin-top: 7px;
+        .lesson-academic-video-note strong {
           font-family: var(--serif);
-          font-size: 27px;
-          line-height: 1.1;
+          font-size: 20px;
+          font-weight: 700;
         }
 
-        .lesson-video-note p {
-          margin: 8px 0 0;
+        .lesson-academic-video-note p {
+          margin: 5px 0 0;
           color: var(--muted);
           font-size: 14px;
           line-height: 1.55;
         }
 
-        .lesson-video-note a {
+        .lesson-academic-video-note a {
           flex: 0 0 auto;
           color: var(--accent);
           font-size: 12px;
-          font-weight: 800;
+          font-weight: 700;
           text-decoration: underline;
-          text-underline-offset: 4px;
+          text-underline-offset: 3px;
         }
 
-        .lesson-reading-content {
-          width: min(820px, 100%);
-          margin: 0 auto;
-          padding: 76px 0 0;
+        .lesson-academic-content {
+          padding-top: 66px;
         }
 
-        .lesson-learning h2,
-        .lesson-practice-card h2,
-        .lesson-phase-heading h2 {
-          margin: 10px 0 0;
+        .lesson-academic-section {
+          padding: 0 0 54px;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .lesson-academic-section + .lesson-academic-section {
+          padding-top: 48px;
+        }
+
+        .lesson-academic-section h2,
+        .lesson-academic-phase h2 {
+          margin: 9px 0 0;
           font-family: var(--serif);
           font-weight: 700;
-          letter-spacing: -.03em;
-          line-height: 1.1;
+          letter-spacing: -.025em;
+          line-height: 1.15;
         }
 
-        .lesson-learning h2 {
-          font-size: 38px;
+        .lesson-academic-section h2 {
+          font-size: 30px;
         }
 
-        .lesson-learning ul {
-          margin: 32px 0 0;
-          padding: 0;
-          list-style: none;
-          border-top: 1px solid var(--line-strong);
+        .lesson-academic-objectives {
+          margin: 28px 0 0;
+          padding-left: 26px;
         }
 
-        .lesson-learning li {
-          position: relative;
-          padding: 21px 0 21px 34px;
-          border-bottom: 1px solid var(--line);
+        .lesson-academic-objectives li {
+          padding: 7px 0 7px 8px;
           font-family: var(--serif);
           font-size: 18px;
-          line-height: 1.55;
+          line-height: 1.65;
         }
 
-        .lesson-learning li::before {
-          content: "";
-          position: absolute;
-          top: 31px;
-          left: 2px;
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: var(--accent);
+        .lesson-academic-objectives li::marker {
+          color: var(--accent);
+          font-family: var(--sans);
+          font-size: 13px;
+          font-weight: 800;
         }
 
-        .lesson-practice-grid {
+        .lesson-academic-assignment > p:last-child {
+          max-width: 740px;
+          margin: 22px 0 0;
+          color: #44413d;
+          font-size: 16px;
+          line-height: 1.75;
+        }
+
+        .lesson-academic-prerequisite {
           display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 28px;
-          margin-top: 68px;
-        }
-
-        .lesson-practice-card {
-          min-height: 260px;
-          border-top: 4px solid var(--accent);
-          padding: 28px 30px 30px;
-          background: var(--paper);
-        }
-
-        .lesson-practice-card h2 {
-          font-size: 27px;
-        }
-
-        .lesson-practice-card > p:last-child {
-          margin: 24px 0 0;
-          color: var(--muted);
-          font-size: 15px;
-          line-height: 1.7;
-        }
-
-        .lesson-prerequisite {
-          display: flex;
-          align-items: baseline;
+          grid-template-columns: 120px minmax(0, 1fr);
           gap: 24px;
-          margin-top: 34px;
-          padding: 22px 0;
-          border-top: 1px solid var(--line);
-          border-bottom: 1px solid var(--line);
+          margin: 0;
+          padding: 24px 0;
+          border-bottom: 1px solid var(--line-strong);
         }
 
-        .lesson-prerequisite span {
+        .lesson-academic-prerequisite dt {
           color: var(--accent);
           font-size: 11px;
           font-weight: 800;
+          letter-spacing: .06em;
           text-transform: uppercase;
         }
 
-        .lesson-prerequisite strong {
+        .lesson-academic-prerequisite dd {
+          margin: 0;
           font-size: 14px;
+          font-weight: 600;
         }
 
-        .lesson-reading-nav {
+        .lesson-academic-nav {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          width: min(920px, 100%);
-          margin: 82px auto 0;
+          margin-top: 66px;
           border-top: 1px solid var(--line-strong);
           border-bottom: 1px solid var(--line-strong);
         }
 
-        .lesson-reading-nav > a,
-        .lesson-reading-nav > span {
-          min-height: 118px;
+        .lesson-academic-nav > a,
+        .lesson-academic-nav > span {
+          min-height: 104px;
         }
 
-        .lesson-reading-nav > a {
+        .lesson-academic-nav > a {
           display: flex;
           flex-direction: column;
           justify-content: center;
-          padding: 24px 28px;
+          padding: 20px 24px 20px 0;
           text-decoration: none;
         }
 
-        .lesson-reading-nav > a + a,
-        .lesson-reading-nav > span + a {
+        .lesson-academic-nav > a + a,
+        .lesson-academic-nav > span + a {
           border-left: 1px solid var(--line);
+          padding-right: 0;
+          padding-left: 24px;
           text-align: right;
         }
 
-        .lesson-reading-nav > a:hover {
+        .lesson-academic-nav > a:hover {
           color: var(--accent);
-          background: var(--paper);
         }
 
-        .lesson-reading-nav span {
+        .lesson-academic-nav span {
           color: var(--accent);
           font-size: 10px;
           font-weight: 800;
-          letter-spacing: .05em;
+          letter-spacing: .055em;
           text-transform: uppercase;
         }
 
-        .lesson-reading-nav strong {
-          margin-top: 8px;
+        .lesson-academic-nav strong {
+          margin-top: 7px;
           font-family: var(--serif);
           font-size: 16px;
+          font-weight: 700;
           line-height: 1.4;
         }
 
-        .lesson-phase-list {
-          max-width: 1040px;
-          margin: 88px auto 0;
-          padding: 44px 0 0;
-          border-top: 4px solid var(--accent);
+        .lesson-academic-phase {
+          margin-top: 76px;
+          padding-top: 30px;
+          border-top: 5px solid var(--accent);
         }
 
-        .lesson-phase-heading {
+        .lesson-academic-phase > header {
           display: flex;
           align-items: end;
           justify-content: space-between;
           gap: 28px;
         }
 
-        .lesson-phase-heading h2 {
-          font-size: 32px;
+        .lesson-academic-phase h2 {
+          font-size: 28px;
         }
 
-        .lesson-phase-heading > a {
+        .lesson-academic-phase > header > a {
           color: var(--accent);
           font-size: 12px;
-          font-weight: 800;
+          font-weight: 700;
           text-decoration: underline;
-          text-underline-offset: 4px;
+          text-underline-offset: 3px;
         }
 
-        .lesson-phase-links {
-          margin-top: 28px;
+        .lesson-academic-phase-list {
+          margin-top: 24px;
           border-top: 1px solid var(--line-strong);
         }
 
-        .lesson-phase-links a {
+        .lesson-academic-phase-list a {
           display: grid;
-          grid-template-columns: 54px minmax(0, 1fr);
+          grid-template-columns: 48px minmax(0, 1fr);
           gap: 14px;
-          align-items: center;
-          min-height: 58px;
+          align-items: baseline;
+          min-height: 52px;
+          padding: 14px 0;
           border-bottom: 1px solid var(--line);
           text-decoration: none;
         }
 
-        .lesson-phase-links a:hover {
+        .lesson-academic-phase-list a:hover {
           color: var(--accent);
-          background: var(--paper);
         }
 
-        .lesson-phase-links a.is-current {
-          color: var(--accent-dark);
-          background: var(--accent-soft);
-        }
-
-        .lesson-phase-links a span {
+        .lesson-academic-phase-list a.is-current {
+          border-left: 4px solid var(--accent);
           padding-left: 12px;
+          color: var(--accent-dark);
+          font-weight: 700;
+        }
+
+        .lesson-academic-phase-list a span {
           color: var(--accent);
           font-size: 10px;
           font-weight: 800;
         }
 
-        .lesson-phase-links a strong {
-          padding: 12px 14px 12px 0;
+        .lesson-academic-phase-list a strong {
           font-family: var(--serif);
           font-size: 15px;
-          line-height: 1.4;
+          font-weight: 600;
+          line-height: 1.45;
         }
 
         @media (max-width: 760px) {
-          .lesson-reading-shell {
-            padding-top: 22px;
-            padding-bottom: 68px;
+          .lesson-academic-shell {
+            padding-top: 20px;
+            padding-bottom: 72px;
           }
 
-          .lesson-reading-hero {
-            padding: 44px 0 34px;
+          .lesson-academic-hero {
+            padding: 36px 0 40px;
           }
 
-          .lesson-reading-hero h1 {
-            font-size: clamp(40px, 12vw, 56px);
+          .lesson-academic-rule {
+            width: 64px;
+            height: 4px;
+            margin-bottom: 20px;
           }
 
-          .lesson-reading-phase {
-            font-size: 16px;
+          .lesson-academic-hero h1 {
+            font-size: clamp(38px, 11vw, 52px);
           }
 
-          .lesson-video-note {
-            min-height: 0;
-            flex-direction: column;
+          .lesson-academic-meta {
+            font-size: 15px;
+          }
+
+          .lesson-academic-video-note {
             align-items: flex-start;
-            padding: 22px;
+            flex-direction: column;
+            gap: 14px;
           }
 
-          .lesson-reading-content {
-            padding-top: 56px;
+          .lesson-academic-content {
+            padding-top: 50px;
           }
 
-          .lesson-learning h2 {
-            font-size: 32px;
+          .lesson-academic-section {
+            padding-bottom: 42px;
           }
 
-          .lesson-learning li {
-            padding-left: 28px;
+          .lesson-academic-section + .lesson-academic-section {
+            padding-top: 40px;
+          }
+
+          .lesson-academic-section h2 {
+            font-size: 27px;
+          }
+
+          .lesson-academic-objectives li {
             font-size: 17px;
           }
 
-          .lesson-practice-grid,
-          .lesson-reading-nav {
+          .lesson-academic-prerequisite {
+            grid-template-columns: 1fr;
+            gap: 8px;
+          }
+
+          .lesson-academic-nav {
             grid-template-columns: 1fr;
           }
 
-          .lesson-practice-card {
-            min-height: 0;
-          }
-
-          .lesson-reading-nav > a + a,
-          .lesson-reading-nav > span + a {
+          .lesson-academic-nav > a + a,
+          .lesson-academic-nav > span + a {
             border-top: 1px solid var(--line);
             border-left: 0;
+            padding-left: 0;
           }
 
-          .lesson-reading-nav > a {
-            min-height: 104px;
-            padding: 20px 0;
+          .lesson-academic-nav > a {
+            min-height: 92px;
+            padding: 18px 0;
           }
 
-          .lesson-phase-heading {
+          .lesson-academic-phase > header {
             align-items: flex-start;
             flex-direction: column;
           }
 
-          .lesson-phase-links a {
-            grid-template-columns: 42px minmax(0, 1fr);
+          .lesson-academic-phase-list a {
+            grid-template-columns: 38px minmax(0, 1fr);
           }
         }
       `}</style>

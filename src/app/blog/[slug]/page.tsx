@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BlogEngagement } from "@/components/BlogEngagement";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts, blogPostsBySlug } from "@/data/blog";
@@ -106,6 +107,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </section>
             ))}
           </article>
+
+          <BlogEngagement
+            slug={post.slug}
+            title={post.title}
+            issueNumber={post.discussionIssue}
+          />
 
           <Link className="blog-back" href="/blog">← Back to all notes</Link>
         </div>

@@ -4,6 +4,7 @@ import "./marketplace.css";
 import "./institute.css";
 import "./brand-consistency.css";
 import "./cmu.css";
+import "./blog-engagement.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cppvalley.com"),

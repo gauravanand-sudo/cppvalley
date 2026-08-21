@@ -3,6 +3,7 @@ import "./globals.css";
 import "./marketplace.css";
 import "./institute.css";
 import "./brand-consistency.css";
+import "./cmu.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cppvalley.com"),
@@ -52,7 +53,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f5f5f2",
+  themeColor: "#ffffff",
   colorScheme: "light",
 };
 

@@ -19,6 +19,7 @@ export function SiteFooter() {
 
         <nav className="site-footer-nav" aria-label="Footer navigation">
           <Link href="/curriculum">Curriculum</Link>
+          <Link href="/blog">Blog</Link>
           <Link href="/curriculum/01-define-latency-like-an-engineer">Preview lesson</Link>
         </nav>
       </div>

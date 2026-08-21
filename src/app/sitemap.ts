@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
+import { blogPosts } from "@/data/blog";
 import { lessons } from "@/data/curriculum";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date("2026-08-16");
+  const lastModified = new Date("2026-08-21");
 
   const corePages: MetadataRoute.Sitemap = [
     {
@@ -17,6 +18,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.9,
     },
+    {
+      url: "https://cppvalley.com/blog",
+      lastModified,
+      changeFrequency: "daily",
+      priority: 0.8,
+    },
   ];
 
   const lessonPages: MetadataRoute.Sitemap = lessons.map((lesson) => ({
@@ -26,5 +33,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...corePages, ...lessonPages];
+  const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: `https://cppvalley.com/blog/${post.slug}`,
+    lastModified: new Date(`${post.publishedAt}T00:00:00.000Z`),
+    changeFrequency: "monthly",
+    priority: 0.65,
+  }));
+
+  return [...corePages, ...lessonPages, ...blogPages];
 }

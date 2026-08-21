@@ -22,6 +22,7 @@ export function SiteHeader() {
 
           <nav className="site-nav" aria-label="Primary navigation">
             <Link href="/curriculum">Curriculum</Link>
+            <Link href="/blog">Blog</Link>
             <Link className="site-preview" href="/curriculum/01-define-latency-like-an-engineer">
               Preview lesson
             </Link>

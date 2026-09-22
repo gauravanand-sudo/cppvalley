@@ -9,18 +9,21 @@ export function SiteFooter() {
           <Link className="site-footer-logo" href="/" aria-label="cppvalley home">
             <BrandLockup />
           </Link>
-          <span>HFT Core Systems</span>
+          <span>C++ · HFT · AI Systems Interview Prep</span>
         </div>
 
         <div className="site-footer-meta">
-          <span>96 lessons · 9 phases</span>
-          <span>C++ · systems · low latency · HFT</span>
+          <span>Courses · daily writing · interview questions · book notes · YouTube series</span>
+          <span>Built for engineers preparing for C++ / HFT / AI systems roles</span>
         </div>
 
         <nav className="site-footer-nav" aria-label="Footer navigation">
-          <Link href="/curriculum">Curriculum</Link>
+          <Link href="/courses">Courses</Link>
           <Link href="/blog">Blog</Link>
-          <Link href="/curriculum/01-define-latency-like-an-engineer">Preview lesson</Link>
+          <Link href="/interviews">Interviews</Link>
+          <Link href="/conferences">Conferences</Link>
+          <Link href="/books">Books</Link>
+          <Link href="/youtube">YouTube</Link>
         </nav>
       </div>
     </footer>

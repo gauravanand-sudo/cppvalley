@@ -14,35 +14,24 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://cppvalley.com"),
   applicationName: "cppvalley",
   title: {
-    default: "cppvalley — C++ Systems, EDA, HFT & AI Interview Prep",
+    default: "cppvalley — C++ Systems, HFT & Interview Prep",
     template: "%s · cppvalley",
   },
   description:
-    "Explore C++ interview preparation, EDA software engineering, HFT systems, low-latency C++, CUDA, GPU programming, AI systems, projects, videos, book notes and interview questions for students and engineers.",
+    "Learn C++ systems, HFT, low-latency engineering, EDA software basics, projects, videos and interview questions for students and engineers.",
   keywords: [
     "C++ interview preparation",
     "C++ roadmap for college students",
     "modern C++ interview questions",
-    "advanced modern C++",
-    "C++ concurrency course",
     "EDA software engineer roadmap",
-    "EDA interview preparation",
-    "semiconductor software engineer",
-    "VLSI CAD software",
     "HFT interview preparation",
     "HFT internship preparation",
     "low latency C++",
-    "CUDA GPU programming",
-    "GPU programming C++",
-    "AI systems engineering",
     "C++ systems programming",
-    "AI systems interview",
-    "C++ design patterns",
     "C++ multithreading",
     "trading systems",
     "cppvalley YouTube",
-    "C++ book summaries",
-    "C++ projects for resume",
+    "C++ projects for resume"
   ],
   authors: [{ name: "cppvalley", url: "https://www.youtube.com/@cppvalley" }],
   creator: "cppvalley",
@@ -51,23 +40,23 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://cppvalley.com",
     types: {
-      "application/rss+xml": "https://cppvalley.com/rss.xml",
+      "application/rss+xml": [{ url: "https://cppvalley.com/rss.xml", title: "cppvalley Articles" }],
     },
   },
   openGraph: {
-    title: "cppvalley — C++ Systems, EDA, HFT & AI Interview Prep",
+    title: "cppvalley — C++ Systems, HFT & Interview Prep",
     description:
-      "A focused learning platform for C++, EDA software, HFT, CUDA, GPU programming, low-latency systems and AI systems interviews — with courses, embedded videos, projects, book notes and interview questions.",
+      "A focused learning platform for C++, HFT, low-latency systems, EDA software basics and systems interviews — with courses, videos, projects, articles and interview questions.",
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
-    images: [{ url: "/course-cover/third-year-cpp-eda-hft", width: 1200, height: 675, alt: "cppvalley course catalog" }],
+    images: [{ url: "/cppvalley-logo.webp", width: 1200, height: 593, alt: "cppvalley logo" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "cppvalley — C++ Systems Interview Prep",
-    description: "C++, EDA, HFT, CUDA, GPU programming, low-latency systems and AI systems interview preparation.",
-    images: ["/course-cover/third-year-cpp-eda-hft"],
+    description: "C++, HFT, low-latency systems, EDA basics and systems interview preparation.",
+    images: ["/cppvalley-logo.webp"],
   },
   robots: {
     index: true,
@@ -130,13 +119,8 @@ const structuredData = {
       name: "cppvalley",
       url: "https://cppvalley.com",
       description:
-        "C++ systems learning platform for EDA software, HFT, low-latency engineering, CUDA, GPU programming and AI systems interview preparation.",
+        "C++ systems learning platform for HFT, low-latency engineering, EDA software basics and interview preparation.",
       inLanguage: "en",
-      potentialAction: {
-        "@type": "SearchAction",
-        target: "https://cppvalley.com/courses?query={search_term_string}",
-        "query-input": "required name=search_term_string",
-      },
     },
     {
       "@type": "EducationalOrganization",
@@ -148,11 +132,9 @@ const structuredData = {
       teaches: [
         "Modern C++",
         "C++ interview preparation",
-        "EDA software engineering",
+        "EDA software basics",
         "HFT systems",
-        "low-latency C++",
-        "CUDA and GPU programming",
-        "AI systems engineering"
+        "low-latency C++"
       ],
     },
     {
@@ -164,7 +146,8 @@ const structuredData = {
         { "@type": "ListItem", position: 2, name: "Videos", url: "https://cppvalley.com/youtube" },
         { "@type": "ListItem", position: 3, name: "Interview Questions", url: "https://cppvalley.com/interviews" },
         { "@type": "ListItem", position: 4, name: "Projects", url: "https://cppvalley.com/projects" },
-        { "@type": "ListItem", position: 5, name: "Book Notes", url: "https://cppvalley.com/books" }
+        { "@type": "ListItem", position: 5, name: "Articles", url: "https://cppvalley.com/blog" },
+        { "@type": "ListItem", position: 6, name: "Book Notes", url: "https://cppvalley.com/books" }
       ],
     },
   ],

@@ -5,12 +5,12 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts } from "@/data/blog";
 
 export const metadata: Metadata = {
-  title: "Blog",
-  description: "Daily notes on C++, systems, low latency, performance engineering and HFT from cppvalley.",
+  title: "Daily Blog",
+  description: "Daily cppvalley notes on C++, HFT, AI systems, low latency, design patterns, interviews, books, conferences and engineering careers.",
   alternates: { canonical: "/blog" },
   openGraph: {
-    title: "cppvalley Blog",
-    description: "Daily notes on C++, systems, low latency, performance engineering and HFT.",
+    title: "cppvalley Daily Blog",
+    description: "Daily notes on C++, HFT, AI systems, low latency, interviews and systems engineering.",
     url: "/blog",
     type: "website",
   },
@@ -35,18 +35,18 @@ export default function BlogPage() {
       <main className="blog-main">
         <section className="site-container blog-hero">
           <div className="blog-hero-copy">
-            <p className="blog-kicker">cppvalley engineering notes</p>
-            <h1>Blog</h1>
+            <p className="blog-kicker">cppvalley daily engineering notes</p>
+            <h1>Daily Blog</h1>
             <p>
-              Short, practical notes on C++, computer systems, Linux, networking, concurrency,
-              latency measurement, market microstructure and HFT engineering.
+              Short, practical notes on C++, HFT, AI systems, low latency, design patterns,
+              interview questions, book summaries, conference talks and project ideas.
             </p>
           </div>
 
           <aside className="blog-hero-side" aria-label="Blog publishing focus">
             <strong>One focused engineering idea at a time</strong>
             <strong>Written for builders and interview candidates</strong>
-            <strong>New notes can be published daily</strong>
+            <strong>Designed to build long-term SEO traffic</strong>
           </aside>
         </section>
 

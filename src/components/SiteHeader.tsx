@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ActiveNav } from "@/components/ActiveNav";
 import { BrandLockup } from "@/components/BrandLockup";
 
 const navItems = [
@@ -17,11 +18,7 @@ export function SiteHeader() {
             <BrandLockup />
           </Link>
 
-          <nav className="site-nav clean-nav" aria-label="Primary navigation">
-            {navItems.map((item) => (
-              <Link href={item.href} key={item.href}>{item.label}</Link>
-            ))}
-          </nav>
+          <ActiveNav items={navItems} />
         </div>
       </div>
     </header>

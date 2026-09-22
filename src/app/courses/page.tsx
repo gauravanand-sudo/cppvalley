@@ -6,8 +6,7 @@ import { courses } from "@/data/courses";
 
 export const metadata: Metadata = {
   title: "Courses — cppvalley",
-  description:
-    "C++, HFT, EDA, CUDA, GPU and AI systems courses from cppvalley.",
+  description: "C++, HFT, EDA, CUDA, GPU and AI systems courses from cppvalley.",
   alternates: { canonical: "/courses" },
 };
 
@@ -15,29 +14,26 @@ export default function CoursesPage() {
   const sortedCourses = [...courses].sort((a, b) => a.priority - b.priority);
 
   return (
-    <div className="page-shell lp-page course-catalog-page academic-page">
+    <div className="page-shell lp-page course-catalog-page academic-page clean-courses-page">
       <SiteHeader />
       <main className="lp-main">
-        <section className="site-container lp-section" id="courses">
-          <div className="lp-section-head compact-section-head">
-            <div>
-              <p className="lp-kicker">Courses</p>
-              <h1>Courses</h1>
-            </div>
-          </div>
+        <section className="site-container clean-page-section">
+          <header className="clean-page-head">
+            <p className="lp-kicker">Courses</p>
+            <h1>Courses</h1>
+          </header>
 
-          <div className="lp-course-grid flagship-course-grid">
+          <div className="clean-course-list">
             {sortedCourses.map((course) => (
-              <Link className="lp-course-card academic-course-card" href={course.href} key={course.slug}>
-                <div className="lp-card-thumb academic-card-thumb">
+              <Link className="clean-course-row" href={course.href} key={course.slug}>
+                <div className="clean-course-main">
                   <span>{course.pillar}</span>
-                  <strong>{course.shortTitle}</strong>
-                </div>
-                <div className="lp-card-body">
-                  <h3>{course.title}</h3>
+                  <h2>{course.title}</h2>
                   <p>{course.description}</p>
-                  <div className="lp-meta"><span>{course.level}</span><span>{course.duration}</span></div>
-                  <strong className="lp-link-text">Open course →</strong>
+                </div>
+                <div className="clean-course-meta">
+                  <strong>{course.duration}</strong>
+                  <small>{course.level}</small>
                 </div>
               </Link>
             ))}

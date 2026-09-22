@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { VideoCoursePlayer } from "@/components/VideoCoursePlayer";
-import { coursePages, coursesBySlug, type Course } from "@/data/courses";
+import { courses, coursesBySlug, type Course } from "@/data/courses";
 import { youtubeChannelUrl, youtubeEmbedUrl, youtubeSeries } from "@/data/youtube";
 
 type CoursePageProps = {
@@ -24,11 +24,13 @@ function getSeriesForCourse(slug: string) {
 }
 
 function isCourseRoutable(course: Course) {
-  return course.href === `/courses/${course.slug}` || Boolean(getSeriesForCourse(course.slug));
+  return course.href === `/courses/${course.slug}` || course.href === "/curriculum" || Boolean(getSeriesForCourse(course.slug));
 }
 
 export function generateStaticParams() {
-  return coursePages.map((course) => ({ slug: course.slug }));
+  return courses
+    .filter((course) => course.slug !== "third-year-cpp-eda-hft")
+    .map((course) => ({ slug: course.slug }));
 }
 
 export async function generateMetadata({ params }: CoursePageProps): Promise<Metadata> {

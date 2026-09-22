@@ -7,7 +7,7 @@ export function SiteHeader() {
       <div className="site-identity-bar">
         <div className="site-container site-identity-inner">
           <span>cppvalley</span>
-          <span>C++ · HFT · AI Systems · Interviews</span>
+          <span>C++ · EDA · HFT · AI Systems · Interviews</span>
         </div>
       </div>
 
@@ -20,11 +20,11 @@ export function SiteHeader() {
           <span className="site-program">Systems Interview Institute</span>
 
           <nav className="site-nav" aria-label="Primary navigation">
+            <Link href="/courses/third-year-cpp-eda-hft">Student Roadmap</Link>
             <Link href="/courses">Courses</Link>
-            <Link href="/blog">Daily Blog</Link>
-            <Link href="/interviews">Interviews</Link>
-            <Link href="/books">Books</Link>
             <Link href="/youtube">YouTube</Link>
+            <Link href="/blog">Blog</Link>
+            <Link href="/interviews">Interviews</Link>
             <Link className="site-preview" href="/curriculum">
               HFT Curriculum
             </Link>

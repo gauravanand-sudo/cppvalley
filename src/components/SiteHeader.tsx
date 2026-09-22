@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { BrandLockup } from "@/components/BrandLockup";
-import { CourseCta } from "@/components/CourseCta";
 
 export function SiteHeader() {
   return (
@@ -8,7 +7,7 @@ export function SiteHeader() {
       <div className="site-identity-bar">
         <div className="site-container site-identity-inner">
           <span>cppvalley</span>
-          <span>C++ · Systems · Low Latency · HFT</span>
+          <span>C++ · HFT · AI Systems · Interviews</span>
         </div>
       </div>
 
@@ -18,20 +17,17 @@ export function SiteHeader() {
             <BrandLockup />
           </Link>
 
-          <span className="site-program">HFT Core Systems</span>
+          <span className="site-program">Systems Interview Institute</span>
 
           <nav className="site-nav" aria-label="Primary navigation">
-            <Link href="/curriculum">Curriculum</Link>
-            <Link href="/blog">Blog</Link>
-            <Link className="site-preview" href="/curriculum/01-define-latency-like-an-engineer">
-              Preview lesson
+            <Link href="/courses">Courses</Link>
+            <Link href="/blog">Daily Blog</Link>
+            <Link href="/interviews">Interviews</Link>
+            <Link href="/books">Books</Link>
+            <Link href="/youtube">YouTube</Link>
+            <Link className="site-preview" href="/curriculum">
+              HFT Curriculum
             </Link>
-            <CourseCta
-              className="site-enroll"
-              checkoutLabel="Enroll"
-              fallbackLabel="View course"
-              fallbackHref="/curriculum"
-            />
           </nav>
         </div>
       </div>

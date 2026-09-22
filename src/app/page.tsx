@@ -61,7 +61,7 @@ const featuredCourses = [
     title: "C++ Interview Video Library",
     href: "/youtube",
     level: "Intermediate",
-    text: "Your cppvalley videos organized like a course catalog: virtual functions, unique_ptr, atomics, cache coherence and low-latency C++.",
+    text: "cppvalley videos organized like a course catalog: virtual functions, unique_ptr, atomics, cache coherence and low-latency C++.",
     lessons: "8 videos",
     duration: "4+ hours",
     rating: "4.7",
@@ -189,7 +189,7 @@ export default function Home() {
           <div className="market-section-head">
             <div>
               <p className="market-eyebrow">Guided paths</p>
-              <h2>Grokking-style roadmaps by role</h2>
+              <h2>Role-based roadmaps</h2>
             </div>
           </div>
           <div className="market-path-list">

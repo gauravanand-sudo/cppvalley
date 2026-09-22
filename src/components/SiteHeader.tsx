@@ -25,6 +25,10 @@ export function SiteHeader() {
               <Link href={item.href} key={item.href}>{item.label}</Link>
             ))}
           </nav>
+
+          <Link className="site-header-cta" href="/courses/third-year-cpp-eda-hft">
+            Start here
+          </Link>
         </div>
       </div>
     </header>

@@ -160,7 +160,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
   };
 
   return (
-    <div className="page-shell lp-page course-detail-page modern-page">
+    <div className="page-shell lp-page course-detail-page modern-page market-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
@@ -168,44 +168,83 @@ export default async function CoursePage({ params }: CoursePageProps) {
       <SiteHeader />
 
       <main className="lp-main">
-        <section className="site-container lp-section course-detail-simple smooth-course-detail">
-          <nav className="lp-breadcrumb" aria-label="Breadcrumb">
-            <Link href="/courses">Courses</Link>
-            <span>/</span>
-            <span>{course.shortTitle}</span>
-          </nav>
-
-          <p className="lp-kicker">{course.pillar}</p>
-          <h1>{course.title}</h1>
-          <p>{course.description}</p>
-          <div className="lp-meta"><span>{courseSignal(course)}</span><span>{course.level}</span><span>{course.duration}</span></div>
-          <div className="lp-actions course-detail-actions">
-            <Link className="lp-button primary" href="/interviews">Practice interview questions</Link>
-            <Link className="lp-button" href="/courses">All courses</Link>
+        <section className="market-page-hero">
+          <div className="site-container">
+            <div className="market-hero-copy">
+              <nav className="lp-breadcrumb" aria-label="Breadcrumb">
+                <Link href="/courses">Courses</Link>
+                <span>/</span>
+                <span>{course.shortTitle}</span>
+              </nav>
+              <p className="lp-kicker">{course.pillar}</p>
+              <h1>{course.title}</h1>
+              <p>{course.description}</p>
+              <div className="market-rating-row"><strong>4.8</strong><span>{courseSignal(course)}</span><span>{course.level}</span><span>{course.duration}</span></div>
+            </div>
+            <aside className="market-hero-panel">
+              <strong>Course preview</strong>
+              <ul>
+                <li>{course.modules.length} modules</li>
+                <li>{course.tags.slice(0, 3).join(" · ")}</li>
+                <li>Outcome, prerequisites and module map included</li>
+              </ul>
+              <Link className="lp-button primary" href="/interviews">Practice interview questions</Link>
+              <Link className="lp-button" href="/courses">All courses</Link>
+            </aside>
           </div>
+        </section>
 
-          <div className="course-insight-grid" aria-label="Course guidance">
-            <article className="course-insight-card">
-              <span>Outcome</span>
-              <p>{courseOutcome(course)}</p>
-            </article>
-            <article className="course-insight-card">
-              <span>Good for</span>
-              <p>{courseGoodFor(course)}</p>
-            </article>
-            <article className="course-insight-card">
-              <span>Prerequisites</span>
-              <p>{coursePrerequisites(course)}</p>
-            </article>
-          </div>
+        <section className="site-container lp-section">
+          <div className="market-layout">
+            <aside className="market-sidebar" aria-label="Course summary">
+              <div className="market-sidebar-section">
+                <h3>This course includes</h3>
+                <ul>
+                  <li>{course.modules.length} modules</li>
+                  <li>{course.level}</li>
+                  <li>{course.duration}</li>
+                  <li>{course.pillar}</li>
+                </ul>
+              </div>
+              <div className="market-sidebar-section">
+                <h3>Tags</h3>
+                <ul>{course.tags.map((tag) => <li key={tag}>{tag}</li>)}</ul>
+              </div>
+            </aside>
 
-          <div className="course-module-grid">
-            {course.modules.map((module, index) => (
-              <article className="course-module-card" key={module}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <strong>{module}</strong>
-              </article>
-            ))}
+            <div className="market-content-column">
+              <div className="course-insight-grid" aria-label="Course guidance">
+                <article className="course-insight-card">
+                  <span>Outcome</span>
+                  <p>{courseOutcome(course)}</p>
+                </article>
+                <article className="course-insight-card">
+                  <span>Good for</span>
+                  <p>{courseGoodFor(course)}</p>
+                </article>
+                <article className="course-insight-card">
+                  <span>Prerequisites</span>
+                  <p>{coursePrerequisites(course)}</p>
+                </article>
+              </div>
+
+              <div className="market-section-head">
+                <div>
+                  <p className="lp-kicker">Curriculum</p>
+                  <h2>What you will study</h2>
+                  <p>Modules are shown like a course curriculum so you can scan the path before starting.</p>
+                </div>
+              </div>
+
+              <div className="course-module-grid">
+                {course.modules.map((module, index) => (
+                  <article className="course-module-card" key={module}>
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <strong>{module}</strong>
+                  </article>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       </main>

@@ -9,7 +9,7 @@ import { interviewQuestionCount, interviewSets } from "@/data/interviews";
 export const metadata: Metadata = {
   title: "Interview Questions — C++, HFT, EDA and Systems",
   description:
-    "Company-style C++, HFT, EDA and AI systems interview questions with answer frameworks, topics, round types and preparation paths from cppvalley.",
+    "Company-style C++, HFT, EDA and systems interview questions with answer frameworks, topics and preparation paths from cppvalley.",
   alternates: { canonical: "/interviews" },
   keywords: [
     "C++ interview questions",
@@ -43,24 +43,6 @@ const roundTypes = [
   "Project deep dive",
 ] as const;
 
-const publishingSteps = [
-  {
-    title: "Add company set",
-    image: "/course-cover/company-interview-set",
-    text: "Create or extend one object in src/data/interviews.ts with company, role focus, SEO description and tags.",
-  },
-  {
-    title: "Add questions",
-    image: "/course-cover/interview-questions-daily",
-    text: "Write original prompts, answer framework bullets and related topics. Keep every question searchable and useful.",
-  },
-  {
-    title: "Publish and link",
-    image: "/course-cover/interview-seo-publishing",
-    text: "The dynamic page, sitemap entry, internal links, FAQ schema and ad placements are generated from the data.",
-  },
-] as const;
-
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "ItemList",
@@ -88,20 +70,19 @@ export default function InterviewsPage() {
               <p className="lp-kicker">Interview questions</p>
               <h1>Company-style question banks for C++ systems roles.</h1>
               <p>
-                Publish one company or topic page at a time. Each page has focused prompts, answer frameworks, related topics, internal links and monetization slots without disrupting readability.
+                Practice original prompts for C++, HFT, EDA, low-latency and systems interviews. Each question includes a clear answer framework and related topic tags.
               </p>
               <div className="lp-actions">
                 <Link className="lp-button primary" href="#company-question-banks">Browse question banks</Link>
                 <Link className="lp-button" href="/courses">Study courses</Link>
               </div>
             </div>
-            <aside className="lp-hero-card home-hero-image-card">
-              <img src="/course-cover/interview-question-bank" alt="Interview question bank cover" />
-              <div className="lp-card-body">
-                <span className="course-badge">Practice library</span>
-                <h2>{interviewQuestionCount} questions · {interviewSets.length} sets</h2>
-                <p>Add questions daily using <code>src/data/interviews.ts</code>. The sitemap and dynamic pages update automatically.</p>
+            <aside className="lp-hero-card">
+              <div className="lp-hero-card-top">
+                <span>Practice library</span>
+                <strong>{interviewQuestionCount} questions · {interviewSets.length} sets</strong>
               </div>
+              <p>Use these pages for structured preparation. Every prompt is written as practice material, not as leaked interview content.</p>
             </aside>
           </div>
         </section>
@@ -117,9 +98,9 @@ export default function InterviewsPage() {
         <section className="site-container lp-section" id="company-question-banks">
           <div className="lp-section-head">
             <div>
-              <p className="lp-kicker">Company and topic pages</p>
-              <h2>Question banks ready for search traffic</h2>
-              <p>Use these pages for company-style practice. Avoid posting confidential or leaked interview content; publish original explanations and prompts instead.</p>
+              <p className="lp-kicker">Question banks</p>
+              <h2>Practice by company or topic</h2>
+              <p>Pick a set, answer out loud, then compare your reasoning with the framework.</p>
             </div>
           </div>
 
@@ -129,40 +110,22 @@ export default function InterviewsPage() {
                 {index === 2 ? (
                   <AdSlot slot={interviewsFeedAdSlot} className="ad-slot-inarticle" />
                 ) : null}
-                <Link className="lp-course-card image-course-card interview-company-card" href={`/interviews/${set.slug}`}>
-                  <img className="course-card-image" src={`/course-cover/${set.slug}`} alt={`${set.pageTitle} cover`} loading="lazy" />
+                <Link className="lp-course-card interview-company-card" href={`/interviews/${set.slug}`}>
+                  <div className="lp-card-thumb">
+                    <span>{set.company}</span>
+                    <strong>{set.roleFocus}</strong>
+                  </div>
                   <div className="lp-card-body">
-                    <div className="course-card-topline"><span className="course-badge">{set.company}</span><span>{set.questions.length} questions</span></div>
+                    <span className="course-badge">{set.questions.length} questions</span>
                     <h3>{set.pageTitle}</h3>
                     <p>{set.description}</p>
                     <div className="course-tags">
                       {set.tags.map((tag) => <span key={tag}>{tag}</span>)}
                     </div>
-                    <strong className="lp-link-text">Open question set →</strong>
+                    <div className="lp-card-footer"><strong>Open question set →</strong></div>
                   </div>
                 </Link>
               </Fragment>
-            ))}
-          </div>
-        </section>
-
-        <section className="site-container lp-section daily-publishing-panel">
-          <div className="lp-section-head">
-            <div>
-              <p className="lp-kicker">Publishing workflow</p>
-              <h2>How to add one interview page or question daily</h2>
-            </div>
-          </div>
-          <div className="lp-course-grid">
-            {publishingSteps.map((step, index) => (
-              <article className="lp-card image-course-card" key={step.title}>
-                <img className="course-card-image" src={step.image} alt={`${step.title} cover`} loading="lazy" />
-                <div className="lp-card-body">
-                  <span className="course-badge">Step {index + 1}</span>
-                  <h3>{step.title}</h3>
-                  <p>{step.text}</p>
-                </div>
-              </article>
             ))}
           </div>
         </section>

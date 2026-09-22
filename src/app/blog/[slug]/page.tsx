@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdSlot } from "@/components/AdSlot";
 import { BlogEngagement } from "@/components/BlogEngagement";
-import { MdxArticle } from "@/components/MdxArticle";
+import { BlogReadingTools } from "@/components/BlogReadingTools";
+import { MdxArticle, getMdxHeadings } from "@/components/MdxArticle";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts, blogPostsBySlug } from "@/data/blog";
@@ -14,6 +15,17 @@ type BlogPostPageProps = {
 
 const blogArticleTopAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_ARTICLE_TOP_SLOT;
 const blogArticleBottomAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_ARTICLE_BOTTOM_SLOT;
+
+const sourceNotes: Record<string, { title: string; author: string; date: string; note: string }> = {
+  "cpp-hft-actor-messaging-fast-send-3370ns-to-30ns": {
+    title:
+      "Adapting the Actor Model of Concurrency for High-Frequency Trading: Synchronous Message Delivery (fast_send) and a Tick-to-Book Latency Study",
+    author: "Vincent Maciejewski",
+    date: "September 2026",
+    note:
+      "This post explains the paper's reported measurements and architecture at a student-friendly level. Treat the benchmark numbers as workload-specific, not universal performance guarantees.",
+  },
+};
 
 export function generateStaticParams() {
   return blogPosts.map((post) => ({ slug: post.slug }));
@@ -36,6 +48,13 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       url: `/blog/${post.slug}`,
       type: "article",
       publishedTime: `${post.publishedAt}T00:00:00.000Z`,
+      images: [{ url: `/blog/${post.slug}/opengraph-image`, alt: post.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: [`/blog/${post.slug}/opengraph-image`],
     },
   };
 }
@@ -55,6 +74,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   if (!post) notFound();
 
+  const headings = getMdxHeadings(post.mdx).slice(0, 32);
+  const source = sourceNotes[post.slug];
   const sortedPosts = [...blogPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
   const currentIndex = sortedPosts.findIndex((item) => item.slug === post.slug);
   const previousPost = sortedPosts[currentIndex + 1];
@@ -110,6 +131,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       />
 
       <SiteHeader />
+      <BlogReadingTools headings={headings} />
 
       <main className="blog-post-main lp-main">
         <div className="site-container blog-post-shell content-with-sidebar">
@@ -135,6 +157,15 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
             <MdxArticle source={post.mdx} />
 
+            {source ? (
+              <aside className="article-source-box" aria-label="Source note">
+                <span>Source</span>
+                <strong>{source.title}</strong>
+                <p>{source.author} · {source.date}</p>
+                <p>{source.note}</p>
+              </aside>
+            ) : null}
+
             <AdSlot slot={blogArticleBottomAdSlot} className="ad-slot-leaderboard" />
 
             <nav className="article-prev-next" aria-label="Article navigation">
@@ -152,6 +183,21 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </div>
 
           <aside className="content-sidebar article-sidebar">
+            {headings.length ? (
+              <div className="lp-card article-toc-card">
+                <div className="lp-card-body">
+                  <span className="course-badge">On this page</span>
+                  <nav className="article-toc" aria-label="Article table of contents">
+                    {headings.map((heading) => (
+                      <a className={heading.level === 3 ? "toc-indent" : undefined} href={`#${heading.id}`} key={`${heading.id}-${heading.text}`}>
+                        {heading.text}
+                      </a>
+                    ))}
+                  </nav>
+                </div>
+              </div>
+            ) : null}
+
             <div className="lp-card">
               <div className="lp-card-body">
                 <span className="course-badge">Continue learning</span>

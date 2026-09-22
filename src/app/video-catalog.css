@@ -1,0 +1,437 @@
+.video-catalog-page {
+  background: #f7f9fa;
+  color: #1c1d1f;
+}
+
+.video-catalog-page main {
+  background: #f7f9fa;
+}
+
+.youtube-catalog-hero {
+  background: #1c1d1f;
+  color: #ffffff;
+  border-bottom: 1px solid #2d2f31;
+}
+
+.youtube-catalog-hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+  gap: 2.25rem;
+  align-items: center;
+  padding: clamp(2.6rem, 6vw, 5rem) 0;
+}
+
+.youtube-kicker {
+  margin: 0 0 0.75rem;
+  color: #c0c4fc;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.youtube-catalog-copy h1 {
+  max-width: 880px;
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(2.4rem, 5.8vw, 5.2rem);
+  line-height: 1;
+  letter-spacing: -0.055em;
+}
+
+.youtube-catalog-copy p {
+  max-width: 780px;
+  color: #e5e7eb;
+  font-size: clamp(1.02rem, 1.45vw, 1.22rem);
+  line-height: 1.62;
+}
+
+.youtube-search-box {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  max-width: 780px;
+  margin-top: 1.25rem;
+  border: 1px solid #ffffff;
+  background: #ffffff;
+  color: #1c1d1f;
+  padding: 0.9rem 1rem;
+  box-shadow: 0 6px 0 #a435f0;
+}
+
+.youtube-search-box span {
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.youtube-search-box strong {
+  font-weight: 900;
+}
+
+.youtube-search-box em {
+  color: #4b5563;
+  font-style: normal;
+}
+
+.youtube-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.3rem;
+}
+
+.youtube-primary-cta,
+.youtube-secondary-cta,
+.youtube-text-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid #a435f0;
+  background: #a435f0;
+  color: #ffffff !important;
+  padding: 0.72rem 1rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.youtube-secondary-cta {
+  background: #ffffff;
+  color: #5624d0 !important;
+}
+
+.youtube-text-cta {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: transparent;
+}
+
+.youtube-featured-course {
+  border: 1px solid #d1d7dc;
+  background: #ffffff;
+  color: #1c1d1f;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.26);
+}
+
+.youtube-featured-video,
+.youtube-course-frame,
+.youtube-row-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #111827;
+}
+
+.youtube-featured-video iframe,
+.youtube-course-frame iframe,
+.youtube-row-video iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.youtube-featured-meta {
+  padding: 1rem;
+}
+
+.youtube-featured-meta > span,
+.youtube-course-topic,
+.youtube-row-copy span {
+  display: inline-flex;
+  width: fit-content;
+  background: #eceb98;
+  color: #3d3c0a;
+  padding: 0.2rem 0.45rem;
+  font-size: 0.74rem;
+  font-weight: 900;
+}
+
+.youtube-featured-meta h2 {
+  margin: 0.75rem 0 0.4rem;
+  color: #1c1d1f;
+  font-size: 1.25rem;
+  line-height: 1.16;
+}
+
+.youtube-featured-meta p {
+  margin: 0 0 0.7rem;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.youtube-rating-row,
+.youtube-card-rating,
+.youtube-course-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  color: #6a6f73;
+  font-size: 0.9rem;
+}
+
+.youtube-rating-row b,
+.youtube-card-rating b {
+  color: #b4690e;
+}
+
+.youtube-rating-row span,
+.youtube-card-rating span {
+  color: #b4690e;
+}
+
+.youtube-featured-meta a,
+.youtube-course-footer a,
+.youtube-block-head a,
+.youtube-side-cta a {
+  color: #5624d0;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.youtube-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: #d1d7dc;
+  border: 1px solid #d1d7dc;
+  margin-top: 1.2rem;
+}
+
+.youtube-stats-row div {
+  background: #ffffff;
+  padding: 1rem;
+}
+
+.youtube-stats-row strong {
+  display: block;
+  color: #1c1d1f;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.youtube-stats-row span {
+  color: #6a6f73;
+  font-weight: 800;
+}
+
+.youtube-topic-bar,
+.youtube-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.youtube-topic-bar a,
+.youtube-chip-row span,
+.youtube-keyword-pills span {
+  border: 1px solid #d1d7dc;
+  background: #ffffff;
+  color: #1c1d1f;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.youtube-topic-bar a:hover {
+  color: #5624d0;
+  border-color: #5624d0;
+}
+
+.youtube-catalog-layout {
+  display: grid;
+  grid-template-columns: 285px minmax(0, 1fr);
+  gap: 1.2rem;
+  align-items: start;
+  padding: 1.4rem 0 3rem;
+}
+
+.youtube-filter-panel {
+  position: sticky;
+  top: 92px;
+  border: 1px solid #d1d7dc;
+  background: #ffffff;
+  padding: 1rem;
+}
+
+.youtube-filter-panel h2 {
+  margin: 0 0 0.4rem;
+  color: #1c1d1f;
+  font-size: 1.15rem;
+}
+
+.youtube-filter-panel p {
+  margin: 0 0 0.9rem;
+  color: #6a6f73;
+  line-height: 1.5;
+}
+
+.youtube-path-list {
+  display: grid;
+}
+
+.youtube-path-list a {
+  display: block;
+  border-top: 1px solid #d1d7dc;
+  padding: 0.8rem 0;
+  color: #1c1d1f;
+  text-decoration: none;
+}
+
+.youtube-path-list strong,
+.youtube-path-list span {
+  display: block;
+}
+
+.youtube-path-list span {
+  color: #6a6f73;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  margin-top: 0.2rem;
+}
+
+.youtube-side-cta {
+  margin-top: 1rem;
+  border: 1px solid #d1d7dc;
+  background: #f7f9fa;
+  padding: 0.85rem;
+}
+
+.youtube-course-block {
+  margin-bottom: 2rem;
+}
+
+.youtube-block-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: end;
+  margin-bottom: 0.9rem;
+}
+
+.youtube-block-head p {
+  margin: 0 0 0.25rem;
+  color: #6a6f73;
+  font-weight: 800;
+}
+
+.youtube-block-head h2 {
+  margin: 0;
+  color: #1c1d1f;
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+.youtube-block-description {
+  max-width: 850px;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.youtube-course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.youtube-course-card,
+.youtube-row-card {
+  border: 1px solid #d1d7dc;
+  background: #ffffff;
+  color: #1c1d1f;
+}
+
+.youtube-course-card:hover,
+.youtube-row-card:hover {
+  box-shadow: 0 8px 18px rgba(28, 29, 31, 0.12);
+}
+
+.youtube-course-body {
+  padding: 1rem;
+}
+
+.youtube-course-body h3 {
+  margin: 0.65rem 0 0.35rem;
+  color: #1c1d1f;
+  font-size: 1.1rem;
+  line-height: 1.18;
+}
+
+.youtube-course-instructor,
+.youtube-course-intent {
+  color: #6a6f73;
+  line-height: 1.5;
+}
+
+.youtube-row-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.youtube-row-card {
+  display: grid;
+  grid-template-columns: 56px 220px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem;
+}
+
+.youtube-row-number {
+  color: #5624d0;
+  font-weight: 900;
+  text-align: center;
+}
+
+.youtube-row-copy h3 {
+  margin: 0.35rem 0;
+  color: #1c1d1f;
+  line-height: 1.18;
+}
+
+.youtube-row-copy p,
+.youtube-row-copy small {
+  color: #6a6f73;
+  line-height: 1.45;
+}
+
+.youtube-keyword-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 980px) {
+  .youtube-catalog-hero-inner,
+  .youtube-catalog-layout,
+  .youtube-row-card {
+    grid-template-columns: 1fr;
+  }
+
+  .youtube-filter-panel {
+    position: static;
+  }
+
+  .youtube-stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .youtube-hero-actions {
+    flex-direction: column;
+  }
+
+  .youtube-primary-cta,
+  .youtube-secondary-cta,
+  .youtube-text-cta {
+    width: 100%;
+  }
+
+  .youtube-stats-row {
+    grid-template-columns: 1fr;
+  }
+}

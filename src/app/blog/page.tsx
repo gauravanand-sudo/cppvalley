@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AdSlot } from "@/components/AdSlot";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts } from "@/data/blog";
@@ -16,6 +17,9 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
+
+const blogTopAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_TOP_SLOT;
+const blogFeedAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_FEED_SLOT;
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en", {
@@ -55,6 +59,10 @@ export default function BlogPage() {
           </div>
         </section>
 
+        <div className="site-container">
+          <AdSlot slot={blogTopAdSlot} className="ad-slot-leaderboard" />
+        </div>
+
         <section className="site-container blog-index" aria-labelledby="latest-posts-heading">
           <div className="blog-index-heading">
             <h2 id="latest-posts-heading">Latest articles</h2>
@@ -63,15 +71,24 @@ export default function BlogPage() {
 
           {posts.length > 0 ? (
             <div className="blog-list">
-              {posts.map((post) => (
-                <Link className="blog-list-item" href={`/blog/${post.slug}`} key={post.slug}>
-                  <span className="blog-list-date">{formatDate(post.publishedAt)}</span>
-                  <div className="blog-list-copy">
-                    <h2>{post.title}</h2>
-                    <p>{post.excerpt}</p>
-                  </div>
-                  <span className="blog-list-arrow" aria-hidden="true">→</span>
-                </Link>
+              {posts.map((post, index) => (
+                <>
+                  {index === 2 ? (
+                    <AdSlot
+                      slot={blogFeedAdSlot}
+                      className="ad-slot-leaderboard"
+                      key="blog-feed-ad"
+                    />
+                  ) : null}
+                  <Link className="blog-list-item" href={`/blog/${post.slug}`} key={post.slug}>
+                    <span className="blog-list-date">{formatDate(post.publishedAt)}</span>
+                    <div className="blog-list-copy">
+                      <h2>{post.title}</h2>
+                      <p>{post.excerpt}</p>
+                    </div>
+                    <span className="blog-list-arrow" aria-hidden="true">→</span>
+                  </Link>
+                </>
               ))}
             </div>
           ) : (

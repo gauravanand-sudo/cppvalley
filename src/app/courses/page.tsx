@@ -2,186 +2,157 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { coursePillars, courseStats, courses } from "@/data/courses";
 
 export const metadata: Metadata = {
-  title: "Courses — C++, EDA, HFT and AI Systems",
+  title: "Courses — C++, HFT, EDA, CUDA, GPU and AI Systems",
   description:
-    "Browse cppvalley course tracks for Core C++, EDA/HFT preparation, HFT systems, design patterns, concurrency, AI systems and performance engineering.",
+    "Browse the cppvalley course catalog covering Core C++, advanced modern C++, STL and LLD, concurrency, Linux, HFT, trading systems, EDA, CUDA, GPU programming, AI systems and distributed backend infrastructure.",
   alternates: { canonical: "/courses" },
+  keywords: [
+    "C++ courses",
+    "HFT systems course",
+    "CUDA GPU programming course",
+    "AI systems engineering course",
+    "EDA software engineering course",
+    "low latency C++ course",
+    "C++ concurrency course",
+    "systems interview preparation",
+  ],
 };
 
-const filters = ["All", "C++", "Student", "EDA", "HFT", "Concurrency", "AI Systems", "Projects"] as const;
-
-const courses = [
+const launchPlan = [
   {
-    id: "student-cpp-eda-hft",
-    badge: "Guided project path",
-    status: "Available",
-    href: "/courses/third-year-cpp-eda-hft",
-    title: "3rd/4th Year C++ → EDA/HFT Track",
-    provider: "cppvalley",
-    level: "Beginner to internship-ready",
-    text: "A practical path into C++ systems, EDA CAD software, semiconductor tooling, HFT engineering and performance-heavy backend roles.",
-    lessons: "8 modules",
-    duration: "12 weeks",
-    rating: "4.9",
-    skills: ["Modern C++", "OS/Linux", "Architecture", "EDA", "HFT", "Projects"],
+    phase: "Phase 1",
+    title: "Launch foundation",
+    text: "Core C++, student roadmap, HFT/low-latency and AI systems give the site enough breadth without looking empty.",
   },
   {
-    id: "core-cpp",
-    badge: "Core foundation",
-    status: "Available",
-    href: "/courses#core-cpp",
-    title: "Core C++ for Interviews",
-    provider: "cppvalley",
-    level: "Beginner to advanced",
-    text: "A zero-to-senior C++ course around Effective Modern C++, Effective STL and practical interview topics.",
-    lessons: "97 lessons",
-    duration: "8 weeks",
-    rating: "4.8",
-    skills: ["RAII", "Smart pointers", "Move semantics", "Templates", "STL", "Tooling"],
+    phase: "Phase 2",
+    title: "Add systems depth",
+    text: "Concurrency, Linux/networking, STL/LLD and trading systems turn cppvalley into a serious systems platform.",
   },
   {
-    id: "hft",
-    badge: "Systems specialization",
-    status: "Available",
-    href: "/curriculum",
-    title: "HFT Core Systems",
-    provider: "cppvalley",
-    level: "Intermediate to advanced",
-    text: "CPU, Linux, networking, low latency, market data, execution, risk and tick-to-trade systems.",
-    lessons: "96 lessons",
-    duration: "9 phases",
-    rating: "4.9",
-    skills: ["Latency", "CPU", "Linux", "Networking", "Market data", "Execution"],
-  },
-  {
-    id: "lld",
-    badge: "Design track",
-    status: "Outline",
-    href: "/courses#lld",
-    title: "Design Patterns + LLD in Modern C++",
-    provider: "cppvalley",
-    level: "Intermediate to senior",
-    text: "Modern C++ design thinking for interviews: SOLID, dependency inversion, type erasure, patterns and LLD problems.",
-    lessons: "Planned",
-    duration: "6 weeks",
-    rating: "New",
-    skills: ["Strategy", "Factory", "Observer", "Command", "Adapter", "Type erasure"],
-  },
-  {
-    id: "concurrency",
-    badge: "Concurrency track",
-    status: "Outline",
-    href: "/courses#concurrency",
-    title: "C++ Multithreading and Concurrency",
-    provider: "cppvalley",
-    level: "Intermediate to senior",
-    text: "Threads, locks, condition variables, futures, atomics, memory ordering and concurrent systems.",
-    lessons: "Planned",
-    duration: "7 weeks",
-    rating: "New",
-    skills: ["std::thread", "Mutexes", "Futures", "Atomics", "Memory ordering", "Queues"],
-  },
-  {
-    id: "ai-systems",
-    badge: "Systems design",
-    status: "Outline",
-    href: "/courses#ai-systems",
-    title: "AI Systems Engineering",
-    provider: "cppvalley",
-    level: "Intermediate to architect",
-    text: "RAG, vector search, inference serving, batching, evals, agents, reliability and cost-aware architecture.",
-    lessons: "Planned",
-    duration: "6 weeks",
-    rating: "New",
-    skills: ["RAG", "Vector DBs", "Serving", "Batching", "Evals", "Agents"],
-  },
-  {
-    id: "performance",
-    badge: "Project lab",
-    status: "Project based",
-    href: "/projects",
-    title: "Compiler, Performance and Systems Labs",
-    provider: "cppvalley",
-    level: "Advanced",
-    text: "Portfolio-grade labs: parsers, compilers, profilers, allocators, benchmark harnesses and low-level systems projects.",
-    lessons: "Project based",
-    duration: "Self paced",
-    rating: "Lab",
-    skills: ["Compiler", "Memory pool", "Profiler", "Benchmarking", "Parsing", "Tracing"],
+    phase: "Phase 3",
+    title: "Add specialist tracks",
+    text: "EDA, CUDA/GPU, advanced C++ and distributed AI infrastructure complete the long-term catalog.",
   },
 ] as const;
 
 export default function CoursesPage() {
+  const sortedCourses = [...courses].sort((a, b) => a.priority - b.priority);
+
   return (
-    <div className="page-shell lp-page">
+    <div className="page-shell lp-page course-catalog-page">
       <SiteHeader />
       <main className="lp-main">
         <section className="catalog-hero">
-          <div className="site-container catalog-hero-inner">
+          <div className="site-container lp-hero-inner">
             <div>
               <p className="lp-kicker">Course catalog</p>
-              <h1>Courses for C++, EDA, HFT and AI systems interviews.</h1>
+              <h1>12 flagship courses covering C++, HFT, EDA, CUDA, GPU and AI systems.</h1>
               <p>
-                Browse role-oriented tracks, study the modules, watch related videos, build projects and practice explaining design decisions clearly.
+                The catalog is intentionally focused: enough courses to cover the full systems roadmap, not so many that learners get lost. Every course has an image-first card, clear level, duration, modules, outcomes and projects.
               </p>
               <div className="lp-actions">
-                <Link className="lp-button primary" href="/youtube">Video lessons</Link>
-                <Link className="lp-button" href="/projects">Project labs</Link>
+                <Link className="lp-button primary" href="#all-courses">Browse courses</Link>
+                <Link className="lp-button" href="/interviews">Practice questions</Link>
               </div>
             </div>
-            <aside>
-              <strong>Build depth with a path</strong>
-              <span>Each track connects concepts, projects, videos and interview practice so learning stays focused.</span>
+            <aside className="lp-hero-card">
+              <div className="lp-hero-card-top">
+                <span>Recommended catalog size</span>
+                <strong>{courseStats.totalCourses} main courses</strong>
+              </div>
+              <div className="lp-stat-grid">
+                <div><strong>{courseStats.pillars}</strong><span>pillars</span></div>
+                <div><strong>{courseStats.liveOrBuilding}</strong><span>live/building</span></div>
+                <div><strong>3</strong><span>launch phases</span></div>
+              </div>
             </aside>
           </div>
         </section>
 
-        <section className="site-container catalog-body">
-          <div className="catalog-toolbar">
-            <Link className="catalog-search" href="/courses" aria-label="Search course catalog">
-              Search C++, EDA, HFT, concurrency, AI systems and projects
-            </Link>
-            <div className="catalog-filters">
-              {filters.map((filter) => <span key={filter}>{filter}</span>)}
+        <section className="site-container lp-category-row" aria-label="Course pillars">
+          <a href="#all-courses">All courses</a>
+          {coursePillars.map((pillar) => <a href={`#${pillar.toLowerCase().replaceAll(" ", "-").replaceAll("/", "")}`} key={pillar}>{pillar}</a>)}
+        </section>
+
+        <section className="site-container lp-section course-launch-plan">
+          <div className="lp-section-head">
+            <div>
+              <p className="lp-kicker">Build order</p>
+              <h2>Launch in phases, not chaos</h2>
+            </div>
+          </div>
+          <div className="lp-course-grid">
+            {launchPlan.map((item) => (
+              <article className="lp-card" key={item.phase}>
+                <img className="course-card-image" src={`/course-cover/${item.phase.toLowerCase().replaceAll(" ", "-")}`} alt={`${item.phase} course launch cover`} loading="lazy" />
+                <div className="lp-card-body">
+                  <span className="course-badge">{item.phase}</span>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="site-container lp-section" id="all-courses">
+          <div className="lp-section-head">
+            <div>
+              <p className="lp-kicker">All flagship courses</p>
+              <h2>Image-first course catalog</h2>
+              <p>Each card uses a real generated cover image so the catalog feels like a production learning platform, not a text directory.</p>
             </div>
           </div>
 
-          <div className="catalog-layout">
-            <aside className="catalog-sidebar" aria-label="Learning paths sidebar">
-              <h2>Learning paths</h2>
-              <Link href="/courses/third-year-cpp-eda-hft">Student C++ → EDA/HFT</Link>
-              <Link href="/courses#core-cpp">Core C++ interviews</Link>
-              <Link href="/curriculum">HFT Core Systems</Link>
-              <Link href="/youtube">Video courses</Link>
-              <Link href="/projects">Project labs</Link>
-            </aside>
-
-            <section className="catalog-grid" aria-label="Course cards">
-              {courses.map((course) => (
-                <article className="catalog-card" id={course.id} key={course.id}>
-                  <Link href={course.href}>
-                    <div className="catalog-thumb">
-                      <span>{course.badge}</span>
-                      <strong>{course.title}</strong>
-                    </div>
-                    <div className="catalog-card-body">
-                      <span className="course-badge">{course.provider}</span>
-                      <div className="course-rating"><b>{course.rating === "New" || course.rating === "Lab" ? course.rating : `★ ${course.rating}`}</b><span>{course.status}</span></div>
-                      <h3>{course.title}</h3>
-                      <p>{course.text}</p>
-                      <div className="course-meta"><span>{course.level}</span><span>{course.lessons}</span><span>{course.duration}</span></div>
-                      <div className="course-tags">
-                        {course.skills.map((skill) => <span key={skill}>{skill}</span>)}
-                      </div>
-                    </div>
-                  </Link>
-                </article>
-              ))}
-            </section>
+          <div className="lp-course-grid flagship-course-grid">
+            {sortedCourses.map((course) => (
+              <Link className="lp-course-card image-course-card" href={course.href} id={course.slug} key={course.slug}>
+                <img className="course-card-image" src={course.coverImage} alt={`${course.title} cover`} loading="lazy" />
+                <div className="lp-card-body">
+                  <div className="course-card-topline">
+                    <span className="course-badge">{course.status}</span>
+                    <span>{course.launchPhase}</span>
+                  </div>
+                  <h3>{course.title}</h3>
+                  <p>{course.description}</p>
+                  <div className="lp-meta"><span>{course.level}</span><span>{course.duration}</span><span>{course.lessons}</span></div>
+                  <div className="course-tags">
+                    {course.tags.slice(0, 5).map((tag) => <span key={tag}>{tag}</span>)}
+                  </div>
+                  <strong className="lp-link-text">Open course →</strong>
+                </div>
+              </Link>
+            ))}
           </div>
         </section>
+
+        {coursePillars.map((pillar) => (
+          <section className="site-container lp-section" id={pillar.toLowerCase().replaceAll(" ", "-").replaceAll("/", "")} key={pillar}>
+            <div className="lp-section-head">
+              <div>
+                <p className="lp-kicker">{pillar}</p>
+                <h2>{pillar} courses</h2>
+              </div>
+            </div>
+            <div className="course-row-list">
+              {sortedCourses.filter((course) => course.pillar === pillar).map((course) => (
+                <Link className="course-row-card" href={course.href} key={course.slug}>
+                  <img src={course.coverImage} alt={`${course.title} cover`} loading="lazy" />
+                  <div>
+                    <span>{course.status} · {course.launchPhase}</span>
+                    <h3>{course.title}</h3>
+                    <p>{course.description}</p>
+                  </div>
+                  <strong>{course.duration}</strong>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ))}
       </main>
       <SiteFooter />
     </div>

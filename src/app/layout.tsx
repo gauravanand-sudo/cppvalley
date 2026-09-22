@@ -5,6 +5,7 @@ import "./brand-consistency.css";
 import "./site-stable.css";
 import "./curriculum-platform.css";
 import "./ads.css";
+import "./seo-growth.css";
 
 const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
@@ -41,7 +42,12 @@ export const metadata: Metadata = {
   creator: "cppvalley",
   publisher: "cppvalley",
   category: "Education",
-  alternates: { canonical: "https://cppvalley.com" },
+  alternates: {
+    canonical: "https://cppvalley.com",
+    types: {
+      "application/rss+xml": "https://cppvalley.com/rss.xml",
+    },
+  },
   openGraph: {
     title: "cppvalley — C++ Systems, EDA, HFT & AI Interview Prep",
     description:
@@ -148,10 +154,11 @@ const structuredData = {
       name: "cppvalley learning hubs",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Courses", url: "https://cppvalley.com/courses" },
-        { "@type": "ListItem", position: 2, name: "Videos", url: "https://cppvalley.com/youtube" },
+        { "@type": "ListItem", position: 2, name: "Articles", url: "https://cppvalley.com/blog" },
         { "@type": "ListItem", position: 3, name: "Interview Questions", url: "https://cppvalley.com/interviews" },
-        { "@type": "ListItem", position: 4, name: "Projects", url: "https://cppvalley.com/projects" },
-        { "@type": "ListItem", position: 5, name: "Book Notes", url: "https://cppvalley.com/books" }
+        { "@type": "ListItem", position: 4, name: "Videos", url: "https://cppvalley.com/youtube" },
+        { "@type": "ListItem", position: 5, name: "Projects", url: "https://cppvalley.com/projects" },
+        { "@type": "ListItem", position: 6, name: "Book Notes", url: "https://cppvalley.com/books" }
       ],
     },
   ],

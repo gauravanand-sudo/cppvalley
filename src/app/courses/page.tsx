@@ -4,17 +4,28 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
-  title: "Courses",
+  title: "Courses — C++, EDA, HFT and AI Systems",
   description:
-    "Modular cppvalley courses for Core C++, HFT systems, design patterns, C++ multithreading, AI systems and performance engineering.",
+    "Modular cppvalley courses for Core C++, 3rd/4th year EDA-HFT preparation, HFT systems, C++ design patterns, multithreading, AI systems and performance engineering.",
   alternates: { canonical: "/courses" },
 };
 
 const courses = [
   {
+    id: "student-cpp-eda-hft",
+    status: "New track",
+    live: true,
+    href: "/courses/third-year-cpp-eda-hft",
+    title: "3rd/4th Year C++ → EDA/HFT Track",
+    level: "College student → internship/new-grad ready",
+    text: "For students who want a serious path into C++ systems, EDA CAD software, semiconductor tooling, HFT engineering or performance-heavy backend roles.",
+    modules: ["Modern C++", "DSA for systems", "OS + Linux", "Computer architecture", "EDA software basics", "Low-latency/HFT basics", "Portfolio projects", "Resume + interviews"],
+  },
+  {
     id: "core-cpp",
     status: "Free now",
     live: true,
+    href: "/courses#core-cpp",
     title: "Core C++ for Interviews",
     level: "Beginner → Advanced",
     text: "A natural zero-to-architect C++ course built around Effective Modern C++, Effective STL and interview-important extras like tooling, UB and performance.",
@@ -24,16 +35,17 @@ const courses = [
     id: "hft",
     status: "Roadmap live",
     live: true,
+    href: "/curriculum",
     title: "HFT Core Systems",
     level: "Intermediate → Advanced",
     text: "The existing HFT curriculum becomes one specialized track under cppvalley: CPU, Linux, networking, low latency, market data, execution and risk.",
-    href: "/curriculum",
     modules: ["Latency measurement", "CPU + memory", "Linux tuning", "Networking", "Low-latency C++", "Market data", "Execution + risk", "Tick-to-trade"],
   },
   {
     id: "lld",
     status: "Placeholder",
     live: false,
+    href: "/courses#lld",
     title: "Design Patterns + LLD in Modern C++",
     level: "Intermediate → Senior",
     text: "Klaus Iglberger/Fedor Pikus-style design thinking for interviews: SOLID, dependency inversion, type erasure, patterns and real LLD problems.",
@@ -43,6 +55,7 @@ const courses = [
     id: "concurrency",
     status: "Placeholder",
     live: false,
+    href: "/courses#concurrency",
     title: "C++ Multithreading and Concurrency",
     level: "Intermediate → Senior",
     text: "Anthony Williams-inspired concurrency track: threads, locks, condition variables, futures, atomics, memory ordering and concurrent systems.",
@@ -52,6 +65,7 @@ const courses = [
     id: "ai-systems",
     status: "Placeholder",
     live: false,
+    href: "/courses#ai-systems",
     title: "AI Systems Engineering",
     level: "Intermediate → Architect",
     text: "Systems thinking for modern AI roles: RAG, vector search, inference serving, batching, evals, agents, reliability and cost-aware architecture.",
@@ -61,6 +75,7 @@ const courses = [
     id: "performance",
     status: "Research lab",
     live: false,
+    href: "/projects",
     title: "Compiler, Performance and Systems Labs",
     level: "Advanced",
     text: "Portfolio-grade labs for people who want proof: parsers, compilers, profilers, allocators, benchmark harnesses and low-level systems projects.",
@@ -75,9 +90,9 @@ export default function CoursesPage() {
       <main className="platform-simple-page site-container">
         <section className="platform-page-hero">
           <p className="platform-eyebrow">Courses</p>
-          <h1>One modular catalog for C++, HFT and AI systems preparation.</h1>
+          <h1>Clear tracks for C++, EDA, HFT and AI systems interviews.</h1>
           <p className="page-intro">
-            Start free. Build trust. Turn the catalog into paid cohorts or ads later. Each track is designed as a clear content silo for SEO and a natural learning path for serious engineers.
+            The catalog is built for traffic first: specific course pages, focused keywords, internal links, and clear outcomes. Monetization can come later.
           </p>
         </section>
 
@@ -92,7 +107,7 @@ export default function CoursesPage() {
                 {course.modules.map((module) => <li key={module}>{module}</li>)}
               </ul>
               <div className="platform-card-footer">
-                {"href" in course ? <Link href={course.href}>Open curriculum</Link> : <span>Placeholder ready</span>}
+                <Link href={course.href}>{course.live ? "Open track" : "View placeholder"}</Link>
                 <b>↗</b>
               </div>
             </article>

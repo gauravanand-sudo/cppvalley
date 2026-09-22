@@ -7,13 +7,21 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts } from "@/data/blog";
 
 export const metadata: Metadata = {
-  title: "Articles — cppvalley",
+  title: "Articles — C++, HFT, EDA and AI Systems Notes",
   description:
-    "cppvalley articles on C++, HFT, AI systems, low latency, design patterns, interviews, books, conferences and engineering careers.",
+    "Daily cppvalley articles on C++, HFT, EDA software, low latency, AI systems, design patterns, interviews, books, conferences and engineering careers.",
   alternates: { canonical: "/blog" },
+  keywords: [
+    "C++ blog",
+    "HFT engineering blog",
+    "low latency C++ notes",
+    "EDA software articles",
+    "AI systems engineering articles",
+    "C++ interview preparation"
+  ],
   openGraph: {
     title: "cppvalley Articles",
-    description: "Notes on C++, HFT, AI systems, low latency, interviews and systems engineering.",
+    description: "Daily notes on C++, HFT, EDA, AI systems, low latency, interviews and systems engineering.",
     url: "/blog",
     type: "website",
   },
@@ -34,28 +42,47 @@ function formatDate(value: string) {
 export default function BlogPage() {
   const posts = [...blogPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: "cppvalley Articles",
+    description: metadata.description,
+    url: "https://cppvalley.com/blog",
+    blogPost: posts.slice(0, 20).map((post) => ({
+      "@type": "BlogPosting",
+      headline: post.title,
+      description: post.excerpt,
+      datePublished: post.publishedAt,
+      url: `https://cppvalley.com/blog/${post.slug}`,
+    })),
+  };
+
   return (
     <div className="blog-page lp-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
+      />
       <SiteHeader />
       <main className="blog-main lp-main">
         <section className="blog-hero">
           <div className="site-container lp-hero-inner">
             <div>
               <p className="lp-kicker">Articles</p>
-              <h1>Short systems notes for serious C++ learners.</h1>
+              <h1>Daily systems notes for serious C++ learners.</h1>
               <p>
-                Read practical explanations on C++, HFT, low latency, AI systems, interviews, books and project ideas. Each note is designed to teach one useful engineering idea clearly.
+                Publish one focused article every day: one concept, one example, one interview takeaway, and clear internal links to courses, videos, projects and question banks.
               </p>
               <div className="lp-actions">
-                <Link className="lp-button primary" href="/courses">Explore courses</Link>
-                <Link className="lp-button" href="/youtube">Watch videos</Link>
+                <Link className="lp-button primary" href="#latest-posts-heading">Read latest articles</Link>
+                <Link className="lp-button" href="/interviews">Practice questions</Link>
               </div>
             </div>
 
-            <aside className="blog-hero-side" aria-label="Article focus">
-              <strong>Focused explanations</strong>
-              <strong>Interview-ready takeaways</strong>
-              <strong>Links to courses and projects</strong>
+            <aside className="blog-hero-side" aria-label="Article system">
+              <strong>Daily publishing ready</strong>
+              <strong>Article schema enabled</strong>
+              <strong>Ad slots on index and article pages</strong>
             </aside>
           </div>
         </section>
@@ -63,6 +90,20 @@ export default function BlogPage() {
         <div className="site-container">
           <AdSlot slot={blogTopAdSlot} className="ad-slot-leaderboard" />
         </div>
+
+        <section className="site-container lp-section daily-publishing-panel">
+          <div className="lp-section-head">
+            <div>
+              <p className="lp-kicker">Daily workflow</p>
+              <h2>One daily blog = one searchable topic</h2>
+            </div>
+          </div>
+          <div className="lp-course-grid">
+            <article className="lp-card"><div className="lp-card-body"><span className="course-badge">Topic</span><h3>Target one keyword</h3><p>Examples: virtual destructor C++, false sharing, EDA netlist graph, HFT order book, C++ atomics.</p></div></article>
+            <article className="lp-card"><div className="lp-card-body"><span className="course-badge">Structure</span><h3>Explain, then connect</h3><p>Use short sections, bullets, code ideas, interview prompts and links to courses or projects.</p></div></article>
+            <article className="lp-card"><div className="lp-card-body"><span className="course-badge">Monetize</span><h3>Ads are controlled</h3><p>Top, mid and bottom placements are ready for AdSense without breaking reading flow.</p></div></article>
+          </div>
+        </section>
 
         <section className="site-container blog-index" aria-labelledby="latest-posts-heading">
           <div className="blog-index-heading">
@@ -82,6 +123,11 @@ export default function BlogPage() {
                     <div className="blog-list-copy">
                       <h2>{post.title}</h2>
                       <p>{post.excerpt}</p>
+                      {post.topics?.length ? (
+                        <div className="course-tags">
+                          {post.topics.map((topic) => <span key={topic}>{topic}</span>)}
+                        </div>
+                      ) : null}
                     </div>
                     <span className="blog-list-arrow" aria-hidden="true">→</span>
                   </Link>

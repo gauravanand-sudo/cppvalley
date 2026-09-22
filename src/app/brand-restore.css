@@ -1,0 +1,34 @@
+/* Restore cppvalley logo sizing after the UI cleanup pass. */
+.site-logo .market-brand,
+.lesson-logo .market-brand {
+  width: 150px !important;
+  height: 82px !important;
+  min-width: 150px !important;
+  background-size: contain !important;
+  background-position: left center !important;
+  background-repeat: no-repeat !important;
+}
+
+.site-footer-logo .market-brand {
+  width: 120px !important;
+  height: 66px !important;
+  min-width: 120px !important;
+  background-size: contain !important;
+  background-position: left center !important;
+  background-repeat: no-repeat !important;
+}
+
+@media (max-width: 760px) {
+  .site-logo .market-brand,
+  .lesson-logo .market-brand {
+    width: 136px !important;
+    height: 74px !important;
+    min-width: 136px !important;
+  }
+
+  .site-footer-logo .market-brand {
+    width: 108px !important;
+    height: 60px !important;
+    min-width: 108px !important;
+  }
+}

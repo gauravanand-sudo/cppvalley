@@ -3,7 +3,7 @@ import { BrandLockup } from "@/components/BrandLockup";
 
 const navItems = [
   { href: "/courses", label: "Courses" },
-  { href: "/youtube", label: "Videos" },
+  { href: "/youtube", label: "Video Courses" },
   { href: "/interviews", label: "Questions" },
   { href: "/projects", label: "Projects" },
   { href: "/blog", label: "Articles" },
@@ -12,8 +12,11 @@ const navItems = [
 
 export function SiteHeader() {
   return (
-    <header className="site-header lp-header">
-      <div className="site-header-main">
+    <header className="site-header lp-header academic-header">
+      <div className="academic-brand-bar">
+        <div className="site-container">cppvalley</div>
+      </div>
+      <div className="site-header-main academic-local-header">
         <div className="site-header-inner site-container public-header-inner">
           <Link className="site-logo" href="/" aria-label="cppvalley home">
             <BrandLockup />

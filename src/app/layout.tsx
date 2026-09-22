@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./brand-consistency.css";
-import "./platform.css";
-import "./video-catalog.css";
 import "./site-stable.css";
 
 export const metadata: Metadata = {
@@ -38,13 +36,11 @@ export const metadata: Metadata = {
   creator: "cppvalley",
   publisher: "cppvalley",
   category: "Education",
-  alternates: {
-    canonical: "https://cppvalley.com",
-  },
+  alternates: { canonical: "https://cppvalley.com" },
   openGraph: {
     title: "cppvalley — C++ Systems, EDA, HFT & AI Interview Prep",
     description:
-      "A focused learning hub for C++, EDA software, HFT, low-latency systems and AI systems interviews — with courses, embedded videos, projects, book notes and interview questions.",
+      "A focused learning platform for C++, EDA software, HFT, low-latency systems and AI systems interviews — with courses, embedded videos, projects, book notes and interview questions.",
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
@@ -74,27 +70,36 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: "#0056d2",
   colorScheme: "light",
 };
 
 const logoFitCss = `
 .site-logo .market-brand,
 .lesson-logo .market-brand {
-  width: 150px !important;
-  height: 64px !important;
-  min-width: 150px !important;
+  width: 146px !important;
+  height: 54px !important;
+  min-width: 146px !important;
   background-size: contain !important;
-  background-position: center center !important;
+  background-position: left center !important;
   background-repeat: no-repeat !important;
 }
 
-@media (max-width: 720px) {
+.site-footer-logo .market-brand {
+  width: 156px !important;
+  height: 58px !important;
+  min-width: 156px !important;
+  background-size: contain !important;
+  background-position: left center !important;
+  background-repeat: no-repeat !important;
+}
+
+@media (max-width: 760px) {
   .site-logo .market-brand,
   .lesson-logo .market-brand {
-    width: 116px !important;
-    height: 52px !important;
-    min-width: 116px !important;
+    width: 122px !important;
+    height: 46px !important;
+    min-width: 122px !important;
   }
 }
 `;
@@ -108,11 +113,11 @@ const structuredData = {
       name: "cppvalley",
       url: "https://cppvalley.com",
       description:
-        "C++ systems learning hub for EDA software, HFT, low-latency engineering and AI systems interview preparation.",
+        "C++ systems learning platform for EDA software, HFT, low-latency engineering and AI systems interview preparation.",
       inLanguage: "en",
       potentialAction: {
         "@type": "SearchAction",
-        target: "https://cppvalley.com/blog?query={search_term_string}",
+        target: "https://cppvalley.com/courses?query={search_term_string}",
         "query-input": "required name=search_term_string",
       },
     },
@@ -129,7 +134,7 @@ const structuredData = {
         "EDA software engineering",
         "HFT systems",
         "low-latency C++",
-        "AI systems engineering",
+        "AI systems engineering"
       ],
     },
     {
@@ -141,17 +146,13 @@ const structuredData = {
         { "@type": "ListItem", position: 2, name: "Videos", url: "https://cppvalley.com/youtube" },
         { "@type": "ListItem", position: 3, name: "Interview Questions", url: "https://cppvalley.com/interviews" },
         { "@type": "ListItem", position: 4, name: "Projects", url: "https://cppvalley.com/projects" },
-        { "@type": "ListItem", position: 5, name: "Book Notes", url: "https://cppvalley.com/books" },
+        { "@type": "ListItem", position: 5, name: "Book Notes", url: "https://cppvalley.com/books" }
       ],
     },
   ],
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <head>

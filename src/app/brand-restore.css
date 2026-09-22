@@ -1,21 +1,48 @@
-/* Restore cppvalley logo sizing after the UI cleanup pass. */
+/* Keep the original transparent cppvalley logo visible and unsquashed. */
+.site-logo,
+.lesson-logo,
+.site-footer-logo {
+  display: inline-flex !important;
+  align-items: center !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  text-decoration: none !important;
+}
+
 .site-logo .market-brand,
 .lesson-logo .market-brand {
+  display: block !important;
   width: 150px !important;
   height: 82px !important;
   min-width: 150px !important;
+  flex: 0 0 150px !important;
+  background-color: transparent !important;
+  background-size: contain !important;
+  background-position: left center !important;
+  background-repeat: no-repeat !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
+}
+
+.site-footer-logo .market-brand {
+  display: block !important;
+  width: 120px !important;
+  height: 66px !important;
+  min-width: 120px !important;
+  flex: 0 0 120px !important;
+  background-color: transparent !important;
   background-size: contain !important;
   background-position: left center !important;
   background-repeat: no-repeat !important;
 }
 
-.site-footer-logo .market-brand {
-  width: 120px !important;
-  height: 66px !important;
-  min-width: 120px !important;
-  background-size: contain !important;
-  background-position: left center !important;
-  background-repeat: no-repeat !important;
+.site-header-inner,
+.public-header-inner,
+.clean-header-inner {
+  min-height: 86px !important;
 }
 
 @media (max-width: 760px) {
@@ -24,11 +51,13 @@
     width: 136px !important;
     height: 74px !important;
     min-width: 136px !important;
+    flex-basis: 136px !important;
   }
 
   .site-footer-logo .market-brand {
     width: 108px !important;
     height: 60px !important;
     min-width: 108px !important;
+    flex-basis: 108px !important;
   }
 }

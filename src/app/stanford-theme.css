@@ -1,0 +1,459 @@
+/* Academic public theme inspired by Stanford-style structure: red brand bar, white local header, serif headlines, clean curriculum cards. */
+:root {
+  --academic-red: #8c1515;
+  --academic-red-dark: #6f1010;
+  --academic-digital-red: #b1040e;
+  --academic-ink: #2e2d29;
+  --academic-muted: #5f574f;
+  --academic-border: #d7d0c6;
+  --academic-sand: #f4f1ea;
+  --academic-white: #ffffff;
+  --academic-link: #006cb8;
+  --academic-shadow: 0 12px 28px rgba(46, 45, 41, 0.08);
+}
+
+html {
+  scroll-padding-top: 110px;
+}
+
+body,
+.lp-page,
+.lp-main,
+.course-catalog-page,
+.video-catalog-page {
+  background: var(--academic-sand) !important;
+  color: var(--academic-ink) !important;
+}
+
+.academic-brand-bar {
+  background: var(--academic-red);
+  color: #ffffff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  padding: 0.68rem 0;
+}
+
+.academic-local-header,
+.site-header-main {
+  background: #ffffff !important;
+  border-bottom: 1px solid var(--academic-border) !important;
+  box-shadow: none !important;
+}
+
+.site-header,
+.lp-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #ffffff;
+}
+
+.public-header-inner,
+.site-header-inner {
+  min-height: 72px !important;
+  gap: 1rem !important;
+}
+
+.site-nav {
+  gap: clamp(0.75rem, 2vw, 1.65rem) !important;
+}
+
+.site-nav a {
+  color: var(--academic-ink) !important;
+  font-size: 0.94rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible {
+  color: var(--academic-digital-red) !important;
+}
+
+.academic-hero,
+.lp-hero,
+.catalog-hero,
+.platform-page-hero,
+.youtube-catalog-hero,
+.course-detail-hero {
+  background: #ffffff !important;
+  color: var(--academic-ink) !important;
+  border-bottom: 1px solid var(--academic-border) !important;
+}
+
+.lp-hero-inner,
+.youtube-catalog-hero-inner,
+.course-detail-hero-inner {
+  padding: clamp(2.6rem, 6vw, 5.25rem) 0 !important;
+}
+
+.lp-kicker {
+  color: var(--academic-digital-red) !important;
+  font-size: 0.8rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+.lp-hero h1,
+.catalog-hero h1,
+.platform-page-hero h1,
+.youtube-catalog-hero h1,
+.course-detail-hero h1,
+.blog-hero h1,
+.video-course-hero h1 {
+  color: var(--academic-ink) !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: clamp(2.5rem, 5.8vw, 5.4rem) !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.045em !important;
+  max-width: 980px !important;
+}
+
+.lp-hero p,
+.catalog-hero p,
+.platform-page-hero p,
+.youtube-catalog-hero p,
+.course-detail-hero p,
+.video-course-hero p {
+  color: var(--academic-muted) !important;
+  font-size: clamp(1.05rem, 1.4vw, 1.24rem) !important;
+  line-height: 1.65 !important;
+  max-width: 760px !important;
+}
+
+.lp-button,
+.youtube-primary-cta,
+.youtube-secondary-cta,
+.youtube-text-cta {
+  border: 1px solid var(--academic-red) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--academic-red) !important;
+  box-shadow: none !important;
+  font-weight: 800 !important;
+  min-height: 44px !important;
+}
+
+.lp-button.primary,
+.youtube-primary-cta {
+  background: var(--academic-red) !important;
+  color: #ffffff !important;
+}
+
+.lp-button:hover,
+.lp-button:focus-visible,
+.youtube-primary-cta:hover,
+.youtube-secondary-cta:hover,
+.youtube-text-cta:hover {
+  background: var(--academic-red-dark) !important;
+  border-color: var(--academic-red-dark) !important;
+  color: #ffffff !important;
+}
+
+.lp-hero-card,
+.academic-info-card,
+.lp-card,
+.lp-course-card,
+.blog-list-item,
+.interview-question-card,
+.course-row-card,
+.youtube-featured-course,
+.youtube-course-card,
+.youtube-row-card,
+.video-series-card,
+.video-lesson-card {
+  border: 1px solid var(--academic-border) !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+  color: var(--academic-ink) !important;
+  box-shadow: none !important;
+}
+
+.lp-hero-card:hover,
+.lp-card:hover,
+.lp-course-card:hover,
+.blog-list-item:hover,
+.course-row-card:hover,
+.video-series-card:hover,
+.video-lesson-card:hover {
+  box-shadow: var(--academic-shadow) !important;
+}
+
+.lp-card-thumb,
+.academic-card-thumb {
+  background: linear-gradient(135deg, var(--academic-red), #2e2d29) !important;
+  color: #ffffff !important;
+  border-bottom: 0 !important;
+  min-height: 136px !important;
+}
+
+.lp-card-thumb span,
+.academic-card-thumb span {
+  color: #f7e9e7 !important;
+  background: transparent !important;
+}
+
+.lp-card-thumb strong,
+.academic-card-thumb strong {
+  color: #ffffff !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: clamp(1.35rem, 2.4vw, 2rem) !important;
+}
+
+.lp-card-body h2,
+.lp-card-body h3,
+.lp-section-head h2,
+.blog-index-heading h2,
+.course-detail-main-card h2 {
+  color: var(--academic-ink) !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  letter-spacing: -0.02em !important;
+}
+
+.lp-card-body p,
+.lp-section-head p,
+.course-row-card p,
+.blog-list-copy p,
+.video-lesson-copy p {
+  color: var(--academic-muted) !important;
+  line-height: 1.62 !important;
+}
+
+.course-badge,
+.youtube-course-topic,
+.youtube-featured-meta > span,
+.youtube-row-copy span {
+  border: 1px solid var(--academic-border) !important;
+  background: #fbf7ef !important;
+  color: var(--academic-red) !important;
+  border-radius: 0 !important;
+  font-weight: 800 !important;
+}
+
+.course-tags span,
+.lp-meta span,
+.blog-post-meta span,
+.interview-question-meta span {
+  border-radius: 0 !important;
+  border-color: var(--academic-border) !important;
+  background: #fbf7ef !important;
+  color: var(--academic-muted) !important;
+}
+
+.lp-card-link,
+.lp-link-text,
+.blog-back,
+.related-link-list a,
+.youtube-featured-meta a,
+.youtube-course-footer a,
+.youtube-block-head a,
+.youtube-side-cta a {
+  color: var(--academic-link) !important;
+  font-weight: 800 !important;
+}
+
+.lp-category-row,
+.academic-topic-row,
+.youtube-topic-bar,
+.youtube-chip-row {
+  background: #ffffff !important;
+  border: 1px solid var(--academic-border) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.lp-category-row a,
+.youtube-topic-bar a,
+.youtube-chip-row span {
+  color: var(--academic-ink) !important;
+  border-color: var(--academic-border) !important;
+  border-radius: 0 !important;
+  background: #fbf7ef !important;
+  font-weight: 800 !important;
+}
+
+.course-row-card.no-image-row,
+.academic-row-card {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  padding: 1rem !important;
+}
+
+.course-row-card.no-image-row > div {
+  padding: 0 !important;
+}
+
+.course-row-card.no-image-row > strong {
+  padding: 0 !important;
+  color: var(--academic-red) !important;
+}
+
+.course-module-list div {
+  border-radius: 0 !important;
+  border-color: var(--academic-border) !important;
+  background: #fbf7ef !important;
+}
+
+.course-module-list span,
+.course-row-card span {
+  color: var(--academic-red) !important;
+}
+
+.video-series-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-bottom: 1px solid var(--academic-border);
+  background: #111827;
+}
+
+.video-watch-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  background: #111111;
+  border-bottom: 1px solid var(--academic-border);
+}
+
+.video-watch-main {
+  aspect-ratio: 16 / 9;
+  min-height: 420px;
+  background: #000000;
+}
+
+.video-watch-main iframe,
+.video-lesson-player iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.video-watch-sidebar {
+  background: #ffffff;
+  border-left: 1px solid var(--academic-border);
+  max-height: min(75vh, 720px);
+  overflow: auto;
+}
+
+.video-watch-sidebar-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--academic-border);
+  color: var(--academic-ink);
+}
+
+.video-watch-sidebar nav {
+  display: grid;
+}
+
+.video-watch-sidebar nav a {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--academic-border);
+  color: var(--academic-ink);
+}
+
+.video-watch-sidebar nav a:hover {
+  background: #fbf7ef;
+}
+
+.video-watch-sidebar nav span {
+  color: var(--academic-red);
+  font-weight: 800;
+}
+
+.video-watch-sidebar nav small {
+  color: var(--academic-muted);
+}
+
+.video-course-hero {
+  padding: clamp(1.6rem, 4vw, 3rem) 0 !important;
+}
+
+.video-lesson-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.video-lesson-card {
+  display: grid;
+  grid-template-columns: 64px minmax(260px, 0.48fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+  padding: 1rem;
+}
+
+.video-lesson-number {
+  color: var(--academic-red);
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
+.video-lesson-player {
+  aspect-ratio: 16 / 9;
+  background: #000000;
+}
+
+.video-lesson-copy h3 {
+  margin: 0.55rem 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  line-height: 1.15;
+}
+
+.site-footer,
+.lp-footer {
+  background: var(--academic-red) !important;
+  color: #ffffff !important;
+}
+
+.site-footer a,
+.site-footer h2,
+.site-footer p,
+.site-footer span {
+  color: #ffffff !important;
+}
+
+@media (max-width: 1100px) {
+  .video-watch-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .video-watch-sidebar {
+    max-height: none;
+    border-left: 0;
+  }
+}
+
+@media (max-width: 780px) {
+  .public-header-inner,
+  .site-header-inner {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    padding: 0.8rem 0 !important;
+  }
+
+  .site-nav {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.35rem;
+  }
+
+  .video-lesson-card {
+    grid-template-columns: 1fr;
+  }
+
+  .video-watch-main {
+    min-height: 0;
+  }
+}

@@ -5,12 +5,13 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts } from "@/data/blog";
 
 export const metadata: Metadata = {
-  title: "Daily Blog",
-  description: "Daily cppvalley notes on C++, HFT, AI systems, low latency, design patterns, interviews, books, conferences and engineering careers.",
+  title: "Articles — cppvalley",
+  description:
+    "cppvalley articles on C++, HFT, AI systems, low latency, design patterns, interviews, books, conferences and engineering careers.",
   alternates: { canonical: "/blog" },
   openGraph: {
-    title: "cppvalley Daily Blog",
-    description: "Daily notes on C++, HFT, AI systems, low latency, interviews and systems engineering.",
+    title: "cppvalley Articles",
+    description: "Notes on C++, HFT, AI systems, low latency, interviews and systems engineering.",
     url: "/blog",
     type: "website",
   },
@@ -29,30 +30,34 @@ export default function BlogPage() {
   const posts = [...blogPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 
   return (
-    <div className="blog-page">
+    <div className="blog-page lp-page">
       <SiteHeader />
+      <main className="blog-main lp-main">
+        <section className="blog-hero">
+          <div className="site-container lp-hero-inner">
+            <div>
+              <p className="lp-kicker">Articles</p>
+              <h1>Short systems notes for serious C++ learners.</h1>
+              <p>
+                Read practical explanations on C++, HFT, low latency, AI systems, interviews, books and project ideas. Each note is designed to teach one useful engineering idea clearly.
+              </p>
+              <div className="lp-actions">
+                <Link className="lp-button primary" href="/courses">Explore courses</Link>
+                <Link className="lp-button" href="/youtube">Watch videos</Link>
+              </div>
+            </div>
 
-      <main className="blog-main">
-        <section className="site-container blog-hero">
-          <div className="blog-hero-copy">
-            <p className="blog-kicker">cppvalley daily engineering notes</p>
-            <h1>Daily Blog</h1>
-            <p>
-              Short, practical notes on C++, HFT, AI systems, low latency, design patterns,
-              interview questions, book summaries, conference talks and project ideas.
-            </p>
+            <aside className="blog-hero-side" aria-label="Article focus">
+              <strong>Focused explanations</strong>
+              <strong>Interview-ready takeaways</strong>
+              <strong>Links to courses and projects</strong>
+            </aside>
           </div>
-
-          <aside className="blog-hero-side" aria-label="Blog publishing focus">
-            <strong>One focused engineering idea at a time</strong>
-            <strong>Written for builders and interview candidates</strong>
-            <strong>Designed to build long-term SEO traffic</strong>
-          </aside>
         </section>
 
         <section className="site-container blog-index" aria-labelledby="latest-posts-heading">
           <div className="blog-index-heading">
-            <h2 id="latest-posts-heading">Latest notes</h2>
+            <h2 id="latest-posts-heading">Latest articles</h2>
             <span>{posts.length} published</span>
           </div>
 
@@ -70,16 +75,15 @@ export default function BlogPage() {
               ))}
             </div>
           ) : (
-            <div className="blog-empty">
-              <strong>No posts published yet.</strong>
-              <p>
-                The blog is ready. The first daily note will appear here as soon as it is added.
-              </p>
+            <div className="lp-card">
+              <div className="lp-card-body">
+                <strong>No articles published yet.</strong>
+                <p>The article library is ready for the first cppvalley systems note.</p>
+              </div>
             </div>
           )}
         </section>
       </main>
-
       <SiteFooter />
     </div>
   );

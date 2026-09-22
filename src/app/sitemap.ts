@@ -3,7 +3,7 @@ import { blogPosts } from "@/data/blog";
 import { lessons } from "@/data/curriculum";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date("2026-08-21");
+  const lastModified = new Date("2026-09-22");
 
   const corePages: MetadataRoute.Sitemap = [
     {
@@ -11,6 +11,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "weekly",
       priority: 1,
+    },
+    {
+      url: "https://cppvalley.com/courses",
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.95,
     },
     {
       url: "https://cppvalley.com/curriculum",
@@ -22,7 +28,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: "https://cppvalley.com/blog",
       lastModified,
       changeFrequency: "daily",
+      priority: 0.9,
+    },
+    {
+      url: "https://cppvalley.com/interviews",
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: "https://cppvalley.com/books",
+      lastModified,
+      changeFrequency: "weekly",
       priority: 0.8,
+    },
+    {
+      url: "https://cppvalley.com/conferences",
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.75,
+    },
+    {
+      url: "https://cppvalley.com/youtube",
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.75,
     },
   ];
 

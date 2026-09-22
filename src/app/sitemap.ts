@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { blogPosts } from "@/data/blog";
+import { courses } from "@/data/courses";
 import { lessons } from "@/data/curriculum";
 import { interviewSets } from "@/data/interviews";
 
@@ -17,13 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: "https://cppvalley.com/courses",
       lastModified,
       changeFrequency: "weekly",
-      priority: 0.95,
-    },
-    {
-      url: "https://cppvalley.com/courses/third-year-cpp-eda-hft",
-      lastModified,
-      changeFrequency: "weekly",
-      priority: 0.95,
+      priority: 0.98,
     },
     {
       url: "https://cppvalley.com/curriculum",
@@ -69,6 +64,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
+  const coursePages: MetadataRoute.Sitemap = courses.map((course) => ({
+    url: `https://cppvalley.com${course.href}`,
+    lastModified,
+    changeFrequency: course.status === "Live" ? "weekly" : "monthly",
+    priority: course.status === "Live" ? 0.92 : 0.82,
+  }));
+
   const lessonPages: MetadataRoute.Sitemap = lessons.map((lesson) => ({
     url: `https://cppvalley.com/curriculum/${lesson.slug}`,
     lastModified,
@@ -90,5 +92,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.78,
   }));
 
-  return [...corePages, ...lessonPages, ...blogPages, ...interviewPages];
+  return [...corePages, ...coursePages, ...lessonPages, ...blogPages, ...interviewPages];
 }

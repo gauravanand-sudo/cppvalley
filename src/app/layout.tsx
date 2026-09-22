@@ -7,6 +7,7 @@ import "./course-catalog.css";
 import "./curriculum-platform.css";
 import "./ads.css";
 import "./seo-growth.css";
+import "./stanford-theme.css";
 
 const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
@@ -14,16 +15,18 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://cppvalley.com"),
   applicationName: "cppvalley",
   title: {
-    default: "cppvalley — C++ Systems, HFT & Interview Prep",
+    default: "cppvalley — C++ Systems, HFT, EDA, GPU & AI Systems",
     template: "%s · cppvalley",
   },
   description:
-    "Learn C++ systems, HFT, low-latency engineering, EDA software basics, projects, videos and interview questions for students and engineers.",
+    "Learn C++ systems, HFT, low-latency engineering, EDA/CAD software, CUDA, GPU programming, AI systems, projects, videos and interview questions.",
   keywords: [
     "C++ interview preparation",
     "C++ roadmap for college students",
     "modern C++ interview questions",
     "EDA software engineer roadmap",
+    "CUDA GPU programming",
+    "AI systems engineering",
     "HFT interview preparation",
     "HFT internship preparation",
     "low latency C++",
@@ -44,9 +47,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "cppvalley — C++ Systems, HFT & Interview Prep",
+    title: "cppvalley — C++ Systems, HFT, EDA, GPU & AI Systems",
     description:
-      "A focused learning platform for C++, HFT, low-latency systems, EDA software basics and systems interviews — with courses, videos, projects, articles and interview questions.",
+      "An academic-style learning platform for C++, HFT, low-latency systems, EDA/CAD software, CUDA, GPU programming and AI systems interviews.",
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
@@ -54,8 +57,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "cppvalley — C++ Systems Interview Prep",
-    description: "C++, HFT, low-latency systems, EDA basics and systems interview preparation.",
+    title: "cppvalley — C++ Systems Learning",
+    description: "C++, HFT, EDA, CUDA, GPU and AI systems interview preparation.",
     images: ["/cppvalley-logo.webp"],
   },
   robots: {
@@ -76,7 +79,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0056d2",
+  themeColor: "#8c1515",
   colorScheme: "light",
 };
 
@@ -119,7 +122,7 @@ const structuredData = {
       name: "cppvalley",
       url: "https://cppvalley.com",
       description:
-        "C++ systems learning platform for HFT, low-latency engineering, EDA software basics and interview preparation.",
+        "C++ systems learning platform for HFT, EDA/CAD software, CUDA, GPU programming and AI systems interview preparation.",
       inLanguage: "en",
     },
     {
@@ -132,9 +135,11 @@ const structuredData = {
       teaches: [
         "Modern C++",
         "C++ interview preparation",
-        "EDA software basics",
+        "EDA software engineering",
         "HFT systems",
-        "low-latency C++"
+        "CUDA and GPU programming",
+        "low-latency C++",
+        "AI systems engineering"
       ],
     },
     {
@@ -143,11 +148,10 @@ const structuredData = {
       name: "cppvalley learning hubs",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Courses", url: "https://cppvalley.com/courses" },
-        { "@type": "ListItem", position: 2, name: "Videos", url: "https://cppvalley.com/youtube" },
+        { "@type": "ListItem", position: 2, name: "Video Courses", url: "https://cppvalley.com/youtube" },
         { "@type": "ListItem", position: 3, name: "Interview Questions", url: "https://cppvalley.com/interviews" },
         { "@type": "ListItem", position: 4, name: "Projects", url: "https://cppvalley.com/projects" },
-        { "@type": "ListItem", position: 5, name: "Articles", url: "https://cppvalley.com/blog" },
-        { "@type": "ListItem", position: 6, name: "Book Notes", url: "https://cppvalley.com/books" }
+        { "@type": "ListItem", position: 5, name: "Articles", url: "https://cppvalley.com/blog" }
       ],
     },
   ],

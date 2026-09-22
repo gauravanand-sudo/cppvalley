@@ -9,6 +9,7 @@ import "./ads.css";
 import "./seo-growth.css";
 import "./video-course-player.css";
 import "./ui-system.css";
+import "./mdx-article.css";
 
 const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 

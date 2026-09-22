@@ -5,39 +5,19 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { coursePillars, courseStats, courses } from "@/data/courses";
 
 export const metadata: Metadata = {
-  title: "Courses — C++, HFT, EDA, CUDA, GPU and AI Systems",
+  title: "Courses — C++ Systems, HFT and Interview Prep",
   description:
-    "Browse the cppvalley course catalog covering Core C++, advanced modern C++, STL and LLD, concurrency, Linux, HFT, trading systems, EDA, CUDA, GPU programming, AI systems and distributed backend infrastructure.",
+    "Browse public cppvalley learning paths for Core C++, student systems preparation, HFT systems and C++ systems video lessons.",
   alternates: { canonical: "/courses" },
   keywords: [
     "C++ courses",
+    "C++ interview preparation",
     "HFT systems course",
-    "CUDA GPU programming course",
-    "AI systems engineering course",
-    "EDA software engineering course",
     "low latency C++ course",
-    "C++ concurrency course",
-    "systems interview preparation",
+    "EDA software roadmap",
+    "systems interview preparation"
   ],
 };
-
-const launchPlan = [
-  {
-    phase: "Phase 1",
-    title: "Launch foundation",
-    text: "Core C++, student roadmap, HFT/low-latency and AI systems give the site enough breadth without looking empty.",
-  },
-  {
-    phase: "Phase 2",
-    title: "Add systems depth",
-    text: "Concurrency, Linux/networking, STL/LLD and trading systems turn cppvalley into a serious systems platform.",
-  },
-  {
-    phase: "Phase 3",
-    title: "Add specialist tracks",
-    text: "EDA, CUDA/GPU, advanced C++ and distributed AI infrastructure complete the long-term catalog.",
-  },
-] as const;
 
 export default function CoursesPage() {
   const sortedCourses = [...courses].sort((a, b) => a.priority - b.priority);
@@ -49,81 +29,61 @@ export default function CoursesPage() {
         <section className="catalog-hero">
           <div className="site-container lp-hero-inner">
             <div>
-              <p className="lp-kicker">Course catalog</p>
-              <h1>12 flagship courses covering C++, HFT, EDA, CUDA, GPU and AI systems.</h1>
+              <p className="lp-kicker">Courses</p>
+              <h1>Focused C++ systems learning paths for students.</h1>
               <p>
-                The catalog is intentionally focused: enough courses to cover the full systems roadmap, not so many that learners get lost. Every course has an image-first card, clear level, duration, modules, outcomes and projects.
+                Start with the courses that are ready to read, watch or follow today. The catalog is kept intentionally clean so students do not land on empty or unfinished tracks.
               </p>
               <div className="lp-actions">
-                <Link className="lp-button primary" href="#all-courses">Browse courses</Link>
+                <Link className="lp-button primary" href="#available-courses">Browse courses</Link>
                 <Link className="lp-button" href="/interviews">Practice questions</Link>
               </div>
             </div>
             <aside className="lp-hero-card">
               <div className="lp-hero-card-top">
-                <span>Recommended catalog size</span>
-                <strong>{courseStats.totalCourses} main courses</strong>
+                <span>Available now</span>
+                <strong>{courseStats.totalCourses} public learning paths</strong>
               </div>
               <div className="lp-stat-grid">
-                <div><strong>{courseStats.pillars}</strong><span>pillars</span></div>
-                <div><strong>{courseStats.liveOrBuilding}</strong><span>live/building</span></div>
-                <div><strong>3</strong><span>launch phases</span></div>
+                <div><strong>C++</strong><span>core</span></div>
+                <div><strong>HFT</strong><span>systems</span></div>
+                <div><strong>EDA</strong><span>roadmap</span></div>
               </div>
             </aside>
           </div>
         </section>
 
-        <section className="site-container lp-category-row" aria-label="Course pillars">
-          <a href="#all-courses">All courses</a>
-          {coursePillars.map((pillar) => <a href={`#${pillar.toLowerCase().replaceAll(" ", "-").replaceAll("/", "")}`} key={pillar}>{pillar}</a>)}
+        <section className="site-container lp-category-row" aria-label="Course areas">
+          <a href="#available-courses">All</a>
+          {coursePillars.map((pillar) => (
+            <a href={`#${pillar.toLowerCase().replaceAll(" ", "-")}`} key={pillar}>{pillar}</a>
+          ))}
         </section>
 
-        <section className="site-container lp-section course-launch-plan">
+        <section className="site-container lp-section" id="available-courses">
           <div className="lp-section-head">
             <div>
-              <p className="lp-kicker">Build order</p>
-              <h2>Launch in phases, not chaos</h2>
-            </div>
-          </div>
-          <div className="lp-course-grid">
-            {launchPlan.map((item) => (
-              <article className="lp-card" key={item.phase}>
-                <img className="course-card-image" src={`/course-cover/${item.phase.toLowerCase().replaceAll(" ", "-")}`} alt={`${item.phase} course launch cover`} loading="lazy" />
-                <div className="lp-card-body">
-                  <span className="course-badge">{item.phase}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="site-container lp-section" id="all-courses">
-          <div className="lp-section-head">
-            <div>
-              <p className="lp-kicker">All flagship courses</p>
-              <h2>Image-first course catalog</h2>
-              <p>Each card uses a real generated cover image so the catalog feels like a production learning platform, not a text directory.</p>
+              <p className="lp-kicker">Available courses</p>
+              <h2>Choose a track</h2>
+              <p>Each card links to an actual course page, curriculum, video library or roadmap that students can use immediately.</p>
             </div>
           </div>
 
           <div className="lp-course-grid flagship-course-grid">
             {sortedCourses.map((course) => (
-              <Link className="lp-course-card image-course-card" href={course.href} id={course.slug} key={course.slug}>
-                <img className="course-card-image" src={course.coverImage} alt={`${course.title} cover`} loading="lazy" />
+              <Link className="lp-course-card" href={course.href} id={course.slug} key={course.slug}>
+                <div className="lp-card-thumb">
+                  <span>{course.pillar}</span>
+                  <strong>{course.shortTitle}</strong>
+                </div>
                 <div className="lp-card-body">
-                  <div className="course-card-topline">
-                    <span className="course-badge">{course.status}</span>
-                    <span>{course.launchPhase}</span>
-                  </div>
                   <h3>{course.title}</h3>
                   <p>{course.description}</p>
                   <div className="lp-meta"><span>{course.level}</span><span>{course.duration}</span><span>{course.lessons}</span></div>
                   <div className="course-tags">
                     {course.tags.slice(0, 5).map((tag) => <span key={tag}>{tag}</span>)}
                   </div>
-                  <strong className="lp-link-text">Open course →</strong>
+                  <strong className="lp-link-text">Open →</strong>
                 </div>
               </Link>
             ))}
@@ -131,19 +91,18 @@ export default function CoursesPage() {
         </section>
 
         {coursePillars.map((pillar) => (
-          <section className="site-container lp-section" id={pillar.toLowerCase().replaceAll(" ", "-").replaceAll("/", "")} key={pillar}>
+          <section className="site-container lp-section" id={pillar.toLowerCase().replaceAll(" ", "-")} key={pillar}>
             <div className="lp-section-head">
               <div>
                 <p className="lp-kicker">{pillar}</p>
-                <h2>{pillar} courses</h2>
+                <h2>{pillar} tracks</h2>
               </div>
             </div>
             <div className="course-row-list">
               {sortedCourses.filter((course) => course.pillar === pillar).map((course) => (
-                <Link className="course-row-card" href={course.href} key={course.slug}>
-                  <img src={course.coverImage} alt={`${course.title} cover`} loading="lazy" />
+                <Link className="course-row-card no-image-row" href={course.href} key={course.slug}>
                   <div>
-                    <span>{course.status} · {course.launchPhase}</span>
+                    <span>{course.pillar}</span>
                     <h3>{course.title}</h3>
                     <p>{course.description}</p>
                   </div>

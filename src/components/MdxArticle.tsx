@@ -30,7 +30,29 @@ type CodeBlock = {
   code: string;
 };
 
-type Block = ListBlock | ParagraphBlock | HeadingBlock | QuoteBlock | CodeBlock;
+type TableBlock = {
+  type: "table";
+  headers: string[];
+  rows: string[][];
+};
+
+type DividerBlock = {
+  type: "divider";
+};
+
+type Block = ListBlock | ParagraphBlock | HeadingBlock | QuoteBlock | CodeBlock | TableBlock | DividerBlock;
+
+function isTableSeparator(line: string) {
+  return /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/.test(line);
+}
+
+function parseTableRow(line: string) {
+  return line
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((cell) => cell.trim());
+}
 
 function parseMdx(source: string): Block[] {
   const blocks: Block[] = [];
@@ -38,6 +60,9 @@ function parseMdx(source: string): Block[] {
   let paragraph: string[] = [];
   let list: string[] = [];
   let code: string[] = [];
+  let tableHeaders: string[] = [];
+  let tableRows: string[][] = [];
+  let tableMode: "idle" | "header" | "body" = "idle";
   let inCodeBlock = false;
 
   const flushParagraph = () => {
@@ -52,12 +77,27 @@ function parseMdx(source: string): Block[] {
     list = [];
   };
 
+  const flushTable = () => {
+    if (!tableHeaders.length || !tableRows.length) {
+      tableHeaders = [];
+      tableRows = [];
+      tableMode = "idle";
+      return;
+    }
+
+    blocks.push({ type: "table", headers: tableHeaders, rows: tableRows });
+    tableHeaders = [];
+    tableRows = [];
+    tableMode = "idle";
+  };
+
   lines.forEach((rawLine) => {
     const line = rawLine.trim();
 
     if (line.startsWith("```")) {
       flushParagraph();
       flushList();
+      flushTable();
       if (inCodeBlock) {
         blocks.push({ type: "code", code: code.join("\n") });
         code = [];
@@ -76,6 +116,46 @@ function parseMdx(source: string): Block[] {
     if (!line) {
       flushParagraph();
       flushList();
+      flushTable();
+      return;
+    }
+
+    if (line === "---" || line === "***") {
+      flushParagraph();
+      flushList();
+      flushTable();
+      blocks.push({ type: "divider" });
+      return;
+    }
+
+    if (line.includes("|") && !line.startsWith("> ")) {
+      if (tableMode === "idle") {
+        flushParagraph();
+        flushList();
+        tableHeaders = parseTableRow(line);
+        tableMode = "header";
+        return;
+      }
+
+      if (tableMode === "header" && isTableSeparator(line)) {
+        tableMode = "body";
+        return;
+      }
+
+      if (tableMode === "body") {
+        tableRows.push(parseTableRow(line));
+        return;
+      }
+
+      flushTable();
+    }
+
+    if (tableMode !== "idle") flushTable();
+
+    if (line.startsWith("# ")) {
+      flushParagraph();
+      flushList();
+      blocks.push({ type: "heading", level: 2, text: line.replace(/^#\s+/, "") });
       return;
     }
 
@@ -112,6 +192,7 @@ function parseMdx(source: string): Block[] {
 
   flushParagraph();
   flushList();
+  flushTable();
 
   return blocks;
 }
@@ -175,6 +256,29 @@ export function MdxArticle({ source }: MdxArticleProps) {
               <code>{block.code}</code>
             </pre>
           );
+        }
+
+        if (block.type === "table") {
+          return (
+            <div className="mdx-table-wrap" key={`table-${index}`}>
+              <table>
+                <thead>
+                  <tr>{block.headers.map((header) => <th key={header}>{renderInline(header)}</th>)}</tr>
+                </thead>
+                <tbody>
+                  {block.rows.map((row, rowIndex) => (
+                    <tr key={`row-${rowIndex}`}>
+                      {row.map((cell, cellIndex) => <td key={`${cell}-${cellIndex}`}>{renderInline(cell)}</td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+
+        if (block.type === "divider") {
+          return <hr key={`divider-${index}`} />;
         }
 
         return <p key={`${block.text}-${index}`}>{renderInline(block.text)}</p>;

@@ -48,7 +48,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
   };
 
   return (
-    <div className="page-shell lp-page course-detail-page academic-page">
+    <div className="page-shell lp-page course-detail-page academic-page modern-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
@@ -56,7 +56,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
       <SiteHeader />
 
       <main className="lp-main">
-        <section className="site-container lp-section course-detail-simple">
+        <section className="site-container lp-section course-detail-simple smooth-course-detail">
           <nav className="lp-breadcrumb" aria-label="Breadcrumb">
             <Link href="/courses">Courses</Link>
             <span>/</span>
@@ -72,12 +72,12 @@ export default async function CoursePage({ params }: CoursePageProps) {
             <Link className="lp-button" href="/courses">All courses</Link>
           </div>
 
-          <div className="course-module-list compact-module-list">
+          <div className="course-module-grid">
             {course.modules.map((module, index) => (
-              <div key={module}>
+              <article className="course-module-card" key={module}>
                 <span>{String(index + 1).padStart(2, "0")}</span>
                 <strong>{module}</strong>
-              </div>
+              </article>
             ))}
           </div>
         </section>

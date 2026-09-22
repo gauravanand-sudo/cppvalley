@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Fragment } from "react";
+import { AdSlot } from "@/components/AdSlot";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 
@@ -9,6 +11,10 @@ export const metadata: Metadata = {
     "C++, HFT and AI systems interview practice, question banks, round breakdowns and answer frameworks from cppvalley.",
   alternates: { canonical: "/interviews" },
 };
+
+const interviewsTopAdSlot = process.env.NEXT_PUBLIC_ADSENSE_INTERVIEWS_TOP_SLOT;
+const interviewsFeedAdSlot = process.env.NEXT_PUBLIC_ADSENSE_INTERVIEWS_FEED_SLOT;
+const interviewsBottomAdSlot = process.env.NEXT_PUBLIC_ADSENSE_INTERVIEWS_BOTTOM_SLOT;
 
 const sections = [
   {
@@ -77,6 +83,10 @@ export default function InterviewsPage() {
           </div>
         </section>
 
+        <div className="site-container">
+          <AdSlot slot={interviewsTopAdSlot} className="ad-slot-leaderboard" />
+        </div>
+
         <section className="site-container lp-section">
           <div className="lp-section-head">
             <div>
@@ -85,20 +95,29 @@ export default function InterviewsPage() {
             </div>
           </div>
           <div className="lp-course-grid">
-            {sections.map((section) => (
-              <article className="lp-card" key={section.title}>
-                <div className="lp-card-body">
-                  <span className="course-badge">{section.tag}</span>
-                  <h3>{section.title}</h3>
-                  <p>{section.text}</p>
-                  <div className="course-tags">
-                    {section.skills.map((skill) => <span key={skill}>{skill}</span>)}
+            {sections.map((section, index) => (
+              <Fragment key={section.title}>
+                {index === 3 ? (
+                  <AdSlot slot={interviewsFeedAdSlot} className="ad-slot-inarticle" />
+                ) : null}
+                <article className="lp-card">
+                  <div className="lp-card-body">
+                    <span className="course-badge">{section.tag}</span>
+                    <h3>{section.title}</h3>
+                    <p>{section.text}</p>
+                    <div className="course-tags">
+                      {section.skills.map((skill) => <span key={skill}>{skill}</span>)}
+                    </div>
                   </div>
-                </div>
-              </article>
+                </article>
+              </Fragment>
             ))}
           </div>
         </section>
+
+        <div className="site-container">
+          <AdSlot slot={interviewsBottomAdSlot} className="ad-slot-leaderboard" />
+        </div>
       </main>
       <SiteFooter />
     </div>

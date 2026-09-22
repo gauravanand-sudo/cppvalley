@@ -5,8 +5,8 @@ const columns = [
   {
     title: "Learn",
     links: [
-      ["Course catalog", "/courses"],
-      ["Video courses", "/youtube"],
+      ["Courses", "/courses"],
+      ["Videos", "/youtube"],
       ["HFT curriculum", "/curriculum"],
       ["Student roadmap", "/courses/third-year-cpp-eda-hft"],
     ],
@@ -16,17 +16,17 @@ const columns = [
     links: [
       ["Interview questions", "/interviews"],
       ["Projects", "/projects"],
-      ["Daily articles", "/blog"],
-      ["Book notes", "/books"],
+      ["Articles", "/blog"],
+      ["Books", "/books"],
     ],
   },
   {
     title: "Topics",
     links: [
-      ["Modern C++", "/courses#core-cpp"],
-      ["EDA software", "/courses/third-year-cpp-eda-hft"],
+      ["Modern C++", "/courses/core-cpp-interviews"],
+      ["EDA roadmap", "/courses/third-year-cpp-eda-hft"],
       ["Low latency", "/curriculum"],
-      ["AI systems", "/courses#ai-systems"],
+      ["C++ videos", "/youtube"],
     ],
   },
 ] as const;
@@ -40,7 +40,7 @@ export function SiteFooter() {
             <BrandLockup />
           </Link>
           <p>
-            Learn C++ systems, EDA software, HFT, low-latency engineering and AI systems with structured courses, videos, projects and interview practice.
+            Learn C++ systems, HFT, low-latency engineering, EDA software basics and interview preparation with focused courses, videos, projects and questions.
           </p>
         </div>
 

@@ -7,11 +7,8 @@ import "./course-catalog.css";
 import "./curriculum-platform.css";
 import "./ads.css";
 import "./seo-growth.css";
-import "./stanford-theme.css";
 import "./video-course-player.css";
-import "./site-tighten.css";
-import "./subtle-theme.css";
-import "./smooth-modern.css";
+import "./ui-system.css";
 
 const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
@@ -78,25 +75,25 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#7a2e2e",
+  themeColor: "#365c7d",
   colorScheme: "light",
 };
 
 const logoFitCss = `
 .site-logo .market-brand,
 .lesson-logo .market-brand {
-  width: 146px !important;
-  height: 54px !important;
-  min-width: 146px !important;
+  width: 128px !important;
+  height: 44px !important;
+  min-width: 128px !important;
   background-size: contain !important;
   background-position: left center !important;
   background-repeat: no-repeat !important;
 }
 
 .site-footer-logo .market-brand {
-  width: 156px !important;
-  height: 58px !important;
-  min-width: 156px !important;
+  width: 128px !important;
+  height: 44px !important;
+  min-width: 128px !important;
   background-size: contain !important;
   background-position: left center !important;
   background-repeat: no-repeat !important;
@@ -105,9 +102,9 @@ const logoFitCss = `
 @media (max-width: 760px) {
   .site-logo .market-brand,
   .lesson-logo .market-brand {
-    width: 122px !important;
-    height: 46px !important;
-    min-width: 122px !important;
+    width: 120px !important;
+    height: 42px !important;
+    min-width: 120px !important;
   }
 }
 `;

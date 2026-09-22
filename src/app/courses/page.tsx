@@ -14,33 +14,27 @@ export default function CoursesPage() {
   const sortedCourses = [...courses].sort((a, b) => a.priority - b.priority);
 
   return (
-    <div className="page-shell lp-page course-catalog-page academic-page clean-courses-page">
+    <div className="page-shell lp-page course-catalog-page academic-page modern-page">
       <SiteHeader />
       <main className="lp-main">
-        <section className="site-container clean-page-section">
-          <header className="clean-page-head clean-page-head-with-cta">
-            <div>
-              <p className="lp-kicker">Courses</p>
-              <h1>Courses</h1>
-            </div>
-            <div className="clean-head-actions">
-              <Link className="lp-button primary" href="/courses/third-year-cpp-eda-hft">Start here</Link>
-              <Link className="lp-button" href="/interviews">Interview questions</Link>
-            </div>
+        <section className="site-container lp-section clean-page-section">
+          <header className="clean-page-head smooth-page-head">
+            <p className="lp-kicker">Courses</p>
+            <h1>Courses</h1>
           </header>
 
-          <div className="clean-course-list">
+          <div className="lp-course-grid flagship-course-grid smooth-course-grid">
             {sortedCourses.map((course) => (
-              <Link className="clean-course-row" href={course.href} key={course.slug}>
-                <div className="clean-course-main">
+              <Link className="lp-course-card academic-course-card smooth-course-card" href={course.href} key={course.slug}>
+                <div className="lp-card-thumb academic-card-thumb">
                   <span>{course.pillar}</span>
-                  <h2>{course.title}</h2>
-                  <p>{course.description}</p>
+                  <strong>{course.shortTitle}</strong>
                 </div>
-                <div className="clean-course-meta">
-                  <strong>{course.duration}</strong>
-                  <small>{course.level}</small>
-                  <em>Open →</em>
+                <div className="lp-card-body">
+                  <h3>{course.title}</h3>
+                  <p>{course.description}</p>
+                  <div className="lp-meta"><span>{course.level}</span><span>{course.duration}</span></div>
+                  <strong className="lp-link-text">Open course →</strong>
                 </div>
               </Link>
             ))}

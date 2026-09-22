@@ -5,211 +5,165 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { lessons, phases } from "@/data/curriculum";
 
 export const metadata: Metadata = {
-  title: "cppvalley — C++, EDA, HFT and AI Systems Interview Prep",
+  title: "cppvalley — C++ Systems Learning Hub",
   description:
-    "A modern learning hub for C++ interviews, EDA software, HFT systems, low-latency C++, AI systems, book summaries, interview questions and YouTube lessons.",
+    "A clean learning hub for students preparing for C++ systems, EDA software, HFT, low-latency engineering and AI systems interviews.",
   alternates: { canonical: "/" },
 };
 
-const featuredTracks = [
+const focusAreas = [
+  "Modern C++",
+  "EDA software",
+  "HFT systems",
+  "Low latency",
+  "AI systems",
+  "Interview projects",
+] as const;
+
+const featuredPaths = [
   {
-    eyebrow: "Start here",
-    title: "3rd/4th Year C++ → EDA/HFT",
-    text: "A practical student roadmap for C++ systems, EDA CAD software, semiconductor tooling, HFT and performance-heavy internships.",
+    label: "Recommended start",
+    title: "3rd/4th Year C++ → EDA/HFT Roadmap",
+    text: "A practical path for students who want C++ systems, EDA CAD software, semiconductor tooling, HFT, or performance-heavy internships.",
     href: "/courses/third-year-cpp-eda-hft",
-    metric: "8 modules",
   },
   {
-    eyebrow: "Core skill",
+    label: "Core foundation",
     title: "Core C++ for Interviews",
-    text: "RAII, smart pointers, move semantics, STL, templates, object model, UB, tooling, performance and build-from-scratch projects.",
+    text: "RAII, smart pointers, move semantics, STL, templates, object model, undefined behavior, tools and build-from-scratch projects.",
     href: "/courses#core-cpp",
-    metric: "free track",
   },
   {
-    eyebrow: "Specialized",
+    label: "Specialized track",
     title: "HFT Core Systems",
-    text: "CPU, memory, Linux, networking, latency measurement, low-latency C++, market data, execution, risk and tick-to-trade.",
+    text: "CPU, Linux, networking, latency measurement, market data, execution, risk and tick-to-trade systems.",
     href: "/curriculum",
-    metric: `${lessons.length} lessons`,
   },
 ] as const;
 
-const hubs = [
-  { label: "Courses", href: "/courses", text: "Structured tracks for C++, EDA, HFT, AI systems and interview prep." },
-  { label: "Videos", href: "/youtube", text: "Your @cppvalley videos organized by topic and embedded on-site." },
-  { label: "Daily Blog", href: "/blog", text: "Short SEO-friendly notes that answer one focused engineering question." },
-  { label: "Interviews", href: "/interviews", text: "C++/systems/HFT/AI interview questions with practical answer frameworks." },
-  { label: "Books", href: "/books", text: "Useful summaries from C++, design, concurrency, systems and HFT books." },
-  { label: "Projects", href: "/projects", text: "Portfolio-grade systems projects students can explain in interviews." },
+const resourceLinks = [
+  { title: "Courses", text: "Structured learning paths for C++, EDA, HFT, AI systems and interview preparation.", href: "/courses" },
+  { title: "YouTube", text: "cppvalley videos organized into topic-wise study paths and embedded on the site.", href: "/youtube" },
+  { title: "Daily Blog", text: "Short engineering notes on one useful C++ or systems idea at a time.", href: "/blog" },
+  { title: "Interview Questions", text: "C++/systems/HFT/AI interview prompts with answer frameworks and project discussion points.", href: "/interviews" },
+  { title: "Book Notes", text: "Clean summaries from C++, STL, design, concurrency, systems and HFT books.", href: "/books" },
+  { title: "Projects", text: "Portfolio projects students can build, measure, explain and show in interviews.", href: "/projects" },
 ] as const;
 
-const proofPoints = [
-  "C++ interview prep",
-  "EDA software roadmap",
-  "HFT internships",
-  "low-latency systems",
-  "AI systems design",
-  "project-based proof",
-] as const;
-
-const contentLoops = [
-  {
-    step: "01",
-    title: "Video becomes page",
-    text: "Every good YouTube video gets a matching page with notes, transcript summary, links and next steps.",
-  },
-  {
-    step: "02",
-    title: "Page links to track",
-    text: "The reader always knows the next useful course, roadmap, blog or project to open.",
-  },
-  {
-    step: "03",
-    title: "Track builds authority",
-    text: "Courses, blogs, questions and book notes reinforce the same high-intent search topics.",
-  },
+const studentPlan = [
+  "Learn modern C++ deeply instead of memorizing syntax.",
+  "Build systems projects with clear README, benchmarks and trade-offs.",
+  "Practice DSA in C++ with implementation discipline.",
+  "Understand OS, Linux, architecture and performance basics.",
+  "Prepare interview stories around projects, failures and design choices.",
 ] as const;
 
 export default function Home() {
   return (
-    <div className="page-shell platform-site modern-site">
+    <div className="page-shell platform-site mit-site">
       <SiteHeader />
 
       <main>
-        <section className="modern-hero site-container">
-          <div className="modern-hero-copy">
-            <div className="modern-pill-row">
-              <span>cppvalley</span>
-              <span>C++ · EDA · HFT · AI Systems</span>
-            </div>
-            <h1>Become interview-ready for serious systems roles.</h1>
-            <p>
-              A focused platform for students and engineers preparing for modern C++, EDA software, HFT, low-latency systems and AI systems interviews — with videos, courses, projects, notes and questions in one place.
+        <section className="mit-hero site-container">
+          <div className="mit-hero-main">
+            <p className="mit-kicker">C++ · EDA · HFT · AI Systems</p>
+            <h1>A serious learning hub for systems interviews.</h1>
+            <p className="mit-lede">
+              cppvalley helps students and engineers prepare for C++ systems, EDA software, semiconductor tooling, HFT, low-latency and AI systems interviews with courses, videos, notes, projects and questions.
             </p>
-            <div className="modern-actions">
-              <Link className="modern-button primary" href="/courses/third-year-cpp-eda-hft">
+            <div className="mit-actions">
+              <Link className="mit-button primary" href="/courses/third-year-cpp-eda-hft">
                 Start student roadmap
               </Link>
-              <Link className="modern-button" href="/youtube">
-                Watch videos
+              <Link className="mit-button" href="/courses">
+                View all courses
               </Link>
-              <Link className="modern-button subtle" href="/courses">
-                Browse tracks
-              </Link>
-            </div>
-            <div className="modern-proof-strip" aria-label="cppvalley focus areas">
-              {proofPoints.map((point) => <span key={point}>{point}</span>)}
             </div>
           </div>
 
-          <aside className="modern-hero-panel" aria-label="cppvalley dashboard preview">
-            <div className="panel-topbar">
-              <span />
-              <span />
-              <span />
-              <strong>learning engine</strong>
-            </div>
-            <div className="panel-command">
-              <span>$</span> build-roadmap --role systems-engineer
-            </div>
-            <div className="panel-grid">
-              <div>
-                <small>HFT curriculum</small>
-                <strong>{lessons.length}</strong>
-                <span>lessons</span>
-              </div>
-              <div>
-                <small>Roadmap depth</small>
-                <strong>{phases.length}</strong>
-                <span>phases</span>
-              </div>
-              <div>
-                <small>Primary tracks</small>
-                <strong>6</strong>
-                <span>hubs</span>
-              </div>
-              <div>
-                <small>Monetization later</small>
-                <strong>SEO</strong>
-                <span>first</span>
-              </div>
-            </div>
-            <div className="panel-stack">
-              <div><b>C++</b><span>language depth + projects</span></div>
-              <div><b>EDA</b><span>graphs, parsers, simulation, tooling</span></div>
-              <div><b>HFT</b><span>latency, order books, trading systems</span></div>
-              <div><b>AI Systems</b><span>RAG, inference, serving, reliability</span></div>
-            </div>
+          <aside className="mit-hero-side" aria-label="cppvalley summary">
+            <h2>Start here</h2>
+            <p>
+              For 3rd/4th year students targeting C++ systems, EDA, HFT, semiconductor software or performance-heavy roles.
+            </p>
+            <Link href="/courses/third-year-cpp-eda-hft">Open the roadmap →</Link>
           </aside>
         </section>
 
-        <section className="modern-section site-container">
-          <div className="modern-section-head">
-            <span>01 · Main paths</span>
-            <h2>Three clear entry points. No confusing content dump.</h2>
+        <section className="mit-strip site-container" aria-label="cppvalley focus areas">
+          {focusAreas.map((item) => <span key={item}>{item}</span>)}
+        </section>
+
+        <section className="mit-section site-container">
+          <div className="mit-section-head">
+            <span>01</span>
+            <div>
+              <p className="mit-kicker">Learning paths</p>
+              <h2>Clear tracks students can understand quickly.</h2>
+            </div>
           </div>
-          <div className="modern-track-grid">
-            {featuredTracks.map((track) => (
-              <Link className="modern-track-card" href={track.href} key={track.title}>
-                <div>
-                  <span>{track.eyebrow}</span>
-                  <b>{track.metric}</b>
-                </div>
-                <h3>{track.title}</h3>
-                <p>{track.text}</p>
-                <strong>Open path →</strong>
+
+          <div className="mit-feature-grid">
+            {featuredPaths.map((path) => (
+              <Link className="mit-feature-card" href={path.href} key={path.title}>
+                <span>{path.label}</span>
+                <h3>{path.title}</h3>
+                <p>{path.text}</p>
+                <b>Open path →</b>
               </Link>
             ))}
           </div>
         </section>
 
-        <section className="modern-section site-container modern-split-section">
-          <div className="modern-section-head compact">
-            <span>02 · Traffic system</span>
-            <h2>Every page has a purpose.</h2>
-            <p>
-              Courses are the spine. Videos bring trust. Blog posts capture long-tail search. Interview questions convert visitors into repeat users.
-            </p>
+        <section className="mit-section site-container">
+          <div className="mit-section-head">
+            <span>02</span>
+            <div>
+              <p className="mit-kicker">Resources</p>
+              <h2>Everything on the site has a learning purpose.</h2>
+            </div>
           </div>
-          <div className="modern-hub-grid">
-            {hubs.map((hub) => (
-              <Link className="modern-hub-card" href={hub.href} key={hub.label}>
-                <h3>{hub.label}</h3>
-                <p>{hub.text}</p>
-                <span>Explore →</span>
+
+          <div className="mit-resource-grid">
+            {resourceLinks.map((resource) => (
+              <Link className="mit-resource-card" href={resource.href} key={resource.title}>
+                <h3>{resource.title}</h3>
+                <p>{resource.text}</p>
               </Link>
             ))}
           </div>
         </section>
 
-        <section className="modern-section site-container">
-          <div className="modern-section-head">
-            <span>03 · Content loop</span>
-            <h2>Modern creator platform, not a static course brochure.</h2>
-          </div>
-          <div className="modern-loop-grid">
-            {contentLoops.map((item) => (
-              <article className="modern-loop-card" key={item.step}>
-                <span>{item.step}</span>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="modern-cta site-container">
+        <section className="mit-section site-container mit-split">
           <div>
-            <span>Start now</span>
-            <h2>Build traffic first. Monetize once trust is real.</h2>
-            <p>
-              Keep the content sharp, practical and searchable. Courses, videos, blogs and interview pages should all help one audience: engineers preparing for C++/EDA/HFT/AI systems roles.
+            <p className="mit-kicker">For students</p>
+            <h2>What to do first</h2>
+            <p className="mit-copy">
+              This is not a random link dump. The site should help a student decide what to study, what to build, and how to explain it in interviews.
             </p>
           </div>
-          <Link className="modern-button primary" href="/courses/third-year-cpp-eda-hft">
-            Open student roadmap
-          </Link>
+          <ol className="mit-plan">
+            {studentPlan.map((step) => <li key={step}>{step}</li>)}
+          </ol>
+        </section>
+
+        <section className="mit-section site-container mit-stats">
+          <div>
+            <span>{lessons.length}</span>
+            <p>HFT curriculum lessons</p>
+          </div>
+          <div>
+            <span>{phases.length}</span>
+            <p>HFT roadmap phases</p>
+          </div>
+          <div>
+            <span>8</span>
+            <p>student roadmap modules</p>
+          </div>
+          <div>
+            <span>6</span>
+            <p>main learning hubs</p>
+          </div>
         </section>
       </main>
 

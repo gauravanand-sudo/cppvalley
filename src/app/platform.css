@@ -1,19 +1,22 @@
-/* cppvalley — clean MIT-inspired academic layout */
+/* cppvalley — MIT-inspired, compact, student-shareable layout */
 :root {
   --cv-red: #a31f34;
   --cv-red-dark: #7b1627;
   --cv-black: #111111;
-  --cv-text: #1f2933;
-  --cv-muted: #5b6673;
-  --cv-line: #d7d7d7;
-  --cv-soft: #f4f4f4;
+  --cv-text: #1f2937;
+  --cv-muted: #5f6978;
+  --cv-border: #d6d6d6;
+  --cv-soft: #f4f4f1;
   --cv-paper: #ffffff;
-  --cv-cream: #faf8f4;
+  --cv-cream: #f7f5f0;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 .platform-site,
 .mit-site {
-  min-height: 100vh;
   background: var(--cv-paper);
   color: var(--cv-text);
 }
@@ -24,108 +27,85 @@
   text-decoration: none;
 }
 
-.mit-top-line {
-  height: 8px;
-  background: var(--cv-red);
+.platform-site h1,
+.platform-site h2,
+.platform-site h3,
+.mit-site h1,
+.mit-site h2,
+.mit-site h3 {
+  overflow-wrap: normal;
+  word-break: normal;
+  text-wrap: balance;
 }
 
+.platform-site p,
+.mit-site p,
+.platform-site li,
+.mit-site li {
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+/* Header */
+.mit-header,
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 40;
   background: #ffffff;
-  border-bottom: 1px solid var(--cv-line);
+  border-bottom: 1px solid var(--cv-border);
+}
+
+.mit-top-line {
+  height: 5px;
+  background: var(--cv-red);
 }
 
 .site-header-main {
   background: #ffffff !important;
-  border-bottom: 0 !important;
+  border: 0 !important;
 }
 
 .site-header-inner {
-  min-height: 82px;
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  gap: 1.35rem;
 }
 
-.site-header .site-program {
-  border-left: 1px solid var(--cv-line) !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: var(--cv-muted) !important;
-  padding-left: 1rem !important;
-  font-weight: 700;
+.site-program {
+  color: var(--cv-red-dark) !important;
+  border: 1px solid #e7c8d0 !important;
+  background: #fff6f8 !important;
+  white-space: nowrap;
 }
 
 .site-nav {
-  gap: 1.1rem !important;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.7rem;
 }
 
 .site-nav a {
   color: var(--cv-black) !important;
+  font-size: 0.94rem;
   font-weight: 750;
+  padding: 0.45rem 0.15rem;
 }
 
 .site-nav a:hover {
   color: var(--cv-red) !important;
 }
 
-.site-nav .site-preview,
-.site-nav .site-enroll {
-  border: 1px solid var(--cv-black) !important;
-  background: var(--cv-black) !important;
-  color: #ffffff !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-}
-
-.site-nav .site-preview:hover,
-.site-nav .site-enroll:hover {
-  background: var(--cv-red) !important;
-  border-color: var(--cv-red) !important;
-  color: #ffffff !important;
-}
-
-.mit-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.65fr);
-  gap: 2rem;
-  padding: clamp(3rem, 7vw, 6.5rem) 0 3rem;
-  border-bottom: 1px solid var(--cv-line);
-}
-
-.mit-kicker,
-.platform-eyebrow,
-.platform-kicker {
-  margin: 0 0 0.75rem;
-  color: var(--cv-red);
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-}
-
-.mit-hero h1 {
-  max-width: 1020px;
-  margin: 0;
-  color: var(--cv-black);
-  font-size: clamp(3.4rem, 8vw, 7.8rem);
-  line-height: 0.92;
-  letter-spacing: -0.075em;
-}
-
-.mit-lede {
-  max-width: 830px;
-  margin: 1.4rem 0 0;
-  color: #2f3a44;
-  font-size: clamp(1.08rem, 1.8vw, 1.42rem);
-  line-height: 1.58;
-}
-
+/* Reusable academic buttons */
 .mit-actions,
 .platform-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.8rem;
-  margin-top: 1.7rem;
+  gap: 0.75rem;
+  margin-top: 1.6rem;
 }
 
 .mit-button,
@@ -133,125 +113,171 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 46px;
+  min-height: 44px;
   border: 1px solid var(--cv-black);
   background: #ffffff;
-  color: var(--cv-black);
-  padding: 0.82rem 1.05rem;
-  font-weight: 850;
-  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
-}
-
-.mit-button:hover,
-.platform-button:hover {
-  background: var(--cv-black);
-  color: #ffffff;
+  color: var(--cv-black) !important;
+  padding: 0.72rem 1rem;
+  font-weight: 800;
+  line-height: 1.1;
 }
 
 .mit-button.primary,
 .platform-button.primary {
   background: var(--cv-red);
+  color: #ffffff !important;
   border-color: var(--cv-red);
-  color: #ffffff;
 }
 
-.mit-button.primary:hover,
-.platform-button.primary:hover {
-  background: var(--cv-red-dark);
-  border-color: var(--cv-red-dark);
+.mit-button:hover,
+.platform-button:hover {
+  background: var(--cv-black);
+  color: #ffffff !important;
+}
+
+/* Home */
+.mit-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.58fr);
+  gap: clamp(1.6rem, 4vw, 3rem);
+  padding: clamp(2.6rem, 6vw, 5.2rem) 0 clamp(2rem, 5vw, 4rem);
+  border-bottom: 1px solid var(--cv-border);
+}
+
+.mit-kicker,
+.platform-eyebrow,
+.platform-kicker {
+  margin: 0 0 0.7rem;
+  color: var(--cv-red);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.mit-hero h1 {
+  max-width: 980px;
+  margin: 0;
+  color: var(--cv-black);
+  font-size: clamp(2.55rem, 6.2vw, 6rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.mit-lede {
+  max-width: 920px;
+  margin: 1.2rem 0 0;
+  color: #374151;
+  font-size: clamp(1.06rem, 1.45vw, 1.34rem);
+  line-height: 1.58;
 }
 
 .mit-hero-side {
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background: var(--cv-black);
-  color: #ffffff;
-  padding: clamp(1.2rem, 3vw, 2rem);
-  min-height: 320px;
+  align-self: start;
+  border-top: 6px solid var(--cv-red);
+  background: var(--cv-soft);
+  padding: 1.2rem;
 }
 
 .mit-hero-side h2 {
-  margin: 0;
-  color: #ffffff;
-  font-size: clamp(1.8rem, 3vw, 3rem);
-  line-height: 0.98;
-  letter-spacing: -0.05em;
+  margin: 0 0 0.65rem;
+  color: var(--cv-black);
+  font-size: clamp(1.3rem, 2vw, 1.85rem);
+  letter-spacing: -0.03em;
 }
 
 .mit-hero-side p {
-  color: #d8dde3;
-  line-height: 1.7;
+  margin: 0;
+  color: #374151;
+  line-height: 1.56;
 }
 
-.mit-hero-side a {
-  width: fit-content;
-  border-bottom: 2px solid var(--cv-red);
-  color: #ffffff;
-  font-weight: 850;
+.mit-mini-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.mit-mini-links a {
+  border: 1px solid var(--cv-border);
+  background: #ffffff;
+  padding: 0.55rem 0.7rem;
+  color: var(--cv-red-dark);
+  font-weight: 800;
+  font-size: 0.92rem;
 }
 
 .mit-strip {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  border-bottom: 1px solid var(--cv-line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 1.15rem 0;
+  border-bottom: 1px solid var(--cv-border);
 }
 
 .mit-strip span {
-  border-right: 1px solid var(--cv-line);
-  padding: 1rem 0.85rem;
+  border: 1px solid var(--cv-border);
+  background: #ffffff;
+  padding: 0.48rem 0.65rem;
   color: var(--cv-black);
-  font-size: 0.92rem;
   font-weight: 800;
-}
-
-.mit-strip span:first-child {
-  border-left: 1px solid var(--cv-line);
+  font-size: 0.9rem;
 }
 
 .mit-section,
 .platform-section {
-  padding: clamp(3rem, 6vw, 5rem) 0;
-  border-bottom: 1px solid var(--cv-line);
+  padding: clamp(2.2rem, 5vw, 4.2rem) 0;
+  border-bottom: 1px solid var(--cv-border);
 }
 
 .mit-section-head,
 .platform-section-head {
   display: grid;
-  grid-template-columns: 70px minmax(0, 1fr);
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  margin-bottom: 1.35rem;
 }
 
-.mit-section-head > span,
-.platform-section-index {
+.mit-section-head > span {
   color: var(--cv-red);
-  font-size: 1rem;
-  font-weight: 950;
+  font-size: 1.18rem;
+  font-weight: 900;
 }
 
 .mit-section h2,
-.platform-section-head h2,
-.platform-simple-page h1 {
-  max-width: 900px;
+.platform-section h2,
+.platform-simple-page h1,
+.platform-page-hero h1 {
+  max-width: 980px;
   margin: 0;
   color: var(--cv-black);
-  font-size: clamp(2.2rem, 4.5vw, 4.5rem);
-  line-height: 0.97;
-  letter-spacing: -0.06em;
+  font-size: clamp(1.85rem, 3.6vw, 3.75rem);
+  line-height: 1.03;
+  letter-spacing: -0.045em;
+}
+
+.mit-copy,
+.platform-page-hero .page-intro,
+.platform-simple-page .page-intro {
+  max-width: 850px;
+  color: var(--cv-muted);
+  font-size: 1.03rem;
+  line-height: 1.62;
 }
 
 .mit-feature-grid,
-.platform-grid {
+.mit-resource-grid,
+.platform-grid,
+.platform-matrix {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--cv-line);
-  border: 1px solid var(--cv-line);
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 1rem;
 }
 
 .mit-feature-card,
+.mit-resource-card,
 .platform-card,
 .platform-feature-card,
 .platform-resource-card,
@@ -259,20 +285,22 @@
 .platform-table-card {
   display: flex;
   flex-direction: column;
-  min-height: 260px;
+  min-height: auto;
+  border: 1px solid var(--cv-border);
   background: #ffffff;
+  padding: 1rem;
   color: var(--cv-text);
-  padding: 1.35rem;
-  transition: background 0.16s ease;
 }
 
 .mit-feature-card:hover,
+.mit-resource-card:hover,
 .platform-card:hover,
 .platform-feature-card:hover,
 .platform-resource-card:hover,
 .platform-video-card:hover,
 .platform-table-card:hover {
-  background: var(--cv-cream);
+  border-color: var(--cv-red);
+  box-shadow: inset 5px 0 0 var(--cv-red);
 }
 
 .mit-feature-card span,
@@ -282,240 +310,151 @@
 .platform-video-card .tag,
 .platform-status {
   width: fit-content;
-  color: var(--cv-red);
-  font-size: 0.76rem;
+  display: inline-flex;
+  background: #fff6f8;
+  border: 1px solid #e9cbd2;
+  color: var(--cv-red-dark);
+  padding: 0.25rem 0.55rem;
+  font-size: 0.72rem;
   font-weight: 900;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.platform-status {
-  display: inline-flex;
-  margin-bottom: 0.75rem;
-}
-
 .platform-status.live {
-  color: #047857;
+  color: #0f5132;
+  background: #edf7f1;
+  border-color: #b9dec9;
 }
 
 .platform-status.soon {
-  color: #92400e;
+  color: #7a4b00;
+  background: #fff8e8;
+  border-color: #f1d48b;
 }
 
 .mit-feature-card h3,
+.mit-resource-card h3,
 .platform-card h3,
 .platform-feature-card h3,
 .platform-resource-card h3,
 .platform-video-card h3,
 .platform-table-card h3 {
-  margin: 0.75rem 0 0.65rem;
+  margin: 0.8rem 0 0.5rem;
   color: var(--cv-black);
-  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
-  line-height: 1.08;
-  letter-spacing: -0.035em;
+  font-size: clamp(1.12rem, 1.55vw, 1.55rem);
+  line-height: 1.16;
+  letter-spacing: -0.025em;
 }
 
 .mit-feature-card p,
+.mit-resource-card p,
 .platform-card p,
 .platform-feature-card p,
 .platform-resource-card p,
 .platform-video-card p,
 .platform-table-card p {
+  margin: 0 0 0.85rem;
   color: var(--cv-muted);
-  line-height: 1.62;
+  line-height: 1.56;
 }
 
 .mit-feature-card b,
-.platform-card-footer {
+.platform-card-footer,
+.platform-card-footer a {
   margin-top: auto;
-  color: var(--cv-black);
+  color: var(--cv-red-dark) !important;
   font-weight: 900;
 }
 
 .platform-card ul,
 .platform-resource-card ul {
-  margin: 0.8rem 0 1rem;
+  margin: 0.7rem 0 1rem;
   padding-left: 1.1rem;
   color: var(--cv-muted);
   line-height: 1.55;
 }
 
-.platform-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  border-top: 1px solid var(--cv-line);
-  padding-top: 1rem;
-}
-
-.platform-card-footer a {
-  color: var(--cv-black);
-}
-
-.mit-resource-grid {
+.mit-split {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-top: 1px solid var(--cv-line);
-}
-
-.mit-resource-card {
-  display: grid;
-  grid-template-columns: 0.55fr 1fr;
-  gap: 1.2rem;
-  border-bottom: 1px solid var(--cv-line);
-  color: var(--cv-text);
-  padding: 1.1rem 0;
-}
-
-.mit-resource-card:nth-child(odd) {
-  padding-right: 1.4rem;
-  border-right: 1px solid var(--cv-line);
-}
-
-.mit-resource-card:nth-child(even) {
-  padding-left: 1.4rem;
-}
-
-.mit-resource-card h3 {
-  margin: 0;
-  color: var(--cv-black);
-  font-size: 1.2rem;
-  letter-spacing: -0.02em;
-}
-
-.mit-resource-card p {
-  margin: 0;
-  color: var(--cv-muted);
-  line-height: 1.55;
-}
-
-.mit-split,
-.platform-two-col {
-  display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  grid-template-columns: minmax(0, 0.8fr) minmax(320px, 1.2fr);
   gap: 2rem;
-}
-
-.mit-copy,
-.platform-simple-page .page-intro {
-  max-width: 760px;
-  color: var(--cv-muted);
-  line-height: 1.7;
-  font-size: 1.05rem;
+  align-items: start;
 }
 
 .mit-plan {
   margin: 0;
   padding: 0;
-  counter-reset: plan;
   list-style: none;
-  border-top: 1px solid var(--cv-line);
+  counter-reset: plan;
+  display: grid;
+  gap: 0.65rem;
 }
 
 .mit-plan li {
   counter-increment: plan;
   display: grid;
-  grid-template-columns: 60px minmax(0, 1fr);
-  gap: 1rem;
-  border-bottom: 1px solid var(--cv-line);
-  padding: 1rem 0;
-  color: var(--cv-black);
-  font-weight: 750;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 0.75rem;
+  align-items: start;
+  border: 1px solid var(--cv-border);
+  background: #ffffff;
+  padding: 0.85rem;
+  line-height: 1.5;
 }
 
 .mit-plan li::before {
   content: counter(plan, decimal-leading-zero);
   color: var(--cv-red);
-  font-weight: 950;
+  font-weight: 900;
 }
 
 .mit-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1px;
-  background: var(--cv-line);
-  border: 1px solid var(--cv-line);
+  background: var(--cv-border);
+  padding: 1px;
+  border: 0;
+  margin-bottom: 2rem;
 }
 
 .mit-stats div {
   background: #ffffff;
-  padding: 1.25rem;
+  padding: 1.1rem;
 }
 
 .mit-stats span {
   display: block;
   color: var(--cv-red);
-  font-size: clamp(2rem, 4vw, 4rem);
-  font-weight: 950;
-  letter-spacing: -0.07em;
-  line-height: 0.95;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.05em;
 }
 
 .mit-stats p {
-  margin: 0.5rem 0 0;
+  margin: 0.35rem 0 0;
   color: var(--cv-muted);
   font-weight: 750;
 }
 
+/* Generic platform pages */
 .platform-simple-page {
-  padding: clamp(2.5rem, 6vw, 5rem) 0;
+  padding: clamp(2rem, 5vw, 4rem) 0;
 }
 
 .platform-page-hero {
-  border-bottom: 1px solid var(--cv-line);
-  margin-bottom: 2rem;
-  padding-bottom: 2rem;
-}
-
-.platform-page-hero h1 {
-  max-width: 980px;
-}
-
-.platform-matrix {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
-  background: var(--cv-line);
-  border: 1px solid var(--cv-line);
-}
-
-.platform-path {
-  display: grid;
-  border-top: 1px solid var(--cv-line);
-}
-
-.platform-path a,
-.platform-path div {
-  display: grid;
-  grid-template-columns: 80px minmax(0, 1fr) auto;
-  gap: 1rem;
-  align-items: center;
-  border-bottom: 1px solid var(--cv-line);
-  background: #ffffff;
-  padding: 1rem 0;
-  color: var(--cv-text);
-}
-
-.platform-path span {
-  color: var(--cv-red);
-  font-weight: 950;
-}
-
-.platform-path strong {
-  display: block;
-  color: var(--cv-black);
-}
-
-.platform-path small {
-  color: var(--cv-muted);
+  margin-bottom: 1.6rem;
+  padding-bottom: 1.6rem;
+  border-bottom: 1px solid var(--cv-border);
 }
 
 .platform-dark-band {
   margin-top: 2rem;
   background: var(--cv-black);
   color: #ffffff;
-  padding: 2rem;
+  padding: 1.4rem;
 }
 
 .platform-dark-band h2,
@@ -525,16 +464,50 @@
 
 .platform-dark-band p {
   color: #d1d5db;
+  line-height: 1.58;
+}
+
+.platform-path {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.platform-path a,
+.platform-path div {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  border: 1px solid var(--cv-border);
+  background: #ffffff;
+  padding: 0.9rem;
+}
+
+.platform-path span {
+  color: var(--cv-red);
+  font-weight: 900;
+}
+
+.platform-path strong {
+  display: block;
+  color: var(--cv-black);
+}
+
+.platform-path small {
+  display: block;
+  color: var(--cv-muted);
+  line-height: 1.45;
 }
 
 .platform-video-frame {
+  width: 100%;
   aspect-ratio: 16 / 9;
   display: grid;
   place-items: center;
-  margin-bottom: 1rem;
-  border: 1px solid var(--cv-line);
-  background: var(--cv-soft);
-  color: var(--cv-muted);
+  margin: 1rem 0;
+  border: 1px solid var(--cv-border);
+  background: #111111;
+  color: #ffffff;
   text-align: center;
   padding: 1rem;
 }
@@ -545,79 +518,55 @@
   border: 0;
 }
 
+/* Footer */
+.mit-footer,
 .site-footer {
   background: var(--cv-black) !important;
   color: #ffffff !important;
-  border-top: 8px solid var(--cv-red);
+  border-top: 6px solid var(--cv-red);
 }
 
-.site-footer a,
-.site-footer span {
+.site-footer-meta span,
+.site-footer-nav a,
+.site-footer-mark span {
+  color: #e5e7eb !important;
+}
+
+.site-footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.site-footer-nav a:hover {
   color: #ffffff !important;
+  text-decoration: underline;
 }
 
-.site-footer-meta span {
-  color: #d1d5db !important;
-}
-
-@media (max-width: 980px) {
+@media (max-width: 960px) {
   .mit-hero,
-  .mit-split,
-  .platform-two-col {
+  .mit-split {
     grid-template-columns: 1fr;
   }
 
-  .mit-strip,
-  .mit-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .site-header-inner {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 0.8rem 0;
   }
 
-  .mit-feature-grid,
-  .platform-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .mit-resource-grid,
-  .platform-matrix {
-    grid-template-columns: 1fr;
-  }
-
-  .mit-resource-card,
-  .mit-resource-card:nth-child(odd),
-  .mit-resource-card:nth-child(even) {
-    grid-template-columns: 1fr;
-    padding-left: 0;
-    padding-right: 0;
-    border-right: 0;
-  }
-
-  .mit-section-head,
-  .platform-section-head {
-    grid-template-columns: 1fr;
+  .site-nav {
+    margin-left: 0;
   }
 }
 
 @media (max-width: 640px) {
-  .mit-hero {
-    padding-top: 2.4rem;
-  }
-
   .mit-hero h1 {
-    font-size: clamp(2.9rem, 17vw, 4.4rem);
+    font-size: clamp(2.2rem, 12vw, 3.8rem);
+    line-height: 1.02;
   }
 
-  .mit-strip,
-  .mit-stats {
-    grid-template-columns: 1fr;
-  }
-
-  .mit-strip span {
-    border-left: 1px solid var(--cv-line);
-    border-bottom: 1px solid var(--cv-line);
-  }
-
-  .platform-path a,
-  .platform-path div {
+  .mit-section-head {
     grid-template-columns: 1fr;
   }
 
@@ -629,5 +578,10 @@
   .mit-button,
   .platform-button {
     width: 100%;
+  }
+
+  .platform-path a,
+  .platform-path div {
+    grid-template-columns: 1fr;
   }
 }

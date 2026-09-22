@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: VideoCoursePageProps): Promis
   const firstVideo = series.videos[0];
 
   return {
-    title: `${series.title} — cppvalley Video Course`,
+    title: `${series.title} — cppvalley Course`,
     description: series.description,
     alternates: { canonical: `/youtube/${series.slug}` },
     keywords: series.seoKeywords,

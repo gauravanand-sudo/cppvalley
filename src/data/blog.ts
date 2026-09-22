@@ -1,3 +1,5 @@
+import { cppHftFastSendActorMessagingMdx } from "@/content/blog/cpp-hft-fast-send-actor-messaging";
+
 export type BlogPost = {
   slug: string;
   title: string;
@@ -10,6 +12,16 @@ export type BlogPost = {
 };
 
 export const blogPosts: BlogPost[] = [
+  {
+    slug: "cpp-hft-actor-messaging-fast-send-3370ns-to-30ns",
+    title: "How a C++ HFT System Reduced Actor Messaging From 3370ns to 30ns",
+    excerpt:
+      "A student-friendly explanation of fast_send, actor groups, thread handoffs, memory pools and why crossing a thread can dominate low-latency C++ messaging costs.",
+    publishedAt: "2026-09-23",
+    readingTime: "22 min read",
+    topics: ["HFT", "C++", "Actors", "Low Latency"],
+    mdx: cppHftFastSendActorMessagingMdx,
+  },
   {
     slug: "roadmap-to-cracking-hft-in-120-days",
     title: "Roadmap to Cracking HFT in 120 Days",

@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 };
 
 const projects = [
-  ["Core C++", "RAII wrapper, unique_ptr, shared_ptr, vector, memory pool and benchmark harness.", "Beginner to intermediate"],
-  ["HFT systems", "Market data decoder, order book, risk gate, replay engine and tick-to-trade capstone.", "Advanced"],
-  ["Concurrency", "Thread-safe queue, scheduler, thread pool, sharded cache and atomics experiments.", "Intermediate"],
-  ["AI systems", "RAG pipeline, vector search, eval harness, inference gateway and observability dashboard.", "Intermediate"],
-  ["Compiler/performance", "Toy compiler, parser, profiler, allocator lab and cache-aware data structures.", "Advanced"],
-  ["Portfolio", "Every project gets README, architecture diagram, benchmark, failure test and interview script.", "Career prep"],
+  ["Core C++", "RAII wrapper, unique_ptr, shared_ptr, vector, memory pool and benchmark harness.", "Beginner to intermediate", "/course-cover/core-cpp-projects"],
+  ["HFT systems", "Market data decoder, order book, risk gate, replay engine and tick-to-trade capstone.", "Advanced", "/course-cover/hft-systems-projects"],
+  ["Concurrency", "Thread-safe queue, scheduler, thread pool, sharded cache and atomics experiments.", "Intermediate", "/course-cover/concurrency-projects"],
+  ["AI systems", "RAG pipeline, vector search, eval harness, inference gateway and observability dashboard.", "Intermediate", "/course-cover/ai-systems-projects"],
+  ["Compiler/performance", "Toy compiler, parser, profiler, allocator lab and cache-aware data structures.", "Advanced", "/course-cover/compiler-performance-projects"],
+  ["Portfolio", "Every project gets README, architecture diagram, benchmark, failure test and interview script.", "Career prep", "/course-cover/portfolio-project-proof"],
 ] as const;
 
 export default function ProjectsPage() {
@@ -37,9 +37,13 @@ export default function ProjectsPage() {
                 <Link className="lp-button" href="/interviews">Practice project interviews</Link>
               </div>
             </div>
-            <aside className="lp-hero-card">
-              <div className="lp-hero-card-top"><span>Project standard</span><strong>Build · Measure · Explain</strong></div>
-              <p>Every project should include a README, design diagram, benchmark, failure cases and trade-off discussion.</p>
+            <aside className="lp-hero-card home-hero-image-card">
+              <img src="/course-cover/systems-project-lab" alt="Systems project lab cover" />
+              <div className="lp-card-body">
+                <span className="course-badge">Project standard</span>
+                <h2>Build · Measure · Explain</h2>
+                <p>Every project should include a README, design diagram, benchmark, failure cases and trade-off discussion.</p>
+              </div>
             </aside>
           </div>
         </section>
@@ -52,8 +56,9 @@ export default function ProjectsPage() {
             </div>
           </div>
           <div className="lp-course-grid">
-            {projects.map(([title, text, level]) => (
-              <article className="lp-card" key={title}>
+            {projects.map(([title, text, level, image]) => (
+              <article className="lp-card image-course-card" key={title}>
+                <img className="course-card-image" src={image} alt={`${title} project cover`} loading="lazy" />
                 <div className="lp-card-body">
                   <span className="course-badge">{level}</span>
                   <h3>{title}</h3>

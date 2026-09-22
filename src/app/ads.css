@@ -1,0 +1,66 @@
+.ad-slot {
+  width: 100%;
+  margin: 1.25rem 0;
+  border: 1px solid var(--lp-border, #d9dce1);
+  border-radius: 4px;
+  background: #ffffff;
+  padding: 0.75rem;
+  overflow: hidden;
+}
+
+.ad-slot-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--lp-muted, #5f6368);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ad-slot-leaderboard {
+  min-height: 118px;
+}
+
+.ad-slot-inarticle {
+  min-height: 260px;
+}
+
+.ad-slot-sidebar {
+  min-height: 300px;
+}
+
+.ad-slot-placeholder {
+  display: grid;
+  place-items: center;
+  min-height: 120px;
+  border-style: dashed;
+  text-align: center;
+  color: var(--lp-muted, #5f6368);
+}
+
+.ad-slot-placeholder span,
+.ad-slot-placeholder strong,
+.ad-slot-placeholder small {
+  display: block;
+}
+
+.ad-slot-placeholder strong {
+  margin-top: 0.3rem;
+  color: var(--lp-ink, #1f1f1f);
+}
+
+.ad-slot-placeholder small {
+  margin-top: 0.25rem;
+}
+
+.ad-article-wrap {
+  margin: 1.5rem 0;
+}
+
+@media (max-width: 760px) {
+  .ad-slot {
+    margin: 1rem 0;
+    padding: 0.55rem;
+  }
+}

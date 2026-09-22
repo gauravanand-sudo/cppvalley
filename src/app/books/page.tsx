@@ -22,7 +22,7 @@ const books = [
 
 export default function BooksPage() {
   return (
-    <div className="page-shell lp-page academic-page">
+    <div className="page-shell lp-page modern-page">
       <SiteHeader />
       <main className="lp-main">
         <section className="site-container lp-section">
@@ -30,6 +30,15 @@ export default function BooksPage() {
             <div>
               <p className="lp-kicker">Books</p>
               <h1>Book summaries</h1>
+              <p>Compact revision anchors for C++, systems, concurrency, design and infrastructure books.</p>
+            </div>
+          </div>
+
+          <div className="lp-card empty-state-card books-note-card">
+            <div className="lp-card-body">
+              <span className="course-badge">Being added gradually</span>
+              <strong>These summaries are roadmap placeholders for now.</strong>
+              <p>Use the list to prioritize reading; detailed summaries will be published over time.</p>
             </div>
           </div>
 

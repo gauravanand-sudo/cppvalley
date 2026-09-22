@@ -67,6 +67,10 @@ export default async function CoursePage({ params }: CoursePageProps) {
           <h1>{course.title}</h1>
           <p>{course.description}</p>
           <div className="lp-meta"><span>{course.level}</span><span>{course.duration}</span></div>
+          <div className="lp-actions course-detail-actions">
+            <Link className="lp-button primary" href="/interviews">Practice interview questions</Link>
+            <Link className="lp-button" href="/courses">All courses</Link>
+          </div>
 
           <div className="course-module-list compact-module-list">
             {course.modules.map((module, index) => (

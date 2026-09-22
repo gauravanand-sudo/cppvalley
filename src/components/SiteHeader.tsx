@@ -14,12 +14,12 @@ export function SiteHeader() {
           <span className="site-program">C++ Systems Learning Hub</span>
 
           <nav className="site-nav" aria-label="Primary navigation">
-            <Link href="/courses/third-year-cpp-eda-hft">Start</Link>
             <Link href="/courses">Courses</Link>
             <Link href="/youtube">Videos</Link>
             <Link href="/blog">Blog</Link>
             <Link href="/interviews">Questions</Link>
             <Link href="/books">Books</Link>
+            <Link href="/projects">Projects</Link>
           </nav>
         </div>
       </div>

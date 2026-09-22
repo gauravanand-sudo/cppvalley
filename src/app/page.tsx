@@ -5,172 +5,228 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { lessons, phases } from "@/data/curriculum";
 
 export const metadata: Metadata = {
-  title: "cppvalley — C++ Systems Learning Hub",
+  title: "cppvalley — C++ Systems Course Marketplace",
   description:
-    "Explore C++ interview prep, EDA software, HFT systems, low-latency engineering, AI systems, projects, videos and interview questions for students and engineers.",
+    "Explore cppvalley courses, embedded videos, interview practice, projects and book notes for C++, EDA software, HFT systems, low-latency engineering and AI systems interviews.",
   alternates: { canonical: "/" },
 };
 
-const focusAreas = [
+const categories = [
   "Modern C++",
   "EDA Software",
   "HFT Systems",
   "Low Latency",
   "AI Systems",
-  "Interview Projects",
+  "Interview Practice",
+  "Projects",
+  "Book Notes",
 ] as const;
 
-const featuredPaths = [
+const featuredCourses = [
   {
-    label: "Student track",
+    badge: "Student favorite",
     title: "3rd/4th Year C++ → EDA/HFT Roadmap",
-    text: "A practical path for students targeting C++ systems, EDA CAD software, semiconductor tooling, HFT or performance-heavy internships.",
     href: "/courses/third-year-cpp-eda-hft",
+    level: "Beginner to Internship Ready",
+    text: "A practical roadmap for students targeting C++ systems, EDA CAD software, semiconductor tooling, HFT and performance-heavy roles.",
+    lessons: "8 modules",
+    duration: "12 weeks",
+    rating: "4.9",
+    meta: ["Modern C++", "OS/Linux", "EDA/HFT", "Projects"],
   },
   {
-    label: "C++ foundation",
+    badge: "Core foundation",
     title: "Core C++ for Interviews",
-    text: "RAII, smart pointers, move semantics, STL, templates, object model, undefined behavior, tooling and build-from-scratch projects.",
     href: "/courses#core-cpp",
+    level: "Beginner to Advanced",
+    text: "RAII, smart pointers, move semantics, STL, templates, object model, undefined behavior, tooling and build-from-scratch projects.",
+    lessons: "97 lessons",
+    duration: "8 weeks",
+    rating: "4.8",
+    meta: ["Scott Meyers", "Effective STL", "Memory", "Tooling"],
   },
   {
-    label: "HFT systems",
+    badge: "Systems depth",
     title: "HFT Core Systems",
-    text: "CPU, Linux, networking, latency measurement, market data, execution, risk and tick-to-trade systems.",
     href: "/curriculum",
+    level: "Intermediate to Advanced",
+    text: "CPU, Linux, networking, latency measurement, market data, execution, risk and tick-to-trade systems for HFT engineering.",
+    lessons: `${lessons.length} lessons`,
+    duration: `${phases.length} phases`,
+    rating: "4.9",
+    meta: ["Latency", "Linux", "Networking", "Trading"],
+  },
+  {
+    badge: "Video course",
+    title: "C++ Interview Video Library",
+    href: "/youtube",
+    level: "Intermediate",
+    text: "Your cppvalley videos organized like a course catalog: virtual functions, unique_ptr, atomics, cache coherence and low-latency C++.",
+    lessons: "8 videos",
+    duration: "4+ hours",
+    rating: "4.7",
+    meta: ["Embedded videos", "C++", "Concurrency", "Low latency"],
   },
 ] as const;
 
-const resourceLinks = [
-  { title: "Courses", text: "Structured paths for C++, EDA, HFT, AI systems and interview preparation.", href: "/courses" },
-  { title: "Videos", text: "cppvalley YouTube lessons organized by topic and embedded on-site.", href: "/youtube" },
-  { title: "Daily Blog", text: "Short engineering notes on one useful C++ or systems idea at a time.", href: "/blog" },
-  { title: "Questions", text: "C++/systems/HFT/AI interview prompts with answer frameworks.", href: "/interviews" },
-  { title: "Book Notes", text: "Summaries from C++, STL, design, concurrency, systems and HFT books.", href: "/books" },
-  { title: "Projects", text: "Portfolio projects students can build, measure, explain and share.", href: "/projects" },
+const learningPaths = [
+  {
+    title: "C++ Interview Track",
+    href: "/courses#core-cpp",
+    text: "Learn language internals, ownership, STL, templates, UB, tools and mock interview explanations.",
+    count: "Core + videos + questions",
+  },
+  {
+    title: "Student EDA/HFT Track",
+    href: "/courses/third-year-cpp-eda-hft",
+    text: "A college-friendly path from modern C++ to OS, architecture, EDA, low latency, projects and interviews.",
+    count: "8 modules + projects",
+  },
+  {
+    title: "HFT Systems Track",
+    href: "/curriculum",
+    text: "Move from latency measurement to Linux, networking, market data, execution, risk and tick-to-trade design.",
+    count: `${lessons.length} lessons`,
+  },
 ] as const;
 
-const learningMap = [
-  "Build real C++ depth: lifetime, ownership, object model, templates and STL.",
-  "Connect C++ to systems: OS, Linux, architecture, networking and performance.",
-  "Choose a domain path: EDA software, HFT systems or AI systems.",
-  "Create project evidence: README, benchmarks, trade-offs and failure notes.",
-  "Practice interviews with clear explanations, not memorized answers.",
+const resourceTiles = [
+  { title: "Courses", href: "/courses", text: "Structured tracks with modules, projects and outcomes." },
+  { title: "Videos", href: "/youtube", text: "Embedded cppvalley video lessons grouped by path." },
+  { title: "Questions", href: "/interviews", text: "Interview prompts and answer frameworks." },
+  { title: "Projects", href: "/projects", text: "Portfolio builds with design trade-offs." },
+  { title: "Blog", href: "/blog", text: "Focused systems notes for long-tail search." },
+  { title: "Books", href: "/books", text: "Summaries from C++, STL, concurrency and systems books." },
 ] as const;
 
 export default function Home() {
   return (
-    <div className="page-shell platform-site mit-site">
+    <div className="page-shell platform-site learning-marketplace">
       <SiteHeader />
 
       <main>
-        <section className="mit-hero site-container">
-          <div className="mit-hero-main">
-            <p className="mit-kicker">C++ · EDA · HFT · AI Systems</p>
-            <h1>C++ systems learning for serious interview preparation.</h1>
-            <p className="mit-lede">
-              Explore courses, videos, projects, notes and questions for modern C++, EDA software, semiconductor tooling, HFT, low-latency engineering and AI systems roles.
-            </p>
-            <div className="mit-actions">
-              <Link className="mit-button primary" href="/courses">
-                Explore courses
-              </Link>
-              <Link className="mit-button" href="/youtube">
-                Watch videos
-              </Link>
-              <Link className="mit-button" href="/interviews">
-                Practice questions
-              </Link>
+        <section className="market-hero">
+          <div className="site-container market-hero-inner">
+            <div className="market-hero-copy">
+              <p className="market-eyebrow">cppvalley learning catalog</p>
+              <h1>Build C++ systems depth for EDA, HFT and AI systems interviews.</h1>
+              <p>
+                Explore course tracks, embedded video lessons, interview questions, projects and book notes designed for students and engineers preparing for serious systems roles.
+              </p>
+              <div className="market-search" role="search" aria-label="cppvalley learning search">
+                <span>What do you want to learn?</span>
+                <strong>C++ interviews · EDA · HFT · low latency · AI systems</strong>
+              </div>
+              <div className="market-actions">
+                <Link className="market-button primary" href="/courses">Explore courses</Link>
+                <Link className="market-button" href="/youtube">Browse videos</Link>
+                <Link className="market-button ghost" href="/interviews">Practice questions</Link>
+              </div>
             </div>
+
+            <aside className="market-hero-card" aria-label="cppvalley catalog snapshot">
+              <div className="market-card-top">
+                <span>Learning path</span>
+                <strong>Systems Interview Prep</strong>
+              </div>
+              <div className="market-progress">
+                <span>C++ foundation</span>
+                <b>RAII · STL · Templates</b>
+              </div>
+              <div className="market-progress">
+                <span>Systems depth</span>
+                <b>Linux · CPU · Networking</b>
+              </div>
+              <div className="market-progress">
+                <span>Domain tracks</span>
+                <b>EDA · HFT · AI Systems</b>
+              </div>
+              <div className="market-stats-row">
+                <div><strong>{lessons.length}</strong><span>HFT lessons</span></div>
+                <div><strong>8</strong><span>videos</span></div>
+                <div><strong>6</strong><span>hubs</span></div>
+              </div>
+            </aside>
           </div>
-
-          <aside className="mit-hero-side" aria-label="cppvalley overview">
-            <h2>What you can explore</h2>
-            <p>
-              Courses, YouTube lessons, interview questions, project ideas, book notes and daily engineering writing — all focused on C++ systems careers.
-            </p>
-            <div className="mit-mini-links">
-              <Link href="/courses/third-year-cpp-eda-hft">Student roadmap</Link>
-              <Link href="/curriculum">HFT curriculum</Link>
-              <Link href="/projects">Projects</Link>
-            </div>
-          </aside>
         </section>
 
-        <section className="mit-strip site-container" aria-label="cppvalley focus areas">
-          {focusAreas.map((item) => <span key={item}>{item}</span>)}
+        <section className="site-container market-category-strip" aria-label="Browse categories">
+          {categories.map((category) => <Link href="/courses" key={category}>{category}</Link>)}
         </section>
 
-        <section className="mit-section site-container">
-          <div className="mit-section-head">
-            <span>01</span>
+        <section className="site-container market-section">
+          <div className="market-section-head">
             <div>
-              <p className="mit-kicker">Learning paths</p>
-              <h2>Clear tracks students can scan fast.</h2>
+              <p className="market-eyebrow">Featured courses</p>
+              <h2>Popular learning tracks</h2>
             </div>
+            <Link href="/courses">View full catalog →</Link>
           </div>
 
-          <div className="mit-feature-grid">
-            {featuredPaths.map((path) => (
-              <Link className="mit-feature-card" href={path.href} key={path.title}>
-                <span>{path.label}</span>
-                <h3>{path.title}</h3>
-                <p>{path.text}</p>
+          <div className="market-course-grid">
+            {featuredCourses.map((course) => (
+              <Link className="market-course-card" href={course.href} key={course.title}>
+                <div className="course-thumb">
+                  <span>{course.badge}</span>
+                  <strong>{course.title.split(" ").slice(0, 3).join(" ")}</strong>
+                </div>
+                <div className="course-body">
+                  <span className="course-badge">{course.badge}</span>
+                  <h3>{course.title}</h3>
+                  <p>{course.text}</p>
+                  <div className="course-rating"><b>★ {course.rating}</b><span>{course.level}</span></div>
+                  <div className="course-meta"><span>{course.lessons}</span><span>{course.duration}</span></div>
+                  <div className="course-tags">
+                    {course.meta.map((item) => <span key={item}>{item}</span>)}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="site-container market-section">
+          <div className="market-section-head">
+            <div>
+              <p className="market-eyebrow">Guided paths</p>
+              <h2>Grokking-style roadmaps by role</h2>
+            </div>
+          </div>
+          <div className="market-path-list">
+            {learningPaths.map((path) => (
+              <Link className="market-path-row" href={path.href} key={path.title}>
+                <div><span>Path</span><h3>{path.title}</h3><p>{path.text}</p></div>
+                <strong>{path.count}</strong>
                 <b>Explore →</b>
               </Link>
             ))}
           </div>
         </section>
 
-        <section className="mit-section site-container">
-          <div className="mit-section-head">
-            <span>02</span>
+        <section className="site-container market-section">
+          <div className="market-section-head">
             <div>
-              <p className="mit-kicker">Resources</p>
-              <h2>Pick a format and keep moving.</h2>
+              <p className="market-eyebrow">Resource library</p>
+              <h2>Learn by format</h2>
             </div>
           </div>
-
-          <div className="mit-resource-grid">
-            {resourceLinks.map((resource) => (
-              <Link className="mit-resource-card" href={resource.href} key={resource.title}>
-                <h3>{resource.title}</h3>
-                <p>{resource.text}</p>
+          <div className="market-resource-grid">
+            {resourceTiles.map((tile) => (
+              <Link className="market-resource-tile" href={tile.href} key={tile.title}>
+                <h3>{tile.title}</h3>
+                <p>{tile.text}</p>
+                <span>Open →</span>
               </Link>
             ))}
           </div>
         </section>
 
-        <section className="mit-section site-container mit-split">
+        <section className="site-container market-final-cta">
           <div>
-            <p className="mit-kicker">Learning map</p>
-            <h2>From student to systems-ready engineer</h2>
-            <p className="mit-copy">
-              cppvalley connects C++ depth, systems fundamentals, domain knowledge and projects so students can explore without being forced into one path.
-            </p>
+            <p className="market-eyebrow">Keep exploring</p>
+            <h2>Pick a course, watch a lesson, build a project, practice the interview explanation.</h2>
           </div>
-          <ol className="mit-plan">
-            {learningMap.map((step) => <li key={step}>{step}</li>)}
-          </ol>
-        </section>
-
-        <section className="mit-section site-container mit-stats">
-          <div>
-            <span>{lessons.length}</span>
-            <p>HFT curriculum lessons</p>
-          </div>
-          <div>
-            <span>{phases.length}</span>
-            <p>HFT roadmap phases</p>
-          </div>
-          <div>
-            <span>8</span>
-            <p>student roadmap modules</p>
-          </div>
-          <div>
-            <span>6</span>
-            <p>main resource hubs</p>
-          </div>
+          <Link className="market-button primary" href="/courses">Explore catalog</Link>
         </section>
       </main>
 

@@ -30,6 +30,27 @@ export const metadata: Metadata = {
 const blogTopAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_TOP_SLOT;
 const blogFeedAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_FEED_SLOT;
 
+const workflowCards = [
+  {
+    label: "Topic",
+    title: "Target one keyword",
+    image: "/course-cover/daily-blog-keyword",
+    text: "Examples: virtual destructor C++, false sharing, EDA netlist graph, HFT order book, C++ atomics.",
+  },
+  {
+    label: "Structure",
+    title: "Explain, then connect",
+    image: "/course-cover/blog-article-structure",
+    text: "Use short sections, bullets, code ideas, interview prompts and links to courses or projects.",
+  },
+  {
+    label: "Monetize",
+    title: "Ads are controlled",
+    image: "/course-cover/blog-ad-placement",
+    text: "Top, mid and bottom placements are ready for AdSense without breaking reading flow.",
+  },
+] as const;
+
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en", {
     day: "2-digit",
@@ -79,10 +100,13 @@ export default function BlogPage() {
               </div>
             </div>
 
-            <aside className="blog-hero-side" aria-label="Article system">
-              <strong>Daily publishing ready</strong>
-              <strong>Article schema enabled</strong>
-              <strong>Ad slots on index and article pages</strong>
+            <aside className="lp-hero-card home-hero-image-card" aria-label="Article system">
+              <img src="/course-cover/daily-systems-articles" alt="Daily systems articles cover" />
+              <div className="lp-card-body">
+                <span className="course-badge">Daily publishing ready</span>
+                <h2>One post every day</h2>
+                <p>Article schema, RSS, internal links and ad slots are ready for a daily publishing habit.</p>
+              </div>
             </aside>
           </div>
         </section>
@@ -99,9 +123,16 @@ export default function BlogPage() {
             </div>
           </div>
           <div className="lp-course-grid">
-            <article className="lp-card"><div className="lp-card-body"><span className="course-badge">Topic</span><h3>Target one keyword</h3><p>Examples: virtual destructor C++, false sharing, EDA netlist graph, HFT order book, C++ atomics.</p></div></article>
-            <article className="lp-card"><div className="lp-card-body"><span className="course-badge">Structure</span><h3>Explain, then connect</h3><p>Use short sections, bullets, code ideas, interview prompts and links to courses or projects.</p></div></article>
-            <article className="lp-card"><div className="lp-card-body"><span className="course-badge">Monetize</span><h3>Ads are controlled</h3><p>Top, mid and bottom placements are ready for AdSense without breaking reading flow.</p></div></article>
+            {workflowCards.map((card) => (
+              <article className="lp-card image-course-card" key={card.title}>
+                <img className="course-card-image" src={card.image} alt={`${card.title} cover`} loading="lazy" />
+                <div className="lp-card-body">
+                  <span className="course-badge">{card.label}</span>
+                  <h3>{card.title}</h3>
+                  <p>{card.text}</p>
+                </div>
+              </article>
+            ))}
           </div>
         </section>
 
@@ -112,13 +143,14 @@ export default function BlogPage() {
           </div>
 
           {posts.length > 0 ? (
-            <div className="blog-list">
+            <div className="blog-list image-blog-list">
               {posts.map((post, index) => (
                 <Fragment key={post.slug}>
                   {index === 2 ? (
                     <AdSlot slot={blogFeedAdSlot} className="ad-slot-leaderboard" />
                   ) : null}
-                  <Link className="blog-list-item" href={`/blog/${post.slug}`}>
+                  <Link className="blog-list-item image-course-card" href={`/blog/${post.slug}`}>
+                    <img className="content-tile-image" src={`/course-cover/${post.slug}`} alt={`${post.title} cover`} loading="lazy" />
                     <span className="blog-list-date">{formatDate(post.publishedAt)}</span>
                     <div className="blog-list-copy">
                       <h2>{post.title}</h2>
@@ -135,7 +167,8 @@ export default function BlogPage() {
               ))}
             </div>
           ) : (
-            <div className="lp-card">
+            <div className="lp-card image-course-card">
+              <img className="course-card-image" src="/course-cover/no-articles-yet" alt="Article library cover" />
               <div className="lp-card-body">
                 <strong>No articles published yet.</strong>
                 <p>The article library is ready for the first cppvalley systems note.</p>

@@ -15,18 +15,17 @@ export default function Home() {
   const sortedCourses = [...courses].sort((a, b) => a.priority - b.priority);
 
   return (
-    <div className="page-shell lp-page academic-page">
+    <div className="page-shell lp-page academic-page modern-page">
       <SiteHeader />
 
       <main className="lp-main">
-        <section className="academic-hero lp-hero compact-hero social-hero">
+        <section className="academic-hero lp-hero compact-hero social-hero smooth-hero">
           <div className="site-container">
             <p className="lp-kicker">cppvalley</p>
             <h1>C++ systems courses for serious students.</h1>
             <p>Learn C++, HFT, EDA, CUDA, GPU and AI systems through focused course tracks.</p>
             <div className="lp-actions hero-cta-row">
-              <Link className="lp-button primary" href="/courses/third-year-cpp-eda-hft">Start here</Link>
-              <Link className="lp-button" href="/courses">Browse courses</Link>
+              <Link className="lp-button primary" href="/courses">Browse courses</Link>
               <Link className="lp-button" href="/interviews">Practice interviews</Link>
             </div>
           </div>
@@ -41,9 +40,9 @@ export default function Home() {
             <Link className="lp-card-link" href="/courses">View all</Link>
           </div>
 
-          <div className="lp-course-grid flagship-course-grid">
+          <div className="lp-course-grid flagship-course-grid smooth-course-grid">
             {sortedCourses.slice(0, 12).map((course) => (
-              <Link className="lp-course-card academic-course-card" href={course.href} key={course.slug}>
+              <Link className="lp-course-card academic-course-card smooth-course-card" href={course.href} key={course.slug}>
                 <div className="lp-card-thumb academic-card-thumb">
                   <span>{course.pillar}</span>
                   <strong>{course.shortTitle}</strong>

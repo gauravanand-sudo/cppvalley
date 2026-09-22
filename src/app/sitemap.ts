@@ -19,6 +19,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.95,
     },
     {
+      url: "https://cppvalley.com/courses/third-year-cpp-eda-hft",
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.95,
+    },
+    {
       url: "https://cppvalley.com/curriculum",
       lastModified,
       changeFrequency: "weekly",
@@ -32,6 +38,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: "https://cppvalley.com/interviews",
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: "https://cppvalley.com/youtube",
       lastModified,
       changeFrequency: "weekly",
       priority: 0.85,
@@ -52,12 +64,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: "https://cppvalley.com/conferences",
       lastModified,
       changeFrequency: "monthly",
-      priority: 0.75,
-    },
-    {
-      url: "https://cppvalley.com/youtube",
-      lastModified,
-      changeFrequency: "weekly",
       priority: 0.75,
     },
   ];

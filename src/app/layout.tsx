@@ -6,6 +6,7 @@ import "./ads.css";
 import "./video-course-player.css";
 import "./ui-system.css";
 import "./mdx-article.css";
+import "./brand-restore.css";
 
 const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
@@ -76,36 +77,6 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-const logoFitCss = `
-.site-logo .market-brand,
-.lesson-logo .market-brand {
-  width: 128px !important;
-  height: 44px !important;
-  min-width: 128px !important;
-  background-size: contain !important;
-  background-position: left center !important;
-  background-repeat: no-repeat !important;
-}
-
-.site-footer-logo .market-brand {
-  width: 128px !important;
-  height: 44px !important;
-  min-width: 128px !important;
-  background-size: contain !important;
-  background-position: left center !important;
-  background-repeat: no-repeat !important;
-}
-
-@media (max-width: 760px) {
-  .site-logo .market-brand,
-  .lesson-logo .market-brand {
-    width: 120px !important;
-    height: 42px !important;
-    min-width: 120px !important;
-  }
-}
-`;
-
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
@@ -153,7 +124,6 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   return (
     <html lang="en">
       <head>
-        <style>{logoFitCss}</style>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

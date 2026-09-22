@@ -25,7 +25,7 @@ export function VideoCoursePlayer({ series }: VideoCoursePlayerProps) {
   }
 
   return (
-    <section className="course-player-shell" aria-label={`${series.title} video course player`}>
+    <section className="course-player-shell" aria-label={`${series.title} course player`}>
       <div className="course-player-left">
         <div className="course-player-video-frame">
           <iframe
@@ -53,7 +53,7 @@ export function VideoCoursePlayer({ series }: VideoCoursePlayerProps) {
       <aside className="course-player-sidebar" aria-label="Course content">
         <div className="course-player-sidebar-head">
           <div>
-            <span>Video course</span>
+            <span>Course</span>
             <h2>{series.title}</h2>
           </div>
           <p>{series.videos.length} lessons</p>

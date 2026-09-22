@@ -3,9 +3,10 @@ import { blogPosts } from "@/data/blog";
 import { courses } from "@/data/courses";
 import { lessons } from "@/data/curriculum";
 import { interviewSets } from "@/data/interviews";
+import { youtubeSeries } from "@/data/youtube";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date("2026-09-22");
+  const lastModified = new Date("2026-09-23");
 
   const corePages: MetadataRoute.Sitemap = [
     {
@@ -42,7 +43,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: "https://cppvalley.com/youtube",
       lastModified,
       changeFrequency: "weekly",
-      priority: 0.85,
+      priority: 0.9,
     },
     {
       url: "https://cppvalley.com/projects",
@@ -64,8 +65,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `https://cppvalley.com${course.href}`,
       lastModified,
       changeFrequency: "weekly",
-      priority: 0.9,
+      priority: 0.86,
     }));
+
+  const videoCoursePages: MetadataRoute.Sitemap = youtubeSeries.map((series) => ({
+    url: `https://cppvalley.com/youtube/${series.slug}`,
+    lastModified,
+    changeFrequency: "weekly",
+    priority: 0.84,
+  }));
 
   const lessonPages: MetadataRoute.Sitemap = lessons.map((lesson) => ({
     url: `https://cppvalley.com/curriculum/${lesson.slug}`,
@@ -88,5 +96,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.78,
   }));
 
-  return [...corePages, ...coursePages, ...lessonPages, ...blogPages, ...interviewPages];
+  return [...corePages, ...coursePages, ...videoCoursePages, ...lessonPages, ...blogPages, ...interviewPages];
 }

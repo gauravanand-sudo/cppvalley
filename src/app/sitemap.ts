@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { blogPosts } from "@/data/blog";
 import { lessons } from "@/data/curriculum";
+import { interviewSets } from "@/data/interviews";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date("2026-09-22");
@@ -39,8 +40,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: "https://cppvalley.com/interviews",
       lastModified,
-      changeFrequency: "weekly",
-      priority: 0.85,
+      changeFrequency: "daily",
+      priority: 0.9,
     },
     {
       url: "https://cppvalley.com/youtube",
@@ -79,8 +80,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `https://cppvalley.com/blog/${post.slug}`,
     lastModified: new Date(`${post.publishedAt}T00:00:00.000Z`),
     changeFrequency: "monthly",
-    priority: 0.65,
+    priority: 0.72,
   }));
 
-  return [...corePages, ...lessonPages, ...blogPages];
+  const interviewPages: MetadataRoute.Sitemap = interviewSets.map((set) => ({
+    url: `https://cppvalley.com/interviews/${set.slug}`,
+    lastModified,
+    changeFrequency: "weekly",
+    priority: 0.78,
+  }));
+
+  return [...corePages, ...lessonPages, ...blogPages, ...interviewPages];
 }

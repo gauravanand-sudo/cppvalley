@@ -2,11 +2,11 @@ import Link from "next/link";
 import { BrandLockup } from "@/components/BrandLockup";
 
 const links = [
+  ["Start here", "/courses/third-year-cpp-eda-hft"],
   ["Courses", "/courses"],
   ["Interview Questions", "/interviews"],
   ["Blog", "/blog"],
   ["Books", "/books"],
-  ["HFT Curriculum", "/curriculum"],
 ] as const;
 
 export function SiteFooter() {
@@ -17,7 +17,7 @@ export function SiteFooter() {
           <Link className="site-footer-logo" href="/" aria-label="cppvalley home">
             <BrandLockup />
           </Link>
-          <p>C++, HFT, EDA, CUDA, GPU and AI systems courses for students and engineers.</p>
+          <p>C++ systems courses for students targeting HFT, EDA, CUDA, GPU and AI systems roles.</p>
         </div>
 
         <nav className="lp-footer-columns" aria-label="Footer navigation">

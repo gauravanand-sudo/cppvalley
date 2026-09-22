@@ -14,7 +14,7 @@ export default function CoursesPage() {
   const sortedCourses = [...courses].sort((a, b) => a.priority - b.priority);
 
   return (
-    <div className="page-shell lp-page course-catalog-page academic-page modern-page">
+    <div className="page-shell lp-page course-catalog-page modern-page">
       <SiteHeader />
       <main className="lp-main">
         <section className="site-container lp-section clean-page-section">
@@ -25,12 +25,9 @@ export default function CoursesPage() {
 
           <div className="lp-course-grid flagship-course-grid smooth-course-grid">
             {sortedCourses.map((course) => (
-              <Link className="lp-course-card academic-course-card smooth-course-card" href={course.href} key={course.slug}>
-                <div className="lp-card-thumb academic-card-thumb">
-                  <span>{course.pillar}</span>
-                  <strong>{course.shortTitle}</strong>
-                </div>
+              <Link className="lp-course-card smooth-course-card" href={course.href} key={course.slug}>
                 <div className="lp-card-body">
+                  <span className="course-card-eyebrow">{course.pillar}</span>
                   <h3>{course.title}</h3>
                   <p>{course.description}</p>
                   <div className="lp-meta"><span>{course.level}</span><span>{course.duration}</span></div>

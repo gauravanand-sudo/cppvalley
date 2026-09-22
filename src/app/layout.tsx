@@ -7,6 +7,7 @@ import "./video-course-player.css";
 import "./ui-system.css";
 import "./mdx-article.css";
 import "./udemy-ui.css";
+import "./market-detail-ui.css";
 import "./brand-restore.css";
 
 const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;

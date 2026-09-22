@@ -18,9 +18,15 @@ export default function CoursesPage() {
       <SiteHeader />
       <main className="lp-main">
         <section className="site-container clean-page-section">
-          <header className="clean-page-head">
-            <p className="lp-kicker">Courses</p>
-            <h1>Courses</h1>
+          <header className="clean-page-head clean-page-head-with-cta">
+            <div>
+              <p className="lp-kicker">Courses</p>
+              <h1>Courses</h1>
+            </div>
+            <div className="clean-head-actions">
+              <Link className="lp-button primary" href="/courses/third-year-cpp-eda-hft">Start here</Link>
+              <Link className="lp-button" href="/interviews">Interview questions</Link>
+            </div>
           </header>
 
           <div className="clean-course-list">
@@ -34,6 +40,7 @@ export default function CoursesPage() {
                 <div className="clean-course-meta">
                   <strong>{course.duration}</strong>
                   <small>{course.level}</small>
+                  <em>Open →</em>
                 </div>
               </Link>
             ))}

@@ -1,4 +1,5 @@
-import type { Metadata, ReactNode, Viewport } from "next";
+import type { Metadata, Viewport } from "next";
+import type { ReactNode } from "react";
 import Script from "next/script";
 import "./globals.css";
 import "./ads.css";

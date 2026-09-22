@@ -1,12 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
-import "./brand-consistency.css";
-import "./site-stable.css";
-import "./course-catalog.css";
-import "./curriculum-platform.css";
 import "./ads.css";
-import "./seo-growth.css";
 import "./video-course-player.css";
 import "./ui-system.css";
 import "./mdx-article.css";
@@ -50,13 +45,13 @@ export const metadata: Metadata = {
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
-    images: [{ url: "/cppvalley-logo.webp", width: 1200, height: 593, alt: "cppvalley logo" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "cppvalley C++ systems courses" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "cppvalley — C++ Systems Courses",
     description: "C++, HFT, EDA, CUDA, GPU and AI systems courses.",
-    images: ["/cppvalley-logo.webp"],
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,

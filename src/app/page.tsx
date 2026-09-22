@@ -7,34 +7,34 @@ import { lessons, phases } from "@/data/curriculum";
 export const metadata: Metadata = {
   title: "cppvalley — C++ Systems Learning Hub",
   description:
-    "A clean learning hub for students preparing for C++ systems, EDA software, HFT, low-latency engineering and AI systems interviews.",
+    "Explore C++ interview prep, EDA software, HFT systems, low-latency engineering, AI systems, projects, videos and interview questions for students and engineers.",
   alternates: { canonical: "/" },
 };
 
 const focusAreas = [
   "Modern C++",
-  "EDA software",
-  "HFT systems",
-  "Low latency",
-  "AI systems",
-  "Interview projects",
+  "EDA Software",
+  "HFT Systems",
+  "Low Latency",
+  "AI Systems",
+  "Interview Projects",
 ] as const;
 
 const featuredPaths = [
   {
-    label: "Recommended start",
+    label: "Student track",
     title: "3rd/4th Year C++ → EDA/HFT Roadmap",
-    text: "A practical path for students who want C++ systems, EDA CAD software, semiconductor tooling, HFT, or performance-heavy internships.",
+    text: "A practical path for students targeting C++ systems, EDA CAD software, semiconductor tooling, HFT or performance-heavy internships.",
     href: "/courses/third-year-cpp-eda-hft",
   },
   {
-    label: "Core foundation",
+    label: "C++ foundation",
     title: "Core C++ for Interviews",
-    text: "RAII, smart pointers, move semantics, STL, templates, object model, undefined behavior, tools and build-from-scratch projects.",
+    text: "RAII, smart pointers, move semantics, STL, templates, object model, undefined behavior, tooling and build-from-scratch projects.",
     href: "/courses#core-cpp",
   },
   {
-    label: "Specialized track",
+    label: "HFT systems",
     title: "HFT Core Systems",
     text: "CPU, Linux, networking, latency measurement, market data, execution, risk and tick-to-trade systems.",
     href: "/curriculum",
@@ -42,20 +42,20 @@ const featuredPaths = [
 ] as const;
 
 const resourceLinks = [
-  { title: "Courses", text: "Structured learning paths for C++, EDA, HFT, AI systems and interview preparation.", href: "/courses" },
-  { title: "YouTube", text: "cppvalley videos organized into topic-wise study paths and embedded on the site.", href: "/youtube" },
+  { title: "Courses", text: "Structured paths for C++, EDA, HFT, AI systems and interview preparation.", href: "/courses" },
+  { title: "Videos", text: "cppvalley YouTube lessons organized by topic and embedded on-site.", href: "/youtube" },
   { title: "Daily Blog", text: "Short engineering notes on one useful C++ or systems idea at a time.", href: "/blog" },
-  { title: "Interview Questions", text: "C++/systems/HFT/AI interview prompts with answer frameworks and project discussion points.", href: "/interviews" },
-  { title: "Book Notes", text: "Clean summaries from C++, STL, design, concurrency, systems and HFT books.", href: "/books" },
-  { title: "Projects", text: "Portfolio projects students can build, measure, explain and show in interviews.", href: "/projects" },
+  { title: "Questions", text: "C++/systems/HFT/AI interview prompts with answer frameworks.", href: "/interviews" },
+  { title: "Book Notes", text: "Summaries from C++, STL, design, concurrency, systems and HFT books.", href: "/books" },
+  { title: "Projects", text: "Portfolio projects students can build, measure, explain and share.", href: "/projects" },
 ] as const;
 
-const studentPlan = [
-  "Learn modern C++ deeply instead of memorizing syntax.",
-  "Build systems projects with clear README, benchmarks and trade-offs.",
-  "Practice DSA in C++ with implementation discipline.",
-  "Understand OS, Linux, architecture and performance basics.",
-  "Prepare interview stories around projects, failures and design choices.",
+const learningMap = [
+  "Build real C++ depth: lifetime, ownership, object model, templates and STL.",
+  "Connect C++ to systems: OS, Linux, architecture, networking and performance.",
+  "Choose a domain path: EDA software, HFT systems or AI systems.",
+  "Create project evidence: README, benchmarks, trade-offs and failure notes.",
+  "Practice interviews with clear explanations, not memorized answers.",
 ] as const;
 
 export default function Home() {
@@ -67,26 +67,33 @@ export default function Home() {
         <section className="mit-hero site-container">
           <div className="mit-hero-main">
             <p className="mit-kicker">C++ · EDA · HFT · AI Systems</p>
-            <h1>A serious learning hub for systems interviews.</h1>
+            <h1>C++ systems learning for serious interview preparation.</h1>
             <p className="mit-lede">
-              cppvalley helps students and engineers prepare for C++ systems, EDA software, semiconductor tooling, HFT, low-latency and AI systems interviews with courses, videos, notes, projects and questions.
+              Explore courses, videos, projects, notes and questions for modern C++, EDA software, semiconductor tooling, HFT, low-latency engineering and AI systems roles.
             </p>
             <div className="mit-actions">
-              <Link className="mit-button primary" href="/courses/third-year-cpp-eda-hft">
-                Start student roadmap
+              <Link className="mit-button primary" href="/courses">
+                Explore courses
               </Link>
-              <Link className="mit-button" href="/courses">
-                View all courses
+              <Link className="mit-button" href="/youtube">
+                Watch videos
+              </Link>
+              <Link className="mit-button" href="/interviews">
+                Practice questions
               </Link>
             </div>
           </div>
 
-          <aside className="mit-hero-side" aria-label="cppvalley summary">
-            <h2>Start here</h2>
+          <aside className="mit-hero-side" aria-label="cppvalley overview">
+            <h2>What you can explore</h2>
             <p>
-              For 3rd/4th year students targeting C++ systems, EDA, HFT, semiconductor software or performance-heavy roles.
+              Courses, YouTube lessons, interview questions, project ideas, book notes and daily engineering writing — all focused on C++ systems careers.
             </p>
-            <Link href="/courses/third-year-cpp-eda-hft">Open the roadmap →</Link>
+            <div className="mit-mini-links">
+              <Link href="/courses/third-year-cpp-eda-hft">Student roadmap</Link>
+              <Link href="/curriculum">HFT curriculum</Link>
+              <Link href="/projects">Projects</Link>
+            </div>
           </aside>
         </section>
 
@@ -99,7 +106,7 @@ export default function Home() {
             <span>01</span>
             <div>
               <p className="mit-kicker">Learning paths</p>
-              <h2>Clear tracks students can understand quickly.</h2>
+              <h2>Clear tracks students can scan fast.</h2>
             </div>
           </div>
 
@@ -109,7 +116,7 @@ export default function Home() {
                 <span>{path.label}</span>
                 <h3>{path.title}</h3>
                 <p>{path.text}</p>
-                <b>Open path →</b>
+                <b>Explore →</b>
               </Link>
             ))}
           </div>
@@ -120,7 +127,7 @@ export default function Home() {
             <span>02</span>
             <div>
               <p className="mit-kicker">Resources</p>
-              <h2>Everything on the site has a learning purpose.</h2>
+              <h2>Pick a format and keep moving.</h2>
             </div>
           </div>
 
@@ -136,14 +143,14 @@ export default function Home() {
 
         <section className="mit-section site-container mit-split">
           <div>
-            <p className="mit-kicker">For students</p>
-            <h2>What to do first</h2>
+            <p className="mit-kicker">Learning map</p>
+            <h2>From student to systems-ready engineer</h2>
             <p className="mit-copy">
-              This is not a random link dump. The site should help a student decide what to study, what to build, and how to explain it in interviews.
+              cppvalley connects C++ depth, systems fundamentals, domain knowledge and projects so students can explore without being forced into one path.
             </p>
           </div>
           <ol className="mit-plan">
-            {studentPlan.map((step) => <li key={step}>{step}</li>)}
+            {learningMap.map((step) => <li key={step}>{step}</li>)}
           </ol>
         </section>
 
@@ -162,7 +169,7 @@ export default function Home() {
           </div>
           <div>
             <span>6</span>
-            <p>main learning hubs</p>
+            <p>main resource hubs</p>
           </div>
         </section>
       </main>

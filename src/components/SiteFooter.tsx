@@ -1,34 +1,12 @@
 import Link from "next/link";
 import { BrandLockup } from "@/components/BrandLockup";
 
-const columns = [
-  {
-    title: "Learn",
-    links: [
-      ["Courses", "/courses"],
-      ["Videos", "/youtube"],
-      ["HFT curriculum", "/curriculum"],
-      ["Student roadmap", "/courses/third-year-cpp-eda-hft"],
-    ],
-  },
-  {
-    title: "Practice",
-    links: [
-      ["Interview questions", "/interviews"],
-      ["Projects", "/projects"],
-      ["Articles", "/blog"],
-      ["Books", "/books"],
-    ],
-  },
-  {
-    title: "Topics",
-    links: [
-      ["Modern C++", "/courses/core-cpp-interviews"],
-      ["EDA roadmap", "/courses/third-year-cpp-eda-hft"],
-      ["Low latency", "/curriculum"],
-      ["C++ videos", "/youtube"],
-    ],
-  },
+const links = [
+  ["Courses", "/courses"],
+  ["Interview Questions", "/interviews"],
+  ["Blog", "/blog"],
+  ["Books", "/books"],
+  ["HFT Curriculum", "/curriculum"],
 ] as const;
 
 export function SiteFooter() {
@@ -39,25 +17,17 @@ export function SiteFooter() {
           <Link className="site-footer-logo" href="/" aria-label="cppvalley home">
             <BrandLockup />
           </Link>
-          <p>
-            Learn C++ systems, HFT, low-latency engineering, EDA software basics and interview preparation with focused courses, videos, projects and questions.
-          </p>
+          <p>C++, HFT, EDA, CUDA, GPU and AI systems courses for students and engineers.</p>
         </div>
 
-        <div className="lp-footer-columns">
-          {columns.map((column) => (
-            <nav aria-label={column.title} key={column.title}>
-              <h2>{column.title}</h2>
-              {column.links.map(([label, href]) => (
-                <Link href={href} key={href}>{label}</Link>
-              ))}
-            </nav>
+        <nav className="lp-footer-columns" aria-label="Footer navigation">
+          {links.map(([label, href]) => (
+            <Link href={href} key={href}>{label}</Link>
           ))}
-        </div>
+        </nav>
 
         <div className="lp-footer-bottom">
           <span>© cppvalley</span>
-          <span>Built for students and engineers preparing for systems roles.</span>
         </div>
       </div>
     </footer>

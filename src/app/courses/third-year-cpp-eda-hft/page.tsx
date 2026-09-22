@@ -130,16 +130,13 @@ export default function StudentCppEdaHftPage() {
                 <h2>The order matters.</h2>
               </div>
             </div>
-            <div className="platform-path">
+            <div className="platform-grid">
               {modules.map((module) => (
-                <div key={module.number}>
-                  <span>{module.number}</span>
-                  <div>
-                    <strong>{module.title}</strong>
-                    <small>{module.detail}</small>
-                  </div>
-                  <b>→</b>
-                </div>
+                <article className="platform-card" key={module.number}>
+                  <span className="tag">{module.number}</span>
+                  <h3>{module.title}</h3>
+                  <p>{module.detail}</p>
+                </article>
               ))}
             </div>
           </div>

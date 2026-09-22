@@ -56,20 +56,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.8,
     },
-    {
-      url: "https://cppvalley.com/conferences",
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.75,
-    },
   ];
 
-  const coursePages: MetadataRoute.Sitemap = courses.map((course) => ({
-    url: `https://cppvalley.com${course.href}`,
-    lastModified,
-    changeFrequency: course.status === "Live" ? "weekly" : "monthly",
-    priority: course.status === "Live" ? 0.92 : 0.82,
-  }));
+  const coursePages: MetadataRoute.Sitemap = courses
+    .filter((course) => course.href.startsWith("/courses/"))
+    .map((course) => ({
+      url: `https://cppvalley.com${course.href}`,
+      lastModified,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    }));
 
   const lessonPages: MetadataRoute.Sitemap = lessons.map((lesson) => ({
     url: `https://cppvalley.com/curriculum/${lesson.slug}`,

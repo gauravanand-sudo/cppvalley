@@ -40,6 +40,7 @@ function formatDate(value: string) {
 
 export default function BlogPage() {
   const posts = [...blogPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+  const [featuredPost, ...otherPosts] = posts;
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -57,7 +58,7 @@ export default function BlogPage() {
   };
 
   return (
-    <div className="blog-page lp-page">
+    <div className="blog-page lp-page modern-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
@@ -68,6 +69,7 @@ export default function BlogPage() {
           <div className="site-container">
             <p className="lp-kicker">Blog</p>
             <h1>Blog</h1>
+            <p>Deep dives on C++, low latency, HFT systems, EDA software and interview preparation.</p>
           </div>
         </section>
 
@@ -81,11 +83,25 @@ export default function BlogPage() {
             <span>{posts.length} published</span>
           </div>
 
+          {featuredPost ? (
+            <Link className="featured-blog-card" href={`/blog/${featuredPost.slug}`}>
+              <span className="course-badge">Featured latest</span>
+              <h2>{featuredPost.title}</h2>
+              <p>{featuredPost.excerpt}</p>
+              <div className="blog-post-meta">
+                <span>{formatDate(featuredPost.publishedAt)}</span>
+                {featuredPost.readingTime ? <span>{featuredPost.readingTime}</span> : null}
+                {featuredPost.topics?.length ? <span>{featuredPost.topics.join(" · ")}</span> : null}
+              </div>
+              <strong className="lp-link-text">Read post →</strong>
+            </Link>
+          ) : null}
+
           {posts.length > 0 ? (
             <div className="blog-list">
-              {posts.map((post, index) => (
+              {otherPosts.map((post, index) => (
                 <Fragment key={post.slug}>
-                  {index === 2 ? (
+                  {index === 1 ? (
                     <AdSlot slot={blogFeedAdSlot} className="ad-slot-leaderboard" />
                   ) : null}
                   <Link className="blog-list-item" href={`/blog/${post.slug}`}>
@@ -105,9 +121,11 @@ export default function BlogPage() {
               ))}
             </div>
           ) : (
-            <div className="lp-card">
+            <div className="lp-card empty-state-card">
               <div className="lp-card-body">
+                <span className="course-badge">Coming soon</span>
                 <strong>No blog posts published yet.</strong>
+                <p>Deep engineering notes are being added gradually.</p>
               </div>
             </div>
           )}

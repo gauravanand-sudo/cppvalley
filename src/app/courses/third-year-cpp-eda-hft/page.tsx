@@ -22,7 +22,6 @@ export const metadata: Metadata = {
     description:
       "A practical student roadmap from C++ systems to EDA, HFT, low-latency and project-based interview preparation.",
     url: "/courses/third-year-cpp-eda-hft",
-    images: [{ url: "/course-cover/third-year-cpp-eda-hft", width: 1200, height: 675, alt: "Student C++ EDA HFT roadmap cover" }],
   },
 };
 
@@ -38,18 +37,18 @@ const modules = [
 ] as const;
 
 const audiences = [
-  ["Student", "3rd/4th year CS, ECE or EE", "Good for students who know basic programming and want a practical systems path with C++ depth.", "/course-cover/student-systems-roadmap"],
-  ["Targets", "EDA, HFT and C++ systems", "Targets EDA software engineer, semiconductor software, HFT intern, trading systems and low-latency C++ roles.", "/course-cover/eda-hft-targets"],
-  ["Output", "Proof-based preparation", "Finish with projects, resume bullets, interview stories and clear trade-off explanations.", "/course-cover/project-proof"],
+  ["Student", "3rd/4th year CS, ECE or EE", "Good for students who know basic programming and want a practical systems path with C++ depth."],
+  ["Targets", "EDA, HFT and C++ systems", "Targets EDA software engineer, semiconductor software, HFT intern, trading systems and low-latency C++ roles."],
+  ["Output", "Proof-based preparation", "Finish with projects, resume bullets, interview stories and clear trade-off explanations."],
 ] as const;
 
 const projects = [
-  ["C++ order book with price levels, matching and latency counters", "/course-cover/order-book-project"],
-  ["Mini netlist parser with graph traversal and topological ordering", "/course-cover/netlist-parser-project"],
-  ["Fixed-size memory pool with placement new and benchmarks", "/course-cover/memory-pool-project"],
-  ["Cache-friendly graph algorithm benchmark", "/course-cover/cache-graph-benchmark"],
-  ["Multithreaded job scheduler with worker threads and a blocking queue", "/course-cover/threaded-scheduler-project"],
-  ["Simple logic simulator for gates and signal propagation", "/course-cover/logic-simulator-project"],
+  "C++ order book with price levels, matching and latency counters",
+  "Mini netlist parser with graph traversal and topological ordering",
+  "Fixed-size memory pool with placement new and benchmarks",
+  "Cache-friendly graph algorithm benchmark",
+  "Multithreaded job scheduler with worker threads and a blocking queue",
+  "Simple logic simulator for gates and signal propagation",
 ] as const;
 
 export default function StudentCppEdaHftPage() {
@@ -70,16 +69,15 @@ export default function StudentCppEdaHftPage() {
                 <Link className="lp-button" href="/courses">Back to catalog</Link>
               </div>
             </div>
-            <aside className="lp-hero-card home-hero-image-card" aria-label="Course summary">
-              <img src="/course-cover/third-year-cpp-eda-hft" alt="Student C++ EDA HFT roadmap cover" />
-              <div className="lp-card-body">
-                <span className="course-badge">Course outcome</span>
-                <h2>Become project-ready for systems internships</h2>
-                <div className="lp-stat-grid">
-                  <div><strong>8</strong><span>modules</span></div>
-                  <div><strong>6</strong><span>projects</span></div>
-                  <div><strong>12w</strong><span>pace</span></div>
-                </div>
+            <aside className="lp-hero-card" aria-label="Course summary">
+              <div className="lp-hero-card-top">
+                <span>Course outcome</span>
+                <strong>Become project-ready for systems internships</strong>
+              </div>
+              <div className="lp-stat-grid">
+                <div><strong>8</strong><span>modules</span></div>
+                <div><strong>6</strong><span>projects</span></div>
+                <div><strong>12w</strong><span>pace</span></div>
               </div>
             </aside>
           </div>
@@ -93,11 +91,10 @@ export default function StudentCppEdaHftPage() {
             </div>
           </div>
           <div className="lp-course-grid">
-            {audiences.map(([label, title, text, image]) => (
-              <article className="lp-card image-course-card" key={title}>
-                <img className="course-card-image" src={image} alt={`${title} cover`} loading="lazy" />
+            {audiences.map(([tag, title, text]) => (
+              <article className="lp-card" key={title}>
                 <div className="lp-card-body">
-                  <span className="course-badge">{label}</span>
+                  <span className="course-badge">{tag}</span>
                   <h3>{title}</h3>
                   <p>{text}</p>
                 </div>
@@ -115,8 +112,7 @@ export default function StudentCppEdaHftPage() {
           </div>
           <div className="lp-course-grid">
             {modules.map(([number, title, detail]) => (
-              <article className="lp-card image-course-card" key={number}>
-                <img className="course-card-image" src={`/course-cover/roadmap-module-${number}`} alt={`${title} cover`} loading="lazy" />
+              <article className="lp-card" key={number}>
                 <div className="lp-card-body">
                   <span className="course-badge">Module {number}</span>
                   <h3>{title}</h3>
@@ -135,9 +131,8 @@ export default function StudentCppEdaHftPage() {
             </div>
           </div>
           <div className="lp-course-grid">
-            {projects.map(([project, image]) => (
-              <article className="lp-card image-course-card" key={project}>
-                <img className="course-card-image" src={image} alt={`${project} cover`} loading="lazy" />
+            {projects.map((project) => (
+              <article className="lp-card" key={project}>
                 <div className="lp-card-body">
                   <span className="course-badge">Build</span>
                   <h3>{project}</h3>

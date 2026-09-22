@@ -43,6 +43,24 @@ const roundTypes = [
   "Project deep dive",
 ] as const;
 
+const publishingSteps = [
+  {
+    title: "Add company set",
+    image: "/course-cover/company-interview-set",
+    text: "Create or extend one object in src/data/interviews.ts with company, role focus, SEO description and tags.",
+  },
+  {
+    title: "Add questions",
+    image: "/course-cover/interview-questions-daily",
+    text: "Write original prompts, answer framework bullets and related topics. Keep every question searchable and useful.",
+  },
+  {
+    title: "Publish and link",
+    image: "/course-cover/interview-seo-publishing",
+    text: "The dynamic page, sitemap entry, internal links, FAQ schema and ad placements are generated from the data.",
+  },
+] as const;
+
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "ItemList",
@@ -77,12 +95,13 @@ export default function InterviewsPage() {
                 <Link className="lp-button" href="/courses">Study courses</Link>
               </div>
             </div>
-            <aside className="lp-hero-card">
-              <div className="lp-hero-card-top">
-                <span>Practice library</span>
-                <strong>{interviewQuestionCount} questions · {interviewSets.length} company/topic sets</strong>
+            <aside className="lp-hero-card home-hero-image-card">
+              <img src="/course-cover/interview-question-bank" alt="Interview question bank cover" />
+              <div className="lp-card-body">
+                <span className="course-badge">Practice library</span>
+                <h2>{interviewQuestionCount} questions · {interviewSets.length} sets</h2>
+                <p>Add questions daily using <code>src/data/interviews.ts</code>. The sitemap and dynamic pages update automatically.</p>
               </div>
-              <p>Add questions daily using <code>src/data/interviews.ts</code>. The sitemap and dynamic pages update automatically.</p>
             </aside>
           </div>
         </section>
@@ -110,19 +129,16 @@ export default function InterviewsPage() {
                 {index === 2 ? (
                   <AdSlot slot={interviewsFeedAdSlot} className="ad-slot-inarticle" />
                 ) : null}
-                <Link className="lp-course-card interview-company-card" href={`/interviews/${set.slug}`}>
-                  <div className="lp-card-thumb">
-                    <span>{set.company}</span>
-                    <strong>{set.roleFocus}</strong>
-                  </div>
+                <Link className="lp-course-card image-course-card interview-company-card" href={`/interviews/${set.slug}`}>
+                  <img className="course-card-image" src={`/course-cover/${set.slug}`} alt={`${set.pageTitle} cover`} loading="lazy" />
                   <div className="lp-card-body">
-                    <span className="course-badge">{set.questions.length} questions</span>
+                    <div className="course-card-topline"><span className="course-badge">{set.company}</span><span>{set.questions.length} questions</span></div>
                     <h3>{set.pageTitle}</h3>
                     <p>{set.description}</p>
                     <div className="course-tags">
                       {set.tags.map((tag) => <span key={tag}>{tag}</span>)}
                     </div>
-                    <div className="lp-card-footer"><strong>Open question set →</strong></div>
+                    <strong className="lp-link-text">Open question set →</strong>
                   </div>
                 </Link>
               </Fragment>
@@ -138,9 +154,16 @@ export default function InterviewsPage() {
             </div>
           </div>
           <div className="lp-course-grid">
-            <article className="lp-card"><div className="lp-card-body"><span className="course-badge">Step 1</span><h3>Add company set</h3><p>Create or extend one object in <code>src/data/interviews.ts</code> with company, role focus, SEO description and tags.</p></div></article>
-            <article className="lp-card"><div className="lp-card-body"><span className="course-badge">Step 2</span><h3>Add questions</h3><p>Write original prompts, answer framework bullets and related topics. Keep every question searchable and useful.</p></div></article>
-            <article className="lp-card"><div className="lp-card-body"><span className="course-badge">Step 3</span><h3>Publish and link</h3><p>The dynamic page, sitemap entry, internal links, FAQ schema and ad placements are generated from the data.</p></div></article>
+            {publishingSteps.map((step, index) => (
+              <article className="lp-card image-course-card" key={step.title}>
+                <img className="course-card-image" src={step.image} alt={`${step.title} cover`} loading="lazy" />
+                <div className="lp-card-body">
+                  <span className="course-badge">Step {index + 1}</span>
+                  <h3>{step.title}</h3>
+                  <p>{step.text}</p>
+                </div>
+              </article>
+            ))}
           </div>
         </section>
 

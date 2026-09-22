@@ -10,14 +10,20 @@ import "./platform.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://cppvalley.com"),
   title: {
-    default: "cppvalley — C++, HFT & AI Systems Interview Prep",
+    default: "cppvalley — C++, EDA, HFT & AI Systems Interview Prep",
     template: "%s · cppvalley",
   },
   description:
-    "cppvalley is a one-stop learning hub for C++, HFT, low-latency systems, AI systems, design patterns, interview questions, book summaries, conference notes and YouTube series.",
+    "cppvalley is a focused learning hub for C++ interviews, EDA software, HFT, low-latency systems, AI systems, design patterns, interview questions, book summaries, conference notes and YouTube series.",
   keywords: [
     "C++ interview preparation",
+    "C++ roadmap for college students",
+    "EDA software engineer roadmap",
+    "EDA interview preparation",
+    "semiconductor software engineer",
+    "VLSI CAD software",
     "HFT interview preparation",
+    "HFT internship preparation",
     "AI systems interview",
     "low latency C++",
     "modern C++",
@@ -32,9 +38,9 @@ export const metadata: Metadata = {
   authors: [{ name: "cppvalley", url: "https://www.youtube.com/@cppvalley" }],
   creator: "cppvalley",
   openGraph: {
-    title: "cppvalley — C++, HFT & AI Systems Interview Prep",
+    title: "cppvalley — C++, EDA, HFT & AI Systems Interview Prep",
     description:
-      "A modular learning hub for C++, HFT, low-latency systems, AI systems, interview questions, book summaries, conference notes and YouTube learning series.",
+      "A modular learning hub for C++, EDA software, HFT, low-latency systems, AI systems, interview questions, book summaries, conference notes and YouTube learning series.",
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
@@ -42,8 +48,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "cppvalley — C++, HFT & AI Systems Interview Prep",
-    description: "C++, HFT, low-latency systems and AI systems interview preparation.",
+    title: "cppvalley — C++, EDA, HFT & AI Systems Interview Prep",
+    description: "C++, EDA, HFT, low-latency systems and AI systems interview preparation.",
     images: ["/cppvalley-logo.webp"],
   },
   robots: {

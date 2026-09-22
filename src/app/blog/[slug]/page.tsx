@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Fragment } from "react";
+import { AdSlot } from "@/components/AdSlot";
 import { BlogEngagement } from "@/components/BlogEngagement";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -9,6 +11,10 @@ import { blogPosts, blogPostsBySlug } from "@/data/blog";
 type BlogPostPageProps = {
   params: Promise<{ slug: string }>;
 };
+
+const blogArticleTopAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_ARTICLE_TOP_SLOT;
+const blogArticleMidAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_ARTICLE_MID_SLOT;
+const blogArticleBottomAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_ARTICLE_BOTTOM_SLOT;
 
 export function generateStaticParams() {
   return blogPosts.map((post) => ({ slug: post.slug }));
@@ -94,19 +100,28 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </div>
           </header>
 
+          <AdSlot slot={blogArticleTopAdSlot} className="ad-slot-leaderboard" />
+
           <article className="blog-article">
             {post.sections.map((section, index) => (
-              <section key={`${post.slug}-${index}`}>
-                {section.heading ? <h2>{section.heading}</h2> : null}
-                {section.paragraphs?.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-                {section.bullets?.length ? (
-                  <ul>
-                    {section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
-                  </ul>
+              <Fragment key={`${post.slug}-${index}`}>
+                <section>
+                  {section.heading ? <h2>{section.heading}</h2> : null}
+                  {section.paragraphs?.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+                  {section.bullets?.length ? (
+                    <ul>
+                      {section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                  ) : null}
+                </section>
+                {index === 0 ? (
+                  <AdSlot slot={blogArticleMidAdSlot} className="ad-slot-inarticle ad-article-wrap" />
                 ) : null}
-              </section>
+              </Fragment>
             ))}
           </article>
+
+          <AdSlot slot={blogArticleBottomAdSlot} className="ad-slot-leaderboard" />
 
           <BlogEngagement
             slug={post.slug}

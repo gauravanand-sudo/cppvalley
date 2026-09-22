@@ -19,6 +19,32 @@ body {
   min-height: 62vh;
 }
 
+.public-header-inner {
+  align-items: center !important;
+}
+
+.site-header-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  border: 1px solid var(--academic-red, #8c1515);
+  background: var(--academic-red, #8c1515);
+  color: #ffffff !important;
+  padding: 0.48rem 0.75rem;
+  font-size: 0.84rem;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-header-cta:hover,
+.site-header-cta:focus-visible {
+  background: var(--academic-red-dark, #6f1010);
+  border-color: var(--academic-red-dark, #6f1010);
+  outline: none;
+}
+
 .lp-section,
 .clean-page-section {
   padding-top: clamp(1.8rem, 4vw, 3.25rem) !important;
@@ -99,6 +125,20 @@ body {
   font-size: 0.86rem !important;
 }
 
+.hero-cta-row,
+.course-detail-actions,
+.clean-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1rem;
+}
+
+.clean-head-actions {
+  margin-top: 0;
+  justify-content: flex-end;
+}
+
 .lp-card-body {
   padding: 1rem !important;
 }
@@ -146,6 +186,13 @@ body {
   margin-bottom: 1rem;
   border-bottom: 1px solid var(--academic-border, #d7d0c6);
   padding-bottom: 0.85rem;
+}
+
+.clean-page-head-with-cta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: end;
 }
 
 .clean-page-head h1 {
@@ -219,6 +266,13 @@ body {
   line-height: 1.25;
 }
 
+.clean-course-meta em {
+  color: var(--academic-link, #006cb8);
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
 .course-module-list {
   gap: 0.55rem !important;
 }
@@ -243,6 +297,12 @@ body {
   font-size: 0.84rem !important;
 }
 
+@media (max-width: 900px) {
+  .site-header-cta {
+    display: none;
+  }
+}
+
 @media (max-width: 760px) {
   .lp-section,
   .clean-page-section {
@@ -250,12 +310,17 @@ body {
     padding-bottom: 1.4rem !important;
   }
 
+  .clean-page-head-with-cta,
   .clean-course-row {
     grid-template-columns: 1fr;
-    gap: 0.55rem;
+    display: grid;
+    gap: 0.75rem;
+    align-items: start;
   }
 
+  .clean-head-actions,
   .clean-course-meta {
+    justify-content: start;
     justify-items: start;
     text-align: left;
   }

@@ -18,12 +18,12 @@ export function SiteFooter() {
         </div>
 
         <nav className="site-footer-nav" aria-label="Footer navigation">
-          <Link href="/courses/third-year-cpp-eda-hft">Start</Link>
           <Link href="/courses">Courses</Link>
           <Link href="/youtube">Videos</Link>
           <Link href="/blog">Blog</Link>
           <Link href="/interviews">Questions</Link>
           <Link href="/books">Books</Link>
+          <Link href="/projects">Projects</Link>
         </nav>
       </div>
     </footer>

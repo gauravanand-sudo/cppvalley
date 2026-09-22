@@ -5,33 +5,36 @@ import "./institute.css";
 import "./brand-consistency.css";
 import "./cmu.css";
 import "./blog-engagement.css";
+import "./platform.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cppvalley.com"),
   title: {
-    default: "cppvalley — HFT Core Systems",
+    default: "cppvalley — C++, HFT & AI Systems Interview Prep",
     template: "%s · cppvalley",
   },
   description:
-    "Learn C++, Linux, networking, concurrency, low latency and trading systems for HFT engineering, with hands-on projects and interview preparation.",
+    "cppvalley is a one-stop learning hub for C++, HFT, low-latency systems, AI systems, design patterns, interview questions, book summaries, conference notes and YouTube series.",
   keywords: [
-    "HFT course",
-    "C++ systems course",
-    "low latency C++",
-    "HFT engineering",
+    "C++ interview preparation",
     "HFT interview preparation",
-    "Linux performance",
-    "network programming",
-    "lock-free programming",
+    "AI systems interview",
+    "low latency C++",
+    "modern C++",
+    "C++ design patterns",
+    "C++ multithreading",
+    "systems design",
     "trading systems",
-    "market data",
+    "cppvalley",
+    "C++ book summaries",
+    "C++ conference notes",
   ],
   authors: [{ name: "cppvalley", url: "https://www.youtube.com/@cppvalley" }],
   creator: "cppvalley",
   openGraph: {
-    title: "cppvalley — HFT Core Systems",
+    title: "cppvalley — C++, HFT & AI Systems Interview Prep",
     description:
-      "Learn C++, systems and low latency for HFT — from CPU and Linux to networking, concurrency and trading systems.",
+      "A modular learning hub for C++, HFT, low-latency systems, AI systems, interview questions, book summaries, conference notes and YouTube learning series.",
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
@@ -39,8 +42,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "cppvalley — HFT Core Systems",
-    description: "Learn C++, systems and low latency for HFT.",
+    title: "cppvalley — C++, HFT & AI Systems Interview Prep",
+    description: "C++, HFT, low-latency systems and AI systems interview preparation.",
     images: ["/cppvalley-logo.webp"],
   },
   robots: {

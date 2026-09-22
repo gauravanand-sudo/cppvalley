@@ -2,40 +2,22 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { youtubeChannelUrl, youtubeEmbedUrl, youtubeSeries } from "@/data/youtube";
 
 export const metadata: Metadata = {
-  title: "YouTube Series",
+  title: "YouTube Series — C++, HFT, EDA and AI Systems",
   description:
-    "cppvalley YouTube series hub for embedded C++, HFT, AI systems, interview preparation and project walkthrough videos.",
+    "Organized cppvalley YouTube videos for Core C++, HFT systems, EDA software, AI systems and interview preparation. Videos are grouped by learning path and embedded on-site.",
   alternates: { canonical: "/youtube" },
+  keywords: [
+    "cppvalley YouTube",
+    "C++ interview videos",
+    "HFT systems videos",
+    "EDA software C++",
+    "AI systems videos",
+    "low latency C++",
+  ],
 };
-
-const series = [
-  {
-    title: "Core C++ Interview Series",
-    tag: "C++",
-    text: "Short lessons for RAII, smart pointers, move semantics, STL, templates, UB and performance traps.",
-    embedUrl: "",
-  },
-  {
-    title: "HFT Systems Series",
-    tag: "HFT",
-    text: "CPU, Linux, networking, low latency, market data, execution, risk and tick-to-trade architecture.",
-    embedUrl: "",
-  },
-  {
-    title: "Design Patterns + LLD Series",
-    tag: "LLD",
-    text: "Modern C++ design patterns, clean architecture, dependency inversion and real design round walkthroughs.",
-    embedUrl: "",
-  },
-  {
-    title: "AI Systems Series",
-    tag: "AI Systems",
-    text: "RAG systems, vector search, model serving, evaluation, agents and production AI architecture.",
-    embedUrl: "",
-  },
-] as const;
 
 export default function YoutubePage() {
   return (
@@ -44,49 +26,60 @@ export default function YoutubePage() {
       <main className="platform-simple-page site-container">
         <section className="platform-page-hero">
           <p className="platform-eyebrow">@cppvalley YouTube</p>
-          <h1>YouTube series embedded into the cppvalley learning hub.</h1>
+          <h1>Videos organized by interview path, not upload date.</h1>
           <p className="page-intro">
-            This page is ready for playlist or video embeds. Add the YouTube embed URL for each series and the videos will play inside cppvalley pages instead of sending learners away immediately.
+            Learners should not browse randomly. This page groups cppvalley videos into C++, HFT,
+            EDA and AI systems tracks so every video supports a course, blog post or interview goal.
           </p>
           <div className="platform-actions">
-            <Link className="platform-button primary" href="https://www.youtube.com/@cppvalley" target="_blank" rel="noreferrer">
-              Open @cppvalley channel
+            <Link className="platform-button primary" href={youtubeChannelUrl} target="_blank" rel="noreferrer">
+              Open channel
             </Link>
-            <Link className="platform-button" href="/courses">
-              Match videos to courses
+            <Link className="platform-button" href="/courses/third-year-cpp-eda-hft">
+              Student roadmap
             </Link>
           </div>
         </section>
 
-        <section className="platform-grid" aria-label="YouTube series placeholders">
-          {series.map((item) => (
-            <article className="platform-video-card" key={item.title}>
-              <div className="platform-video-frame">
-                {item.embedUrl ? (
-                  <iframe
-                    src={item.embedUrl}
-                    title={item.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                  />
-                ) : (
-                  <div>
-                    <strong>Embed slot</strong>
-                    <p>Add a YouTube video or playlist embed URL for this series.</p>
-                  </div>
-                )}
-              </div>
-              <span className="tag">{item.tag}</span>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
+        <section className="platform-grid" aria-label="Organized YouTube series">
+          {youtubeSeries.map((series) => (
+            <article className="platform-video-card" id={series.slug} key={series.slug}>
+              <span className="tag">{series.slug.replaceAll("-", " ")}</span>
+              <h3>{series.title}</h3>
+              <p>{series.description}</p>
+              <p><strong>Audience:</strong> {series.audience}</p>
+
+              {series.videos.map((video) => (
+                <div className="platform-video-frame" key={`${series.slug}-${video.title}`}>
+                  {video.videoId ? (
+                    <iframe
+                      src={youtubeEmbedUrl(video.videoId)}
+                      title={video.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <div>
+                      <strong>{video.title}</strong>
+                      <p>{video.topic} · {video.level}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              <ul>
+                {series.seoKeywords.map((keyword) => (
+                  <li key={keyword}>{keyword}</li>
+                ))}
+              </ul>
             </article>
           ))}
         </section>
 
         <section className="platform-dark-band">
-          <h2>How to add embeds</h2>
+          <h2>Video IDs needed for live embeds</h2>
           <p>
-            Use YouTube share → Embed, then copy the src URL into this page. Playlist embeds work best for course series because each new video can appear without changing the page structure.
+            I could not reliably extract your current @cppvalley video IDs from public search. The page is wired for embeds now: add each YouTube video ID in src/data/youtube.ts and the iframe appears automatically.
           </p>
         </section>
       </main>

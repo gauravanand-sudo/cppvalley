@@ -7,7 +7,7 @@ import { youtubeChannelUrl, youtubeEmbedUrl, youtubeSeries } from "@/data/youtub
 export const metadata: Metadata = {
   title: "C++ Video Courses — cppvalley YouTube Library",
   description:
-    "Udemy-style cppvalley video library for C++ interviews, unique_ptr, virtual functions, atomics, false sharing, low-latency C++, HFT systems and EDA/HFT student preparation.",
+    "cppvalley video library for C++ interviews, unique_ptr, virtual functions, atomics, false sharing, low-latency C++, HFT systems and EDA/HFT student preparation.",
   alternates: { canonical: "/youtube" },
   keywords: [
     "cppvalley YouTube",
@@ -66,7 +66,7 @@ const videoStructuredData = {
 
 export default function YoutubePage() {
   return (
-    <div className="page-shell youtube-udemy-page">
+    <div className="page-shell video-catalog-page">
       <SiteHeader />
       <main>
         <script
@@ -110,7 +110,7 @@ export default function YoutubePage() {
                   />
                 </div>
                 <div className="youtube-featured-meta">
-                  <span>Bestseller-style feature</span>
+                  <span>Featured lesson</span>
                   <h2>{featuredVideo.title}</h2>
                   <p>{featuredVideo.intent}</p>
                   <div className="youtube-rating-row">

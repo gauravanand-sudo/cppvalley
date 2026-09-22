@@ -1,0 +1,148 @@
+/* Marketplace polish for existing detail pages that do not use the new catalog markup directly. */
+.platform-page-hero,
+.blog-post-page .blog-post-main {
+  background: #f7f9fc !important;
+}
+
+.platform-page-hero .lp-hero-inner {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr) !important;
+  gap: clamp(1rem, 3vw, 2rem) !important;
+  align-items: center !important;
+  padding-block: clamp(2rem, 5vw, 4rem) !important;
+}
+
+.lp-hero-card,
+.interview-sidebar .lp-card,
+.article-sidebar .lp-card,
+.interview-question-card,
+.blog-post-hero,
+.mdx-article,
+.article-source-box {
+  border-radius: 4px !important;
+}
+
+.lp-hero-card,
+.interview-sidebar .lp-card,
+.article-sidebar .lp-card,
+.interview-question-card,
+.article-source-box {
+  border: 1px solid var(--market-border) !important;
+  background: #fff !important;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06) !important;
+}
+
+.interview-detail-layout,
+.content-with-sidebar {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 290px !important;
+  gap: 1.25rem !important;
+  align-items: start !important;
+}
+
+.interview-sidebar,
+.content-sidebar {
+  position: sticky !important;
+  top: 92px !important;
+  display: grid !important;
+  gap: 1rem !important;
+}
+
+.interview-question-list {
+  display: grid !important;
+  gap: 1rem !important;
+}
+
+.interview-question-card {
+  display: grid !important;
+  gap: 0.75rem !important;
+  padding: 1rem !important;
+}
+
+.interview-question-card h3,
+.interview-question-card h4 {
+  margin: 0 !important;
+  color: var(--market-ink) !important;
+  letter-spacing: -0.02em !important;
+}
+
+.interview-question-card p,
+.interview-question-card li,
+.compact-steps li {
+  color: var(--market-muted) !important;
+  line-height: 1.58 !important;
+}
+
+.interview-prompt {
+  margin: 0 !important;
+  border-left: 3px solid var(--market-accent) !important;
+  background: #f7f9fc !important;
+  padding: 0.85rem 1rem !important;
+}
+
+.interview-question-card ul,
+.compact-steps {
+  display: grid !important;
+  gap: 0.45rem !important;
+  margin: 0 !important;
+  padding-left: 1.1rem !important;
+}
+
+.blog-post-shell {
+  padding-block: clamp(1.75rem, 4vw, 3rem) !important;
+}
+
+.blog-post-hero {
+  border: 1px solid var(--market-border) !important;
+  background: #fff !important;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.06) !important;
+  padding: 1.15rem !important;
+}
+
+.mdx-article {
+  border: 1px solid var(--market-border) !important;
+  background: #fff !important;
+  padding: clamp(1rem, 2vw, 1.35rem) !important;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.04) !important;
+}
+
+.mdx-table-wrap table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+}
+
+.mdx-table-wrap th,
+.mdx-table-wrap td {
+  border: 1px solid var(--market-border) !important;
+  padding: 0.65rem !important;
+}
+
+.related-link-list {
+  display: grid !important;
+  gap: 0.45rem !important;
+}
+
+.related-link-list a {
+  border: 1px solid var(--market-border) !important;
+  border-radius: 4px !important;
+  background: #fff !important;
+  padding: 0.55rem 0.65rem !important;
+}
+
+.course-module-card,
+.course-insight-card {
+  border-radius: 4px !important;
+}
+
+@media (max-width: 980px) {
+  .platform-page-hero .lp-hero-inner,
+  .interview-detail-layout,
+  .content-with-sidebar {
+    grid-template-columns: 1fr !important;
+  }
+
+  .interview-sidebar,
+  .content-sidebar {
+    position: static !important;
+  }
+}

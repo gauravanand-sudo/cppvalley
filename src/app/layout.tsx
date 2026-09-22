@@ -8,6 +8,7 @@ import "./curriculum-platform.css";
 import "./ads.css";
 import "./seo-growth.css";
 import "./stanford-theme.css";
+import "./video-course-player.css";
 
 const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 

@@ -1,0 +1,62 @@
+.compact-hero .site-container {
+  padding: clamp(2rem, 4vw, 3.2rem) 0;
+}
+
+.compact-hero h1,
+.compact-section-head h1,
+.course-detail-simple h1 {
+  margin: 0;
+  color: var(--academic-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.1rem, 4vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.compact-hero p,
+.course-detail-simple > p {
+  max-width: 760px;
+  color: var(--academic-muted);
+  font-size: 1.08rem;
+  line-height: 1.55;
+}
+
+.compact-section-head {
+  margin-bottom: 1rem !important;
+}
+
+.compact-section-head h2,
+.compact-section-head h1 {
+  color: var(--academic-ink);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.course-detail-simple {
+  max-width: 980px;
+}
+
+.compact-module-list {
+  margin-top: 1.3rem;
+}
+
+.lp-course-card .lp-card-body p {
+  min-height: 0 !important;
+}
+
+.lp-footer-columns {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  align-items: center;
+}
+
+.lp-footer-columns a {
+  font-weight: 800;
+  text-decoration: none;
+}
+
+@media (max-width: 760px) {
+  .compact-hero .site-container {
+    padding: 1.6rem 0;
+  }
+}

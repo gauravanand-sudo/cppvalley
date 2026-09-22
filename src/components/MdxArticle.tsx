@@ -42,6 +42,21 @@ type DividerBlock = {
 
 type Block = ListBlock | ParagraphBlock | HeadingBlock | QuoteBlock | CodeBlock | TableBlock | DividerBlock;
 
+export type MdxHeading = {
+  id: string;
+  text: string;
+  level: 2 | 3;
+};
+
+export function slugifyHeading(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/`/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
 function isTableSeparator(line: string) {
   return /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/.test(line);
 }
@@ -197,6 +212,12 @@ function parseMdx(source: string): Block[] {
   return blocks;
 }
 
+export function getMdxHeadings(source: string): MdxHeading[] {
+  return parseMdx(source)
+    .filter((block): block is HeadingBlock => block.type === "heading")
+    .map((block) => ({ id: slugifyHeading(block.text), text: block.text, level: block.level }));
+}
+
 function renderInline(text: string): ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\([^)]+\))/g).filter(Boolean);
 
@@ -224,6 +245,13 @@ function renderInline(text: string): ReactNode[] {
   });
 }
 
+function calloutType(text: string) {
+  const lower = text.toLowerCase();
+  if (lower.startsWith("key idea") || lower.startsWith("takeaway")) return "idea";
+  if (lower.startsWith("warning") || lower.startsWith("note")) return "note";
+  return "quote";
+}
+
 export function MdxArticle({ source }: MdxArticleProps) {
   const blocks = parseMdx(source);
 
@@ -231,11 +259,12 @@ export function MdxArticle({ source }: MdxArticleProps) {
     <article className="blog-article optimized-article mdx-article">
       {blocks.map((block, index) => {
         if (block.type === "heading") {
+          const id = slugifyHeading(block.text);
           if (block.level === 3) {
-            return <h3 key={`${block.text}-${index}`}>{renderInline(block.text)}</h3>;
+            return <h3 id={id} key={`${block.text}-${index}`}>{renderInline(block.text)}</h3>;
           }
 
-          return <h2 key={`${block.text}-${index}`}>{renderInline(block.text)}</h2>;
+          return <h2 id={id} key={`${block.text}-${index}`}>{renderInline(block.text)}</h2>;
         }
 
         if (block.type === "list") {
@@ -247,7 +276,7 @@ export function MdxArticle({ source }: MdxArticleProps) {
         }
 
         if (block.type === "quote") {
-          return <blockquote key={`${block.text}-${index}`}>{renderInline(block.text)}</blockquote>;
+          return <blockquote className={`mdx-callout mdx-callout-${calloutType(block.text)}`} key={`${block.text}-${index}`}>{renderInline(block.text)}</blockquote>;
         }
 
         if (block.type === "code") {

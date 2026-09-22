@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: CoursePageProps): Promise<Met
   if (!course || course.href !== `/courses/${course.slug}`) return {};
 
   return {
-    title: `${course.title} — cppvalley Course`,
+    title: `${course.title} — cppvalley Curriculum`,
     description: course.description,
     alternates: { canonical: `/courses/${course.slug}` },
     openGraph: {
@@ -39,7 +39,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
   if (!course || course.href !== `/courses/${course.slug}`) notFound();
 
   const relatedCourses = courses
-    .filter((item) => item.slug !== course.slug)
+    .filter((item) => item.slug !== course.slug && item.pillar === course.pillar)
     .slice(0, 3);
 
   const structuredData = {
@@ -58,7 +58,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
   };
 
   return (
-    <div className="page-shell lp-page course-detail-page">
+    <div className="page-shell lp-page course-detail-page academic-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
@@ -66,7 +66,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
       <SiteHeader />
 
       <main className="lp-main">
-        <section className="course-detail-hero">
+        <section className="academic-hero course-detail-hero">
           <div className="site-container course-detail-hero-inner">
             <div>
               <nav className="lp-breadcrumb" aria-label="Breadcrumb">
@@ -78,15 +78,18 @@ export default async function CoursePage({ params }: CoursePageProps) {
               <h1>{course.title}</h1>
               <p>{course.longDescription}</p>
               <div className="lp-actions">
-                <Link className="lp-button primary" href="/youtube">Watch related videos</Link>
+                <Link className="lp-button primary" href="/youtube">Video courses</Link>
                 <Link className="lp-button" href="/interviews">Practice questions</Link>
               </div>
             </div>
-            <aside className="course-detail-cover-card no-image-detail-card">
+            <aside className="academic-info-card course-detail-cover-card no-image-detail-card">
               <div className="course-detail-card-body">
-                <span className="course-badge">{course.pillar}</span>
+                <span className="course-badge">Curriculum</span>
                 <h2>{course.shortTitle}</h2>
-                <div className="lp-meta"><span>{course.level}</span><span>{course.duration}</span><span>{course.lessons}</span></div>
+                <div className="lp-meta"><span>{course.level}</span><span>{course.duration}</span></div>
+                <div className="course-tags">
+                  {course.tags.map((tag) => <span key={tag}>{tag}</span>)}
+                </div>
               </div>
             </aside>
           </div>
@@ -95,8 +98,8 @@ export default async function CoursePage({ params }: CoursePageProps) {
         <section className="site-container lp-section course-detail-grid">
           <article className="lp-card course-detail-main-card">
             <div className="lp-card-body">
-              <p className="lp-kicker">Modules</p>
-              <h2>What this course covers</h2>
+              <p className="lp-kicker">Curriculum</p>
+              <h2>Modules</h2>
               <div className="course-module-list">
                 {course.modules.map((module, index) => (
                   <div key={module}>
@@ -111,18 +114,16 @@ export default async function CoursePage({ params }: CoursePageProps) {
           <aside className="course-detail-side">
             <div className="lp-card">
               <div className="lp-card-body">
-                <p className="lp-kicker">Outcomes</p>
-                <ul className="course-check-list">
-                  {course.outcomes.map((outcome) => <li key={outcome}>{outcome}</li>)}
-                </ul>
+                <p className="lp-kicker">How to use this curriculum</p>
+                <p>Read each module in order, watch related cppvalley videos, then practice explaining the topic through interview questions or a small project.</p>
               </div>
             </div>
             <div className="lp-card">
               <div className="lp-card-body">
-                <p className="lp-kicker">Projects</p>
-                <ul className="course-check-list">
-                  {course.projects.map((project) => <li key={project}>{project}</li>)}
-                </ul>
+                <p className="lp-kicker">Related areas</p>
+                <div className="course-tags">
+                  {course.tags.map((tag) => <span key={tag}>{tag}</span>)}
+                </div>
               </div>
             </div>
           </aside>
@@ -133,7 +134,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
             <div className="lp-section-head">
               <div>
                 <p className="lp-kicker">Continue learning</p>
-                <h2>Related public tracks</h2>
+                <h2>Related curricula</h2>
               </div>
               <Link className="lp-card-link" href="/courses">All courses</Link>
             </div>

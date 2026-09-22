@@ -7,162 +7,209 @@ import { lessons, phases } from "@/data/curriculum";
 export const metadata: Metadata = {
   title: "cppvalley — C++, EDA, HFT and AI Systems Interview Prep",
   description:
-    "cppvalley is a focused learning hub for C++ interviews, EDA software, HFT systems, low-latency C++, AI systems, book summaries, interview questions and YouTube lessons.",
+    "A modern learning hub for C++ interviews, EDA software, HFT systems, low-latency C++, AI systems, book summaries, interview questions and YouTube lessons.",
   alternates: { canonical: "/" },
 };
 
-const tracks = [
+const featuredTracks = [
   {
-    title: "3rd/4th Year C++ → EDA/HFT Track",
-    tag: "Student roadmap",
+    eyebrow: "Start here",
+    title: "3rd/4th Year C++ → EDA/HFT",
+    text: "A practical student roadmap for C++ systems, EDA CAD software, semiconductor tooling, HFT and performance-heavy internships.",
     href: "/courses/third-year-cpp-eda-hft",
-    text: "For college students targeting C++ systems, EDA CAD software, semiconductor tooling, HFT or performance-heavy internships.",
+    metric: "8 modules",
   },
   {
+    eyebrow: "Core skill",
     title: "Core C++ for Interviews",
-    tag: "Free course",
+    text: "RAII, smart pointers, move semantics, STL, templates, object model, UB, tooling, performance and build-from-scratch projects.",
     href: "/courses#core-cpp",
-    text: "Modern C++, RAII, smart pointers, move semantics, STL, templates, UB, tooling and build-from-scratch projects.",
+    metric: "free track",
   },
   {
+    eyebrow: "Specialized",
     title: "HFT Core Systems",
-    tag: "Live curriculum",
+    text: "CPU, memory, Linux, networking, latency measurement, low-latency C++, market data, execution, risk and tick-to-trade.",
     href: "/curriculum",
-    text: "CPU, Linux, networking, latency, low-latency C++, market data, execution, risk and tick-to-trade design.",
-  },
-  {
-    title: "YouTube Series",
-    tag: "Video hub",
-    href: "/youtube",
-    text: "cppvalley videos organized by learning path: C++, EDA, HFT, AI systems and interview preparation.",
-  },
-  {
-    title: "Interview Questions",
-    tag: "Practice",
-    href: "/interviews",
-    text: "C++ questions, systems questions, HFT rounds, design prompts and project-based interview preparation.",
-  },
-  {
-    title: "Books and Conferences",
-    tag: "Reading hub",
-    href: "/books",
-    text: "Book summaries and conference notes for C++, design, concurrency, HFT, EDA and AI systems.",
+    metric: `${lessons.length} lessons`,
   },
 ] as const;
 
-const seoTopics = [
-  "C++ interview preparation",
-  "C++ roadmap for college students",
-  "EDA software engineer roadmap",
-  "HFT internship preparation",
-  "low latency C++",
-  "AI systems engineering",
-  "C++ book summaries",
-  "C++ conference notes",
+const hubs = [
+  { label: "Courses", href: "/courses", text: "Structured tracks for C++, EDA, HFT, AI systems and interview prep." },
+  { label: "Videos", href: "/youtube", text: "Your @cppvalley videos organized by topic and embedded on-site." },
+  { label: "Daily Blog", href: "/blog", text: "Short SEO-friendly notes that answer one focused engineering question." },
+  { label: "Interviews", href: "/interviews", text: "C++/systems/HFT/AI interview questions with practical answer frameworks." },
+  { label: "Books", href: "/books", text: "Useful summaries from C++, design, concurrency, systems and HFT books." },
+  { label: "Projects", href: "/projects", text: "Portfolio-grade systems projects students can explain in interviews." },
+] as const;
+
+const proofPoints = [
+  "C++ interview prep",
+  "EDA software roadmap",
+  "HFT internships",
+  "low-latency systems",
+  "AI systems design",
+  "project-based proof",
+] as const;
+
+const contentLoops = [
+  {
+    step: "01",
+    title: "Video becomes page",
+    text: "Every good YouTube video gets a matching page with notes, transcript summary, links and next steps.",
+  },
+  {
+    step: "02",
+    title: "Page links to track",
+    text: "The reader always knows the next useful course, roadmap, blog or project to open.",
+  },
+  {
+    step: "03",
+    title: "Track builds authority",
+    text: "Courses, blogs, questions and book notes reinforce the same high-intent search topics.",
+  },
 ] as const;
 
 export default function Home() {
   return (
-    <div className="page-shell platform-site">
+    <div className="page-shell platform-site modern-site">
       <SiteHeader />
 
       <main>
-        <section className="platform-hero site-container">
-          <div>
-            <p className="platform-kicker">C++ · EDA · HFT · AI Systems</p>
-            <h1>Prepare for serious <span>C++ systems</span> interviews.</h1>
-            <p className="platform-lede">
-              cppvalley is a focused learning hub for students and engineers preparing for C++, EDA software, HFT, low-latency systems and AI systems roles.
+        <section className="modern-hero site-container">
+          <div className="modern-hero-copy">
+            <div className="modern-pill-row">
+              <span>cppvalley</span>
+              <span>C++ · EDA · HFT · AI Systems</span>
+            </div>
+            <h1>Become interview-ready for serious systems roles.</h1>
+            <p>
+              A focused platform for students and engineers preparing for modern C++, EDA software, HFT, low-latency systems and AI systems interviews — with videos, courses, projects, notes and questions in one place.
             </p>
-            <div className="platform-actions">
-              <Link className="platform-button primary" href="/courses/third-year-cpp-eda-hft">
+            <div className="modern-actions">
+              <Link className="modern-button primary" href="/courses/third-year-cpp-eda-hft">
                 Start student roadmap
               </Link>
-              <Link className="platform-button" href="/courses">
-                Browse courses
-              </Link>
-              <Link className="platform-button ghost" href="/youtube">
+              <Link className="modern-button" href="/youtube">
                 Watch videos
               </Link>
+              <Link className="modern-button subtle" href="/courses">
+                Browse tracks
+              </Link>
+            </div>
+            <div className="modern-proof-strip" aria-label="cppvalley focus areas">
+              {proofPoints.map((point) => <span key={point}>{point}</span>)}
             </div>
           </div>
 
-          <aside className="platform-hero-card" aria-label="cppvalley focus">
-            <div className="platform-terminal">
-              <div><span>$</span> cppvalley focus</div>
-              <div>C++ depth</div>
-              <div>systems fundamentals</div>
-              <div>performance thinking</div>
-              <div>projects + interviews</div>
+          <aside className="modern-hero-panel" aria-label="cppvalley dashboard preview">
+            <div className="panel-topbar">
+              <span />
+              <span />
+              <span />
+              <strong>learning engine</strong>
             </div>
-            <div className="platform-stats">
-              <div><small>HFT curriculum</small><strong>{lessons.length} lessons · {phases.length} phases</strong></div>
-              <div><small>New student track</small><strong>C++ → EDA/HFT roadmap</strong></div>
-              <div><small>Traffic strategy</small><strong>Courses · videos · blogs · questions</strong></div>
+            <div className="panel-command">
+              <span>$</span> build-roadmap --role systems-engineer
+            </div>
+            <div className="panel-grid">
+              <div>
+                <small>HFT curriculum</small>
+                <strong>{lessons.length}</strong>
+                <span>lessons</span>
+              </div>
+              <div>
+                <small>Roadmap depth</small>
+                <strong>{phases.length}</strong>
+                <span>phases</span>
+              </div>
+              <div>
+                <small>Primary tracks</small>
+                <strong>6</strong>
+                <span>hubs</span>
+              </div>
+              <div>
+                <small>Monetization later</small>
+                <strong>SEO</strong>
+                <span>first</span>
+              </div>
+            </div>
+            <div className="panel-stack">
+              <div><b>C++</b><span>language depth + projects</span></div>
+              <div><b>EDA</b><span>graphs, parsers, simulation, tooling</span></div>
+              <div><b>HFT</b><span>latency, order books, trading systems</span></div>
+              <div><b>AI Systems</b><span>RAG, inference, serving, reliability</span></div>
             </div>
           </aside>
         </section>
 
-        <section className="platform-section site-container">
-          <div className="platform-section-index">01</div>
-          <div>
-            <div className="platform-section-head">
-              <div>
-                <p className="platform-eyebrow">Learning tracks</p>
-                <h2>Clear pages. Clear intent. No random content dump.</h2>
-              </div>
-              <Link href="/courses">All courses ↗</Link>
-            </div>
-            <div className="platform-grid">
-              {tracks.map((track) => (
-                <Link className="platform-card" href={track.href} key={track.title}>
-                  <span className="tag">{track.tag}</span>
-                  <h3>{track.title}</h3>
-                  <p>{track.text}</p>
-                  <div className="platform-card-footer"><span>Open</span><b>↗</b></div>
-                </Link>
-              ))}
-            </div>
+        <section className="modern-section site-container">
+          <div className="modern-section-head">
+            <span>01 · Main paths</span>
+            <h2>Three clear entry points. No confusing content dump.</h2>
           </div>
-        </section>
-
-        <section className="platform-section site-container">
-          <div className="platform-section-index">02</div>
-          <div>
-            <div className="platform-section-head">
-              <div>
-                <p className="platform-eyebrow">SEO topics</p>
-                <h2>Build traffic around high-intent searches.</h2>
-              </div>
-            </div>
-            <div className="platform-matrix">
-              {seoTopics.map((topic) => (
-                <div className="platform-table-card" key={topic}>
-                  <h3>{topic}</h3>
-                  <p>Supported by a course page, video page, blog posts and interview-practice content.</p>
+          <div className="modern-track-grid">
+            {featuredTracks.map((track) => (
+              <Link className="modern-track-card" href={track.href} key={track.title}>
+                <div>
+                  <span>{track.eyebrow}</span>
+                  <b>{track.metric}</b>
                 </div>
-              ))}
-            </div>
+                <h3>{track.title}</h3>
+                <p>{track.text}</p>
+                <strong>Open path →</strong>
+              </Link>
+            ))}
           </div>
         </section>
 
-        <section className="platform-section site-container">
-          <div className="platform-section-index">03</div>
-          <div>
-            <div className="platform-section-head">
-              <div>
-                <p className="platform-eyebrow">Content engine</p>
-                <h2>Every content type has a job.</h2>
-              </div>
-            </div>
-            <div className="platform-path">
-              <Link href="/blog"><span>Blog</span><strong>Daily notes</strong><small>Short posts targeting long-tail searches and internal links.</small><b>↗</b></Link>
-              <Link href="/youtube"><span>Video</span><strong>Embedded YouTube series</strong><small>Videos grouped by course path so watch time supports the site.</small><b>↗</b></Link>
-              <Link href="/interviews"><span>Prep</span><strong>Interview questions</strong><small>C++/systems/HFT/AI prompts with answer frameworks.</small><b>↗</b></Link>
-              <Link href="/books"><span>Books</span><strong>Book summaries</strong><small>Scott Meyers, Effective STL, concurrency, design, HFT and systems reading notes.</small><b>↗</b></Link>
-              <Link href="/conferences"><span>Conf</span><strong>C++ conference notes</strong><small>CppCon-style talks distilled into practical interview and project lessons.</small><b>↗</b></Link>
-            </div>
+        <section className="modern-section site-container modern-split-section">
+          <div className="modern-section-head compact">
+            <span>02 · Traffic system</span>
+            <h2>Every page has a purpose.</h2>
+            <p>
+              Courses are the spine. Videos bring trust. Blog posts capture long-tail search. Interview questions convert visitors into repeat users.
+            </p>
           </div>
+          <div className="modern-hub-grid">
+            {hubs.map((hub) => (
+              <Link className="modern-hub-card" href={hub.href} key={hub.label}>
+                <h3>{hub.label}</h3>
+                <p>{hub.text}</p>
+                <span>Explore →</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="modern-section site-container">
+          <div className="modern-section-head">
+            <span>03 · Content loop</span>
+            <h2>Modern creator platform, not a static course brochure.</h2>
+          </div>
+          <div className="modern-loop-grid">
+            {contentLoops.map((item) => (
+              <article className="modern-loop-card" key={item.step}>
+                <span>{item.step}</span>
+                <h3>{item.title}</h3>
+                <p>{item.text}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="modern-cta site-container">
+          <div>
+            <span>Start now</span>
+            <h2>Build traffic first. Monetize once trust is real.</h2>
+            <p>
+              Keep the content sharp, practical and searchable. Courses, videos, blogs and interview pages should all help one audience: engineers preparing for C++/EDA/HFT/AI systems roles.
+            </p>
+          </div>
+          <Link className="modern-button primary" href="/courses/third-year-cpp-eda-hft">
+            Open student roadmap
+          </Link>
         </section>
       </main>
 

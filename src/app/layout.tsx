@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./brand-consistency.css";
 import "./site-stable.css";
+import "./curriculum-platform.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cppvalley.com"),

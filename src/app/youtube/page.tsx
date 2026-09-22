@@ -5,9 +5,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { youtubeChannelUrl, youtubeEmbedUrl, youtubeSeries } from "@/data/youtube";
 
 export const metadata: Metadata = {
-  title: "C++ Video Courses — cppvalley YouTube Library",
+  title: "C++ Video Courses — cppvalley",
   description:
-    "cppvalley video library for C++ interviews, unique_ptr, virtual functions, atomics, false sharing, low-latency C++, HFT systems and EDA/HFT student preparation.",
+    "cppvalley video lessons for C++ interviews, unique_ptr, virtual functions, atomics, false sharing, low-latency C++, HFT systems and EDA/HFT student preparation.",
   alternates: { canonical: "/youtube" },
   keywords: [
     "cppvalley YouTube",
@@ -21,23 +21,11 @@ export const metadata: Metadata = {
     "HFT systems videos",
     "EDA software C++ roadmap",
   ],
-  openGraph: {
-    title: "cppvalley Video Courses",
-    description:
-      "Organized C++ systems videos for interviews, low latency, atomics, HFT and EDA/HFT preparation.",
-    url: "/youtube",
-    type: "website",
-  },
 };
 
 const allVideos = youtubeSeries.flatMap((series) =>
-  series.videos.map((video) => ({
-    ...video,
-    seriesTitle: series.title,
-    seriesSlug: series.slug,
-  }))
+  series.videos.map((video) => ({ ...video, seriesTitle: series.title, seriesSlug: series.slug }))
 );
-
 const uniqueVideos = Array.from(new Map(allVideos.map((video) => [video.videoId, video])).values());
 const featuredVideo = uniqueVideos.find((video) => video.videoId === "0wb01KTkKDo") ?? uniqueVideos[0];
 
@@ -66,9 +54,9 @@ const videoStructuredData = {
 
 export default function YoutubePage() {
   return (
-    <div className="page-shell video-catalog-page">
+    <div className="page-shell lp-page">
       <SiteHeader />
-      <main>
+      <main className="lp-main">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(videoStructuredData) }}
@@ -76,26 +64,19 @@ export default function YoutubePage() {
 
         <section className="youtube-catalog-hero">
           <div className="site-container youtube-catalog-hero-inner">
-            <div className="youtube-catalog-copy">
-              <p className="youtube-kicker">cppvalley video library</p>
-              <h1>C++ systems videos arranged like a course catalog.</h1>
+            <div>
+              <p className="lp-kicker">Video courses</p>
+              <h1>C++ systems videos organized into learning paths.</h1>
               <p>
-                Watch focused cppvalley lessons on C++ interviews, ownership, virtual dispatch,
-                atomics, CPU cache, false sharing and low-latency systems without leaving the site.
+                Watch focused cppvalley lessons on C++ interviews, ownership, virtual dispatch, atomics, CPU cache, false sharing and low-latency systems without leaving the site.
               </p>
-
-              <div className="youtube-search-box" role="search" aria-label="Video library search placeholder">
-                <span>⌕</span>
-                <strong>Search topics:</strong>
-                <em>unique_ptr, virtual destructor, atomics, false sharing, vtable</em>
-              </div>
-
+              <Link className="youtube-search-box" href="#all-videos" aria-label="Browse video lessons">
+                Search topics: unique_ptr, virtual destructor, atomics, false sharing, vtable
+              </Link>
               <div className="youtube-hero-actions">
-                <Link className="youtube-primary-cta" href="#all-videos">Browse video courses</Link>
+                <Link className="youtube-primary-cta" href="#all-videos">Browse video lessons</Link>
                 <Link className="youtube-secondary-cta" href="/courses">Explore courses</Link>
-                <Link className="youtube-text-cta" href={youtubeChannelUrl} target="_blank" rel="noreferrer">
-                  Visit @cppvalley ↗
-                </Link>
+                <Link className="youtube-text-cta" href={youtubeChannelUrl} target="_blank" rel="noreferrer">Visit channel ↗</Link>
               </div>
             </div>
 
@@ -110,15 +91,11 @@ export default function YoutubePage() {
                   />
                 </div>
                 <div className="youtube-featured-meta">
-                  <span>Featured lesson</span>
+                  <span className="course-badge">Featured lesson</span>
                   <h2>{featuredVideo.title}</h2>
                   <p>{featuredVideo.intent}</p>
-                  <div className="youtube-rating-row">
-                    <b>4.8</b>
-                    <span>★★★★★</span>
-                    <small>{featuredVideo.duration} · {featuredVideo.level}</small>
-                  </div>
-                  <Link href={`https://www.youtube.com/watch?v=${featuredVideo.videoId}`} target="_blank" rel="noreferrer">
+                  <div className="youtube-card-rating"><b>★ 4.8</b><span>{featuredVideo.duration}</span><small>{featuredVideo.level}</small></div>
+                  <Link className="lp-card-link" href={`https://www.youtube.com/watch?v=${featuredVideo.videoId}`} target="_blank" rel="noreferrer">
                     Open on YouTube ↗
                   </Link>
                 </div>
@@ -134,11 +111,9 @@ export default function YoutubePage() {
           <div><strong>Free</strong><span>embedded lessons</span></div>
         </section>
 
-        <nav className="site-container youtube-topic-bar" aria-label="Video topics">
+        <nav className="site-container youtube-topic-bar" aria-label="Video paths">
           <a href="#all-videos">All videos</a>
-          {youtubeSeries.map((series) => (
-            <a href={`#${series.slug}`} key={series.slug}>{series.title}</a>
-          ))}
+          {youtubeSeries.map((series) => <a href={`#${series.slug}`} key={series.slug}>{series.title}</a>)}
         </nav>
 
         <section className="site-container youtube-chip-row" aria-label="Popular video topics">
@@ -148,7 +123,7 @@ export default function YoutubePage() {
         <section className="site-container youtube-catalog-layout">
           <aside className="youtube-filter-panel" aria-label="Learning paths sidebar">
             <h2>Learning paths</h2>
-            <p>Pick a path and watch in order, like a compact course.</p>
+            <p>Pick a path and watch in order like a compact course.</p>
             <div className="youtube-path-list">
               {youtubeSeries.map((series) => (
                 <a href={`#${series.slug}`} key={series.slug}>
@@ -160,7 +135,7 @@ export default function YoutubePage() {
             <div className="youtube-side-cta">
               <strong>Want the full roadmap?</strong>
               <p>Pair videos with structured C++, EDA, HFT and systems courses.</p>
-              <Link href="/courses">Explore courses</Link>
+              <Link className="lp-card-link" href="/courses">Explore courses</Link>
             </div>
           </aside>
 
@@ -168,10 +143,10 @@ export default function YoutubePage() {
             <section className="youtube-course-block" id="all-videos">
               <div className="youtube-block-head">
                 <div>
-                  <p>All cppvalley videos</p>
+                  <p className="lp-kicker">All cppvalley videos</p>
                   <h2>Most useful videos for C++ systems interviews</h2>
                 </div>
-                <Link href={youtubeChannelUrl} target="_blank" rel="noreferrer">Channel ↗</Link>
+                <Link className="lp-card-link" href={youtubeChannelUrl} target="_blank" rel="noreferrer">Channel ↗</Link>
               </div>
 
               <div className="youtube-course-grid">
@@ -189,9 +164,7 @@ export default function YoutubePage() {
                       <span className="youtube-course-topic">{video.topic}</span>
                       <h3>{video.title}</h3>
                       <p className="youtube-course-instructor">cppvalley · {video.seriesTitle}</p>
-                      <div className="youtube-card-rating">
-                        <b>4.8</b><span>★★★★★</span><small>{video.level}</small>
-                      </div>
+                      <div className="youtube-card-rating"><b>★ 4.8</b><span>{video.level}</span></div>
                       <p className="youtube-course-intent">{video.intent}</p>
                       <div className="youtube-course-footer">
                         <strong>{video.duration}</strong>
@@ -207,10 +180,10 @@ export default function YoutubePage() {
               <section className="youtube-course-block" id={series.slug} key={series.slug}>
                 <div className="youtube-block-head">
                   <div>
-                    <p>{series.videos.length} videos · {series.audience}</p>
+                    <p className="lp-kicker">{series.videos.length} videos · {series.audience}</p>
                     <h2>{series.title}</h2>
                   </div>
-                  <Link href="/courses">Related courses ↗</Link>
+                  <Link className="lp-card-link" href="/courses">Related courses ↗</Link>
                 </div>
                 <p className="youtube-block-description">{series.description}</p>
 
@@ -227,7 +200,7 @@ export default function YoutubePage() {
                         />
                       </div>
                       <div className="youtube-row-copy">
-                        <span>{video.topic}</span>
+                        <span className="course-badge">{video.topic}</span>
                         <h3>{video.title}</h3>
                         <p>{video.intent}</p>
                         <small>{video.duration} · {video.level}</small>
@@ -236,7 +209,7 @@ export default function YoutubePage() {
                   ))}
                 </div>
 
-                <div className="youtube-keyword-pills" aria-label={`${series.title} SEO topics`}>
+                <div className="youtube-keyword-pills" aria-label={`${series.title} topics`}>
                   {series.seoKeywords.map((keyword) => <span key={keyword}>{keyword}</span>)}
                 </div>
               </section>

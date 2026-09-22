@@ -3,23 +3,21 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
-import { courses, coursesBySlug } from "@/data/courses";
+import { coursePages, courses, coursesBySlug } from "@/data/courses";
 
 type CoursePageProps = {
   params: Promise<{ slug: string }>;
 };
 
 export function generateStaticParams() {
-  return courses
-    .filter((course) => course.slug !== "third-year-cpp-eda-hft")
-    .map((course) => ({ slug: course.slug }));
+  return coursePages.map((course) => ({ slug: course.slug }));
 }
 
 export async function generateMetadata({ params }: CoursePageProps): Promise<Metadata> {
   const { slug } = await params;
   const course = coursesBySlug.get(slug);
 
-  if (!course) return {};
+  if (!course || course.href !== `/courses/${course.slug}`) return {};
 
   return {
     title: `${course.title} — cppvalley Course`,
@@ -30,7 +28,6 @@ export async function generateMetadata({ params }: CoursePageProps): Promise<Met
       description: course.description,
       url: `/courses/${course.slug}`,
       type: "website",
-      images: [{ url: course.coverImage, width: 1200, height: 675, alt: `${course.title} cover` }],
     },
   };
 }
@@ -39,10 +36,10 @@ export default async function CoursePage({ params }: CoursePageProps) {
   const { slug } = await params;
   const course = coursesBySlug.get(slug);
 
-  if (!course || course.slug === "third-year-cpp-eda-hft") notFound();
+  if (!course || course.href !== `/courses/${course.slug}`) notFound();
 
   const relatedCourses = courses
-    .filter((item) => item.slug !== course.slug && item.pillar === course.pillar)
+    .filter((item) => item.slug !== course.slug)
     .slice(0, 3);
 
   const structuredData = {
@@ -82,13 +79,12 @@ export default async function CoursePage({ params }: CoursePageProps) {
               <p>{course.longDescription}</p>
               <div className="lp-actions">
                 <Link className="lp-button primary" href="/youtube">Watch related videos</Link>
-                <Link className="lp-button" href="/projects">Build projects</Link>
+                <Link className="lp-button" href="/interviews">Practice questions</Link>
               </div>
             </div>
-            <aside className="course-detail-cover-card">
-              <img src={course.coverImage} alt={`${course.title} cover`} />
+            <aside className="course-detail-cover-card no-image-detail-card">
               <div className="course-detail-card-body">
-                <span className="course-badge">{course.status}</span>
+                <span className="course-badge">{course.pillar}</span>
                 <h2>{course.shortTitle}</h2>
                 <div className="lp-meta"><span>{course.level}</span><span>{course.duration}</span><span>{course.lessons}</span></div>
               </div>
@@ -132,27 +128,31 @@ export default async function CoursePage({ params }: CoursePageProps) {
           </aside>
         </section>
 
-        <section className="site-container lp-section">
-          <div className="lp-section-head">
-            <div>
-              <p className="lp-kicker">Related courses</p>
-              <h2>Continue in the same pillar</h2>
+        {relatedCourses.length ? (
+          <section className="site-container lp-section">
+            <div className="lp-section-head">
+              <div>
+                <p className="lp-kicker">Continue learning</p>
+                <h2>Related public tracks</h2>
+              </div>
+              <Link className="lp-card-link" href="/courses">All courses</Link>
             </div>
-            <Link className="lp-card-link" href="/courses">All courses</Link>
-          </div>
-          <div className="lp-course-grid">
-            {relatedCourses.map((item) => (
-              <Link className="lp-course-card image-course-card" href={item.href} key={item.slug}>
-                <img className="course-card-image" src={item.coverImage} alt={`${item.title} cover`} loading="lazy" />
-                <div className="lp-card-body">
-                  <span className="course-badge">{item.pillar}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
+            <div className="lp-course-grid">
+              {relatedCourses.map((item) => (
+                <Link className="lp-course-card" href={item.href} key={item.slug}>
+                  <div className="lp-card-thumb">
+                    <span>{item.pillar}</span>
+                    <strong>{item.shortTitle}</strong>
+                  </div>
+                  <div className="lp-card-body">
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </main>
       <SiteFooter />
     </div>

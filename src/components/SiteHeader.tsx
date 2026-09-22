@@ -3,10 +3,8 @@ import { BrandLockup } from "@/components/BrandLockup";
 
 const navItems = [
   { href: "/courses", label: "Courses" },
-  { href: "/youtube", label: "Video Courses" },
-  { href: "/interviews", label: "Questions" },
-  { href: "/projects", label: "Projects" },
-  { href: "/blog", label: "Articles" },
+  { href: "/interviews", label: "Interview Questions" },
+  { href: "/blog", label: "Blog" },
   { href: "/books", label: "Books" },
 ] as const;
 

@@ -1,13 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import "./marketplace.css";
-import "./institute.css";
 import "./brand-consistency.css";
-import "./cmu.css";
-import "./blog-engagement.css";
 import "./platform.css";
-import "./youtube-udemy.css";
-import "./course-marketplace.css";
+import "./video-catalog.css";
 import "./site-stable.css";
 
 export const metadata: Metadata = {

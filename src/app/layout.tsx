@@ -11,6 +11,7 @@ import "./stanford-theme.css";
 import "./video-course-player.css";
 import "./site-tighten.css";
 import "./subtle-theme.css";
+import "./smooth-modern.css";
 
 const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 

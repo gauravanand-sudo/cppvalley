@@ -7,19 +7,19 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts } from "@/data/blog";
 
 export const metadata: Metadata = {
-  title: "Articles — C++, HFT, EDA and Systems Notes",
+  title: "Blog — C++, HFT, EDA and Systems Notes",
   description:
-    "cppvalley articles on C++, HFT, EDA software, low latency, systems design and interview preparation.",
+    "cppvalley blog posts on C++, HFT, EDA software, low latency, systems design and interview preparation.",
   alternates: { canonical: "/blog" },
   keywords: [
     "C++ blog",
     "HFT engineering blog",
     "low latency C++ notes",
-    "EDA software articles",
+    "EDA software blog",
     "systems interview preparation"
   ],
   openGraph: {
-    title: "cppvalley Articles",
+    title: "cppvalley Blog",
     description: "Notes on C++, HFT, EDA, low latency, interviews and systems engineering.",
     url: "/blog",
     type: "website",
@@ -44,7 +44,7 @@ export default function BlogPage() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Blog",
-    name: "cppvalley Articles",
+    name: "cppvalley Blog",
     description: metadata.description,
     url: "https://cppvalley.com/blog",
     blogPost: posts.slice(0, 20).map((post) => ({
@@ -64,25 +64,10 @@ export default function BlogPage() {
       />
       <SiteHeader />
       <main className="blog-main lp-main">
-        <section className="blog-hero">
-          <div className="site-container lp-hero-inner">
-            <div>
-              <p className="lp-kicker">Articles</p>
-              <h1>Systems notes for serious C++ learners.</h1>
-              <p>
-                Practical articles on C++, HFT systems, EDA software basics, low latency, interview preparation and project ideas.
-              </p>
-              <div className="lp-actions">
-                <Link className="lp-button primary" href="#latest-posts-heading">Read articles</Link>
-                <Link className="lp-button" href="/interviews">Practice questions</Link>
-              </div>
-            </div>
-
-            <aside className="blog-hero-side" aria-label="Article focus">
-              <strong>C++ systems</strong>
-              <strong>Interview preparation</strong>
-              <strong>Projects and trade-offs</strong>
-            </aside>
+        <section className="blog-hero compact-hero">
+          <div className="site-container">
+            <p className="lp-kicker">Blog</p>
+            <h1>Blog</h1>
           </div>
         </section>
 
@@ -92,7 +77,7 @@ export default function BlogPage() {
 
         <section className="site-container blog-index" aria-labelledby="latest-posts-heading">
           <div className="blog-index-heading">
-            <h2 id="latest-posts-heading">Latest articles</h2>
+            <h2 id="latest-posts-heading">Latest posts</h2>
             <span>{posts.length} published</span>
           </div>
 
@@ -122,8 +107,7 @@ export default function BlogPage() {
           ) : (
             <div className="lp-card">
               <div className="lp-card-body">
-                <strong>No articles published yet.</strong>
-                <p>Articles will appear here when they are published.</p>
+                <strong>No blog posts published yet.</strong>
               </div>
             </div>
           )}

@@ -7,6 +7,7 @@ import "./cmu.css";
 import "./blog-engagement.css";
 import "./platform.css";
 import "./youtube-udemy.css";
+import "./course-marketplace.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://cppvalley.com"),

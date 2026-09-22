@@ -1,19 +1,21 @@
-/* Final stability layer: one marketplace system wins over older themes */
+/* Final public course marketplace theme */
 :root {
-  --sv-bg: #f7f9fb;
+  --sv-bg: #f7f9fa;
   --sv-surface: #ffffff;
-  --sv-ink: #111827;
-  --sv-muted: #5b6472;
-  --sv-line: #e5e7eb;
+  --sv-ink: #1c1d1f;
+  --sv-muted: #6a6f73;
+  --sv-line: #d1d7dc;
   --sv-purple: #5624d0;
+  --sv-purple-bright: #a435f0;
   --sv-purple-dark: #401b9c;
-  --sv-teal: #0f766e;
-  --sv-shadow: 0 10px 28px rgba(17, 24, 39, 0.08);
+  --sv-yellow: #b4690e;
+  --sv-cream: #eceb98;
+  --sv-shadow: 0 8px 18px rgba(28, 29, 31, 0.12);
 }
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 90px;
+  scroll-padding-top: 86px;
 }
 
 body {
@@ -36,7 +38,7 @@ iframe {
 .page-width,
 .site-header-inner,
 .site-footer-inner {
-  width: min(1180px, calc(100% - 40px)) !important;
+  width: min(1184px, calc(100% - 40px)) !important;
   margin-inline: auto !important;
 }
 
@@ -50,7 +52,6 @@ iframe {
   color: var(--sv-ink) !important;
 }
 
-/* Prevent broken word wrapping / one-word-per-line headings */
 h1,
 h2,
 h3,
@@ -78,7 +79,6 @@ li {
   text-wrap: pretty;
 }
 
-/* Header */
 .site-header,
 .marketplace-header,
 .mit-header {
@@ -87,7 +87,7 @@ li {
   z-index: 80 !important;
   background: #ffffff !important;
   border-bottom: 1px solid var(--sv-line) !important;
-  box-shadow: 0 1px 10px rgba(17, 24, 39, 0.05) !important;
+  box-shadow: 0 2px 4px rgba(28, 29, 31, 0.08) !important;
 }
 
 .mit-top-line,
@@ -120,13 +120,13 @@ li {
   align-items: center !important;
   width: fit-content !important;
   max-width: none !important;
-  border: 1px solid #ddd6fe !important;
-  border-radius: 999px !important;
-  background: #f5f3ff !important;
-  color: var(--sv-purple-dark) !important;
-  padding: 0.35rem 0.65rem !important;
+  border: 1px solid #d1d7dc !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+  color: var(--sv-ink) !important;
+  padding: 0.38rem 0.62rem !important;
   font-size: 0.82rem !important;
-  font-weight: 850 !important;
+  font-weight: 800 !important;
   white-space: nowrap !important;
 }
 
@@ -136,11 +136,11 @@ li {
   flex-wrap: wrap !important;
   align-items: center !important;
   justify-content: flex-end !important;
-  gap: 0.2rem 0.82rem !important;
+  gap: 0.2rem 1rem !important;
 }
 
 .site-nav a {
-  color: #1f2937 !important;
+  color: var(--sv-ink) !important;
   display: inline-flex !important;
   align-items: center !important;
   padding: 0.42rem 0 !important;
@@ -154,38 +154,39 @@ li {
   color: var(--sv-purple) !important;
 }
 
-/* Main hero / course marketplace */
 .market-hero,
 .catalog-hero,
+.youtube-catalog-hero,
 .youtube-hero,
 .mit-hero,
 .platform-page-hero,
 .blog-hero {
-  background: linear-gradient(135deg, #16161d 0%, #241343 55%, #111827 100%) !important;
+  background: #1c1d1f !important;
   color: #ffffff !important;
   border: 0 !important;
 }
 
 .platform-page-hero,
 .blog-hero {
-  border-radius: 0 0 18px 18px !important;
   padding: clamp(2.2rem, 5vw, 4rem) !important;
   margin-bottom: 1.5rem !important;
 }
 
 .market-hero-inner,
 .catalog-hero-inner,
+.youtube-catalog-hero-inner,
 .youtube-hero-inner,
 .mit-hero {
   display: grid !important;
-  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.55fr) !important;
+  grid-template-columns: minmax(0, 1.12fr) minmax(310px, 0.58fr) !important;
   gap: clamp(1.4rem, 4vw, 3rem) !important;
   align-items: center !important;
-  padding: clamp(3rem, 7vw, 5.2rem) 0 !important;
+  padding: clamp(2.8rem, 6vw, 5rem) 0 !important;
 }
 
 .market-hero h1,
 .catalog-hero h1,
+.youtube-catalog-hero h1,
 .youtube-hero h1,
 .mit-hero h1,
 .platform-page-hero h1,
@@ -193,22 +194,23 @@ li {
   max-width: 980px !important;
   margin: 0 !important;
   color: #ffffff !important;
-  font-size: clamp(2.35rem, 5.8vw, 5.2rem) !important;
-  line-height: 1.02 !important;
-  letter-spacing: -0.055em !important;
+  font-size: clamp(2.35rem, 5.4vw, 4.9rem) !important;
+  line-height: 1.03 !important;
+  letter-spacing: -0.045em !important;
 }
 
 .market-hero p,
 .catalog-hero p,
+.youtube-catalog-hero p,
 .youtube-hero p,
 .mit-hero p,
 .platform-page-hero p,
 .blog-hero p,
 .page-intro {
   max-width: 840px !important;
-  color: #e5e7eb !important;
-  font-size: clamp(1rem, 1.35vw, 1.2rem) !important;
-  line-height: 1.6 !important;
+  color: #f7f9fa !important;
+  font-size: clamp(1rem, 1.25vw, 1.18rem) !important;
+  line-height: 1.58 !important;
 }
 
 .market-eyebrow,
@@ -217,30 +219,54 @@ li {
 .blog-kicker,
 .youtube-kicker {
   margin: 0 0 0.75rem !important;
-  color: #c4b5fd !important;
+  color: #c0c4fc !important;
   font-size: 0.78rem !important;
   font-weight: 900 !important;
-  letter-spacing: 0.11em !important;
+  letter-spacing: 0.1em !important;
   text-transform: uppercase !important;
 }
 
 .market-hero-card,
 .mit-hero-side,
+.youtube-featured-course,
 .youtube-hero-card,
 .catalog-hero aside {
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  border-radius: 18px !important;
+  border: 1px solid var(--sv-line) !important;
+  border-radius: 0 !important;
   background: #ffffff !important;
   color: var(--sv-ink) !important;
   padding: 1rem !important;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22) !important;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.25) !important;
 }
 
-/* Buttons */
+.market-search,
+.youtube-search-box,
+.catalog-search {
+  border-radius: 0 !important;
+  border: 1px solid var(--sv-line) !important;
+  background: #ffffff !important;
+  color: var(--sv-ink) !important;
+}
+
+.market-search {
+  box-shadow: 0 6px 0 var(--sv-purple-bright) !important;
+}
+
+.market-search span,
+.youtube-search-box em {
+  color: var(--sv-muted) !important;
+}
+
+.market-search strong,
+.youtube-search-box strong {
+  color: var(--sv-ink) !important;
+}
+
 .market-actions,
 .mit-actions,
 .platform-actions,
-.youtube-actions {
+.youtube-actions,
+.youtube-hero-actions {
   display: flex !important;
   flex-wrap: wrap !important;
   gap: 0.75rem !important;
@@ -250,13 +276,16 @@ li {
 .market-button,
 .mit-button,
 .platform-button,
-.youtube-button {
+.youtube-button,
+.youtube-primary-cta,
+.youtube-secondary-cta,
+.youtube-text-cta {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   min-height: 44px !important;
-  border: 1px solid #c7d2fe !important;
-  border-radius: 8px !important;
+  border: 1px solid var(--sv-purple) !important;
+  border-radius: 0 !important;
   background: #ffffff !important;
   color: var(--sv-purple) !important;
   padding: 0.72rem 1rem !important;
@@ -269,20 +298,31 @@ li {
 .market-button.primary,
 .mit-button.primary,
 .platform-button.primary,
-.youtube-button.primary {
+.youtube-button.primary,
+.youtube-primary-cta {
   border-color: var(--sv-purple) !important;
   background: var(--sv-purple) !important;
   color: #ffffff !important;
 }
 
 .market-button.ghost,
-.youtube-button.ghost {
+.youtube-text-cta {
   background: transparent !important;
   color: #ffffff !important;
-  border-color: rgba(255, 255, 255, 0.35) !important;
+  border-color: #ffffff !important;
 }
 
-/* Sections */
+.market-button:hover,
+.mit-button:hover,
+.platform-button:hover,
+.youtube-button:hover,
+.youtube-primary-cta:hover,
+.youtube-secondary-cta:hover {
+  background: var(--sv-purple-dark) !important;
+  color: #ffffff !important;
+  border-color: var(--sv-purple-dark) !important;
+}
+
 .market-section,
 .mit-section,
 .platform-section,
@@ -296,7 +336,8 @@ li {
 .mit-section-head,
 .platform-section-head,
 .youtube-section-head,
-.blog-index-heading {
+.blog-index-heading,
+.youtube-block-head {
   display: flex !important;
   justify-content: space-between !important;
   align-items: flex-end !important;
@@ -308,15 +349,15 @@ li {
 .mit-section h2,
 .platform-section h2,
 .youtube-section h2,
-.blog-index-heading h2 {
+.blog-index-heading h2,
+.youtube-block-head h2 {
   margin: 0 !important;
   color: var(--sv-ink) !important;
-  font-size: clamp(1.75rem, 3.6vw, 3.15rem) !important;
+  font-size: clamp(1.75rem, 3.4vw, 3rem) !important;
   line-height: 1.05 !important;
-  letter-spacing: -0.04em !important;
+  letter-spacing: -0.035em !important;
 }
 
-/* Grids and cards */
 .market-course-grid,
 .catalog-grid,
 .market-resource-grid,
@@ -328,7 +369,7 @@ li {
 .youtube-video-grid,
 .youtube-path-grid {
   display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) !important;
   gap: 1rem !important;
 }
 
@@ -345,17 +386,18 @@ li {
 .blog-list-item,
 .youtube-course-card,
 .youtube-video-card,
-.youtube-path-card {
+.youtube-path-card,
+.youtube-row-card {
   overflow: hidden !important;
   display: flex !important;
   flex-direction: column !important;
   min-width: 0 !important;
   min-height: auto !important;
   border: 1px solid var(--sv-line) !important;
-  border-radius: 14px !important;
+  border-radius: 0 !important;
   background: #ffffff !important;
   color: var(--sv-ink) !important;
-  box-shadow: 0 8px 22px rgba(17, 24, 39, 0.05) !important;
+  box-shadow: none !important;
   text-decoration: none !important;
 }
 
@@ -364,9 +406,8 @@ li {
 .platform-card:hover,
 .blog-list-item:hover,
 .youtube-course-card:hover,
-.youtube-video-card:hover {
-  transform: translateY(-2px) !important;
-  border-color: #c4b5fd !important;
+.youtube-video-card:hover,
+.youtube-row-card:hover {
   box-shadow: var(--sv-shadow) !important;
 }
 
@@ -377,7 +418,7 @@ li {
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
-  background: linear-gradient(135deg, rgba(86, 36, 208, 0.94), rgba(15, 118, 110, 0.88)) !important;
+  background: #1c1d1f !important;
   color: #ffffff !important;
   padding: 1rem !important;
 }
@@ -385,6 +426,7 @@ li {
 .course-body,
 .catalog-card-body,
 .youtube-card-body,
+.youtube-course-body,
 .blog-list-copy,
 .platform-card,
 .platform-video-card,
@@ -401,12 +443,14 @@ li {
 .mit-resource-card h3,
 .blog-list-copy h2,
 .youtube-course-card h3,
-.youtube-video-card h3 {
+.youtube-video-card h3,
+.youtube-course-body h3,
+.youtube-row-copy h3 {
   margin: 0.55rem 0 0.45rem !important;
   color: var(--sv-ink) !important;
-  font-size: clamp(1.05rem, 1.45vw, 1.32rem) !important;
+  font-size: clamp(1.05rem, 1.35vw, 1.26rem) !important;
   line-height: 1.18 !important;
-  letter-spacing: -0.025em !important;
+  letter-spacing: -0.015em !important;
 }
 
 .course-body p,
@@ -417,16 +461,27 @@ li {
 .mit-resource-card p,
 .blog-list-copy p,
 .youtube-course-card p,
-.youtube-video-card p {
+.youtube-video-card p,
+.youtube-course-body p,
+.youtube-row-copy p {
   margin: 0 0 0.75rem !important;
   color: var(--sv-muted) !important;
   line-height: 1.52 !important;
 }
 
+.course-rating b,
+.youtube-card-rating b,
+.youtube-rating-row b,
+.youtube-card-rating span,
+.youtube-rating-row span {
+  color: var(--sv-yellow) !important;
+}
+
 .course-tags,
 .catalog-filters,
 .market-category-strip,
-.youtube-chip-row {
+.youtube-chip-row,
+.youtube-keyword-pills {
   display: flex !important;
   flex-wrap: wrap !important;
   gap: 0.45rem !important;
@@ -436,63 +491,128 @@ li {
 .catalog-filters span,
 .market-category-strip a,
 .youtube-chip-row span,
+.youtube-keyword-pills span,
 .platform-status,
 .course-badge,
-.tag {
+.tag,
+.youtube-course-topic,
+.youtube-row-copy span {
   width: fit-content !important;
   border: 1px solid var(--sv-line) !important;
-  border-radius: 999px !important;
-  background: #f9fafb !important;
+  border-radius: 0 !important;
+  background: #f7f9fa !important;
   color: #374151 !important;
   padding: 0.28rem 0.55rem !important;
   font-size: 0.76rem !important;
   font-weight: 850 !important;
-  letter-spacing: 0.03em !important;
+  letter-spacing: 0.02em !important;
   text-transform: none !important;
 }
 
-/* Catalog layout */
-.catalog-layout {
+.course-badge,
+.youtube-course-topic {
+  background: var(--sv-cream) !important;
+  color: #3d3c0a !important;
+  border-color: var(--sv-cream) !important;
+}
+
+.catalog-layout,
+.youtube-catalog-layout {
   display: grid !important;
-  grid-template-columns: 250px minmax(0, 1fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
   gap: 1.2rem !important;
   align-items: start !important;
 }
 
-.catalog-sidebar {
+.catalog-sidebar,
+.youtube-filter-panel {
   position: sticky !important;
   top: 92px !important;
   border: 1px solid var(--sv-line) !important;
-  border-radius: 14px !important;
+  border-radius: 0 !important;
   background: #ffffff !important;
   padding: 1rem !important;
 }
 
-/* Video embeds */
 .platform-video-frame,
 .youtube-video-frame,
-.youtube-featured-frame {
+.youtube-featured-frame,
+.youtube-featured-video,
+.youtube-course-frame,
+.youtube-row-video {
   width: 100% !important;
   aspect-ratio: 16 / 9 !important;
   overflow: hidden !important;
   border: 1px solid var(--sv-line) !important;
-  border-radius: 12px !important;
+  border-radius: 0 !important;
   background: #111827 !important;
   padding: 0 !important;
 }
 
 .platform-video-frame iframe,
 .youtube-video-frame iframe,
-.youtube-featured-frame iframe {
+.youtube-featured-frame iframe,
+.youtube-featured-video iframe,
+.youtube-course-frame iframe,
+.youtube-row-video iframe {
   width: 100% !important;
   height: 100% !important;
   border: 0 !important;
 }
 
-/* Footer */
+.youtube-stats-row,
+.mit-stats {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)) !important;
+  gap: 1px !important;
+  background: var(--sv-line) !important;
+  border: 1px solid var(--sv-line) !important;
+}
+
+.youtube-stats-row div,
+.mit-stats div {
+  background: #ffffff !important;
+  padding: 1rem !important;
+}
+
+.youtube-row-list {
+  display: grid !important;
+  gap: 0.75rem !important;
+}
+
+.youtube-row-card {
+  display: grid !important;
+  grid-template-columns: 52px 220px minmax(0, 1fr) !important;
+  gap: 1rem !important;
+  align-items: center !important;
+  padding: 0.75rem !important;
+}
+
+.youtube-row-number {
+  color: var(--sv-purple) !important;
+  font-weight: 900 !important;
+  text-align: center !important;
+}
+
+.market-final-cta {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 1.2rem !important;
+  margin-bottom: 2.4rem !important;
+  background: #1c1d1f !important;
+  color: #ffffff !important;
+  padding: clamp(1.4rem, 4vw, 2.2rem) !important;
+}
+
+.market-final-cta h2 {
+  color: #ffffff !important;
+  margin: 0 !important;
+}
+
 .site-footer,
 .mit-footer {
-  background: #111827 !important;
+  background: #1c1d1f !important;
   color: #ffffff !important;
   border-top: 0 !important;
 }
@@ -507,7 +627,7 @@ li {
 .site-footer span,
 .site-footer-meta,
 .site-footer-nav a {
-  color: #e5e7eb !important;
+  color: #f7f9fa !important;
 }
 
 .site-footer-nav {
@@ -516,17 +636,20 @@ li {
   gap: 0.8rem !important;
 }
 
-/* Responsive */
 @media (max-width: 980px) {
   .market-hero-inner,
   .catalog-hero-inner,
+  .youtube-catalog-hero-inner,
   .youtube-hero-inner,
   .mit-hero,
-  .catalog-layout {
+  .catalog-layout,
+  .youtube-catalog-layout,
+  .youtube-row-card {
     grid-template-columns: 1fr !important;
   }
 
-  .catalog-sidebar {
+  .catalog-sidebar,
+  .youtube-filter-panel {
     position: static !important;
   }
 
@@ -535,7 +658,8 @@ li {
   .platform-section-head,
   .youtube-section-head,
   .market-final-cta,
-  .blog-index-heading {
+  .blog-index-heading,
+  .youtube-block-head {
     align-items: flex-start !important;
     flex-direction: column !important;
   }
@@ -549,6 +673,10 @@ li {
     padding: 0.75rem 0 !important;
   }
 
+  .site-program {
+    display: none !important;
+  }
+
   .site-nav {
     margin-left: 0 !important;
     justify-content: flex-start !important;
@@ -556,25 +684,30 @@ li {
 
   .market-hero h1,
   .catalog-hero h1,
+  .youtube-catalog-hero h1,
   .youtube-hero h1,
   .mit-hero h1,
   .platform-page-hero h1,
   .blog-hero h1 {
-    font-size: clamp(2rem, 10vw, 3.35rem) !important;
-    letter-spacing: -0.035em !important;
+    font-size: clamp(2rem, 10vw, 3.25rem) !important;
+    letter-spacing: -0.03em !important;
   }
 
   .market-actions,
   .mit-actions,
   .platform-actions,
-  .youtube-actions {
+  .youtube-actions,
+  .youtube-hero-actions {
     flex-direction: column !important;
   }
 
   .market-button,
   .mit-button,
   .platform-button,
-  .youtube-button {
+  .youtube-button,
+  .youtube-primary-cta,
+  .youtube-secondary-cta,
+  .youtube-text-cta {
     width: 100% !important;
   }
 
@@ -582,6 +715,6 @@ li {
   .page-width,
   .site-header-inner,
   .site-footer-inner {
-    width: min(100% - 28px, 1180px) !important;
+    width: min(100% - 28px, 1184px) !important;
   }
 }

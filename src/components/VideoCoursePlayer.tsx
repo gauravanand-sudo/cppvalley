@@ -26,7 +26,7 @@ export function VideoCoursePlayer({ series }: VideoCoursePlayerProps) {
 
   return (
     <section className="course-player-shell" aria-label={`${series.title} course player`}>
-      <div className="course-player-left">
+      <div className="course-player-left" aria-label="Active video">
         <div className="course-player-video-frame">
           <iframe
             key={activeVideo.videoId}
@@ -35,18 +35,6 @@ export function VideoCoursePlayer({ series }: VideoCoursePlayerProps) {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
           />
-        </div>
-
-        <div className="course-player-current">
-          <p className="lp-kicker">Lesson {String(activeIndex + 1).padStart(2, "0")}</p>
-          <h1>{activeVideo.title}</h1>
-          <p>{activeVideo.intent}</p>
-          <div className="course-player-meta">
-            <span>{activeVideo.topic}</span>
-            <span>{activeVideo.level}</span>
-            <span>{activeVideo.duration}</span>
-            <a href={watchUrl(activeVideo)} target="_blank" rel="noreferrer">Open on YouTube ↗</a>
-          </div>
         </div>
       </div>
 
@@ -57,6 +45,18 @@ export function VideoCoursePlayer({ series }: VideoCoursePlayerProps) {
             <h2>{series.title}</h2>
           </div>
           <p>{series.videos.length} lessons</p>
+        </div>
+
+        <div className="course-player-current course-player-current-sidebar">
+          <p className="lp-kicker">Lesson {String(activeIndex + 1).padStart(2, "0")}</p>
+          <h1>{activeVideo.title}</h1>
+          <p>{activeVideo.intent}</p>
+          <div className="course-player-meta">
+            <span>{activeVideo.topic}</span>
+            <span>{activeVideo.level}</span>
+            <span>{activeVideo.duration}</span>
+            <a href={watchUrl(activeVideo)} target="_blank" rel="noreferrer">Open on YouTube ↗</a>
+          </div>
         </div>
 
         <div className="course-player-series-summary">

@@ -236,6 +236,29 @@
   aspect-ratio: 16 / 9;
   object-fit: cover;
   border-bottom: 1px solid var(--lp-border);
+  background: #0f172a;
+}
+
+.image-blog-list {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+}
+
+.image-blog-list .blog-list-item {
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+}
+
+.image-blog-list .blog-list-date {
+  margin: 0.95rem 1rem 0;
+}
+
+.image-blog-list .blog-list-copy {
+  padding: 0 1rem 1rem !important;
+}
+
+.image-blog-list .blog-list-arrow {
+  display: none;
 }
 
 @media (max-width: 980px) {

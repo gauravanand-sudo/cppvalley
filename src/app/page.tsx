@@ -15,11 +15,11 @@ export default function Home() {
   const sortedCourses = [...courses].sort((a, b) => a.priority - b.priority);
 
   return (
-    <div className="page-shell lp-page academic-page modern-page">
+    <div className="page-shell lp-page modern-page">
       <SiteHeader />
 
       <main className="lp-main">
-        <section className="academic-hero lp-hero compact-hero social-hero smooth-hero">
+        <section className="lp-hero compact-hero smooth-hero">
           <div className="site-container">
             <p className="lp-kicker">cppvalley</p>
             <h1>C++ systems courses for serious students.</h1>
@@ -42,12 +42,9 @@ export default function Home() {
 
           <div className="lp-course-grid flagship-course-grid smooth-course-grid">
             {sortedCourses.slice(0, 12).map((course) => (
-              <Link className="lp-course-card academic-course-card smooth-course-card" href={course.href} key={course.slug}>
-                <div className="lp-card-thumb academic-card-thumb">
-                  <span>{course.pillar}</span>
-                  <strong>{course.shortTitle}</strong>
-                </div>
+              <Link className="lp-course-card smooth-course-card" href={course.href} key={course.slug}>
                 <div className="lp-card-body">
+                  <span className="course-card-eyebrow">{course.pillar}</span>
                   <h3>{course.title}</h3>
                   <p>{course.description}</p>
                   <div className="lp-meta"><span>{course.level}</span><span>{course.duration}</span></div>

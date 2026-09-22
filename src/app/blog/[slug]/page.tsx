@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Fragment } from "react";
 import { AdSlot } from "@/components/AdSlot";
 import { BlogEngagement } from "@/components/BlogEngagement";
+import { MdxArticle } from "@/components/MdxArticle";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts, blogPostsBySlug } from "@/data/blog";
@@ -13,7 +13,6 @@ type BlogPostPageProps = {
 };
 
 const blogArticleTopAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_ARTICLE_TOP_SLOT;
-const blogArticleMidAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_ARTICLE_MID_SLOT;
 const blogArticleBottomAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_ARTICLE_BOTTOM_SLOT;
 
 export function generateStaticParams() {
@@ -74,7 +73,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Articles", item: "https://cppvalley.com/blog" },
+          { "@type": "ListItem", position: 1, name: "Blog", item: "https://cppvalley.com/blog" },
           { "@type": "ListItem", position: 2, name: post.title, item: `https://cppvalley.com/blog/${post.slug}` },
         ],
       },
@@ -104,7 +103,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   };
 
   return (
-    <div className="blog-post-page lp-page">
+    <div className="blog-post-page lp-page modern-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
@@ -116,7 +115,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <div className="site-container blog-post-shell content-with-sidebar">
           <div className="content-main-column">
             <nav className="blog-post-breadcrumb lp-breadcrumb" aria-label="Breadcrumb">
-              <Link href="/blog">Articles</Link>
+              <Link href="/blog">Blog</Link>
               <span>/</span>
               <span>{post.title}</span>
             </nav>
@@ -134,24 +133,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
             <AdSlot slot={blogArticleTopAdSlot} className="ad-slot-leaderboard" />
 
-            <article className="blog-article optimized-article">
-              {post.sections.map((section, index) => (
-                <Fragment key={`${post.slug}-${index}`}>
-                  <section>
-                    {section.heading ? <h2>{section.heading}</h2> : null}
-                    {section.paragraphs?.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-                    {section.bullets?.length ? (
-                      <ul>
-                        {section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
-                      </ul>
-                    ) : null}
-                  </section>
-                  {index === 0 ? (
-                    <AdSlot slot={blogArticleMidAdSlot} className="ad-slot-inarticle ad-article-wrap" />
-                  ) : null}
-                </Fragment>
-              ))}
-            </article>
+            <MdxArticle source={post.mdx} />
 
             <AdSlot slot={blogArticleBottomAdSlot} className="ad-slot-leaderboard" />
 
@@ -166,7 +148,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               issueNumber={post.discussionIssue}
             />
 
-            <Link className="blog-back" href="/blog">← Back to all articles</Link>
+            <Link className="blog-back" href="/blog">← Back to blog</Link>
           </div>
 
           <aside className="content-sidebar article-sidebar">
@@ -175,10 +157,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <span className="course-badge">Continue learning</span>
                 <h3>Related cppvalley paths</h3>
                 <div className="related-link-list">
-                  <Link href="/courses">Course catalog</Link>
+                  <Link href="/courses">Courses</Link>
                   <Link href="/interviews">Interview questions</Link>
-                  <Link href="/projects">Project labs</Link>
-                  <Link href="/youtube">Video courses</Link>
+                  <Link href="/books">Book summaries</Link>
                 </div>
               </div>
             </div>
@@ -186,7 +167,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             {relatedPosts.length ? (
               <div className="lp-card">
                 <div className="lp-card-body">
-                  <span className="course-badge">Related articles</span>
+                  <span className="course-badge">Related posts</span>
                   <div className="related-link-list">
                     {relatedPosts.map((related) => (
                       <Link href={`/blog/${related.slug}`} key={related.slug}>{related.title}</Link>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Fragment } from "react";
 import { AdSlot } from "@/components/AdSlot";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -72,15 +73,11 @@ export default function BlogPage() {
           {posts.length > 0 ? (
             <div className="blog-list">
               {posts.map((post, index) => (
-                <>
+                <Fragment key={post.slug}>
                   {index === 2 ? (
-                    <AdSlot
-                      slot={blogFeedAdSlot}
-                      className="ad-slot-leaderboard"
-                      key="blog-feed-ad"
-                    />
+                    <AdSlot slot={blogFeedAdSlot} className="ad-slot-leaderboard" />
                   ) : null}
-                  <Link className="blog-list-item" href={`/blog/${post.slug}`} key={post.slug}>
+                  <Link className="blog-list-item" href={`/blog/${post.slug}`}>
                     <span className="blog-list-date">{formatDate(post.publishedAt)}</span>
                     <div className="blog-list-copy">
                       <h2>{post.title}</h2>
@@ -88,7 +85,7 @@ export default function BlogPage() {
                     </div>
                     <span className="blog-list-arrow" aria-hidden="true">→</span>
                   </Link>
-                </>
+                </Fragment>
               ))}
             </div>
           ) : (

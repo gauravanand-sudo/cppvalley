@@ -10,6 +10,7 @@ import "./seo-growth.css";
 import "./stanford-theme.css";
 import "./video-course-player.css";
 import "./site-tighten.css";
+import "./subtle-theme.css";
 
 const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
@@ -76,7 +77,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#8c1515",
+  themeColor: "#7a2e2e",
   colorScheme: "light",
 };
 

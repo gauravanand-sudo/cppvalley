@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { blogPosts } from "@/data/blog";
 import { courses, type Course } from "@/data/courses";
 
 export const metadata: Metadata = {
@@ -10,6 +11,15 @@ export const metadata: Metadata = {
     "C++, HFT, EDA, CUDA, GPU and AI systems courses for students and engineers.",
   alternates: { canonical: "/" },
 };
+
+const books = [
+  ["Effective Modern C++", "Scott Meyers", "Core C++"],
+  ["Effective STL", "Scott Meyers", "STL"],
+  ["C++ Concurrency in Action", "Anthony Williams", "Concurrency"],
+  ["C++ Software Design", "Klaus Iglberger", "Design"],
+  ["Designing Data-Intensive Applications", "Martin Kleppmann", "Systems"],
+  ["Elements of Programming Interviews in C++", "Aziz, Lee, Prakash", "DSA"],
+] as const;
 
 function courseHref(course: Course) {
   if (course.href.startsWith("/youtube/") || course.href === "/curriculum") return `/courses/${course.slug}`;
@@ -22,90 +32,39 @@ function courseSignal(course: Course) {
   if (course.title.toLowerCase().includes("interview")) return "Interview focused";
   if (course.level.includes("Advanced") || course.level.includes("Senior")) return "Advanced systems";
   if (course.pillar === "Roadmap") return "Roadmap";
-  return "Focused track";
+  return "Course";
 }
 
-const journey = [
-  ["1", "Pick a track", "Choose one role path instead of jumping between random topics."],
-  ["2", "Watch and read", "Use course pages, lesson players and blog deep dives together."],
-  ["3", "Practice interviews", "Answer company-style prompts before checking the framework."],
-  ["4", "Revise fast", "Use books and notes as compact revision before interviews."],
-] as const;
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("en", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${value}T00:00:00Z`));
+}
 
 export default function Home() {
   const sortedCourses = [...courses].sort((a, b) => a.priority - b.priority);
-  const topCourses = sortedCourses.slice(0, 8);
-  const pillars = Array.from(new Set(sortedCourses.map((course) => course.pillar)));
+  const latestPost = [...blogPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))[0];
 
   return (
-    <div className="page-shell lp-page modern-page market-page">
+    <div className="page-shell lp-page modern-page simple-home-page">
       <SiteHeader />
 
       <main className="lp-main">
-        <section className="market-home-hero">
-          <div className="site-container">
-            <div className="market-hero-copy">
-              <p className="lp-kicker">cppvalley learning marketplace</p>
-              <h1>Learn C++ systems for HFT, EDA, GPU and AI infrastructure roles.</h1>
-              <p>Structured courses, video lessons, interview banks, engineering notes and book summaries for students preparing for serious systems engineering roles.</p>
-              <div className="lp-actions hero-cta-row">
-                <Link className="lp-button primary" href="/courses">Explore courses</Link>
-                <Link className="lp-button" href="/interviews">Practice interviews</Link>
-              </div>
-              <div className="market-stats-row" aria-label="Platform stats">
-                <span className="market-stat-pill">{sortedCourses.length} learning tracks</span>
-                <span className="market-stat-pill">C++ · HFT · EDA · GPU</span>
-                <span className="market-stat-pill">Student-first roadmap</span>
-              </div>
-            </div>
-
-            <aside className="market-hero-panel">
-              <strong>Start with the right track</strong>
-              <ul>
-                <li>Use the roadmap if you are in 3rd/4th year.</li>
-                <li>Use Core C++ before HFT, EDA or GPU tracks.</li>
-                <li>Practice interviews after every module cluster.</li>
-              </ul>
-              <Link className="lp-button primary" href="/courses/third-year-cpp-eda-hft">Student roadmap</Link>
-            </aside>
-          </div>
-        </section>
-
-        <div className="site-container market-topic-row" aria-label="Browse by topic">
-          {pillars.map((pillar) => <a href="/courses" key={pillar}>{pillar}</a>)}
-        </div>
-
-        <section className="site-container lp-section suggested-path-section" aria-labelledby="suggested-path-heading">
+        <section className="site-container lp-section home-courses-section" id="courses">
           <div className="market-section-head">
             <div>
-              <p className="lp-kicker">Learning path</p>
-              <h2 id="suggested-path-heading">A marketplace, but with a clear student path</h2>
-              <p>Move from choosing one course to practicing questions and revising with notes.</p>
+              <p className="lp-kicker">Courses</p>
+              <h1>Courses</h1>
+              <p>C++ systems, HFT, EDA, GPU and AI infrastructure tracks.</p>
             </div>
-          </div>
-          <div className="market-grid-3">
-            {journey.slice(0, 3).map(([step, title, copy]) => (
-              <article className="market-grid-card" key={title}>
-                <span className="course-badge">Step {step}</span>
-                <h3>{title}</h3>
-                <p>{copy}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="site-container lp-section" id="courses">
-          <div className="market-section-head">
-            <div>
-              <p className="lp-kicker">Popular courses</p>
-              <h2>Courses students open first</h2>
-              <p>Course cards now behave like a learning marketplace: topic, level, duration and next action are visible at a glance.</p>
-            </div>
-            <Link className="lp-card-link" href="/courses">View all</Link>
+            <Link className="lp-card-link" href="/courses">View all courses</Link>
           </div>
 
           <div className="market-course-list">
-            {topCourses.map((course) => (
+            {sortedCourses.map((course) => (
               <Link className="market-course-card" href={courseHref(course)} key={course.slug}>
                 <div className="market-card-thumb">
                   <div>
@@ -115,13 +74,71 @@ export default function Home() {
                 </div>
                 <div className="market-card-body">
                   <span className="course-card-eyebrow">{courseSignal(course)}</span>
-                  <h3>{course.title}</h3>
+                  <h2>{course.title}</h2>
                   <p>{course.description}</p>
-                  <div className="market-rating-row"><strong>4.8</strong><span>Student-ready</span><span>{course.duration}</span></div>
-                  <div className="market-card-meta"><span>{course.level}</span><span>{course.tags.slice(0, 2).join(" · ")}</span></div>
+                  <div className="market-card-meta">
+                    <span>{course.level}</span>
+                    <span>{course.duration}</span>
+                    <span>{course.tags.slice(0, 2).join(" · ")}</span>
+                  </div>
                 </div>
-                <div className="market-card-action">Open course →</div>
+                <div className="market-card-action">Open →</div>
               </Link>
+            ))}
+          </div>
+        </section>
+
+        {latestPost ? (
+          <section className="site-container lp-section home-blog-section" aria-labelledby="daily-blog-heading">
+            <div className="market-section-head">
+              <div>
+                <p className="lp-kicker">Daily blog</p>
+                <h2 id="daily-blog-heading">Daily blog</h2>
+              </div>
+              <Link className="lp-card-link" href="/blog">View blog</Link>
+            </div>
+
+            <Link className="market-featured-card" href={`/blog/${latestPost.slug}`}>
+              <div className="market-card-body">
+                <span className="course-card-eyebrow">{formatDate(latestPost.publishedAt)}</span>
+                <h2>{latestPost.title}</h2>
+                <p>{latestPost.excerpt}</p>
+                <div className="market-card-meta">
+                  {latestPost.readingTime ? <span>{latestPost.readingTime}</span> : null}
+                  {latestPost.topics?.slice(0, 3).map((topic) => <span key={topic}>{topic}</span>)}
+                </div>
+              </div>
+              <div className="market-card-action">Read →</div>
+            </Link>
+          </section>
+        ) : null}
+
+        <section className="site-container lp-section home-books-section" aria-labelledby="books-heading">
+          <div className="market-section-head">
+            <div>
+              <p className="lp-kicker">Books</p>
+              <h2 id="books-heading">Book section</h2>
+              <p>Only the core reading list for now. Detailed summaries can come later.</p>
+            </div>
+            <Link className="lp-card-link" href="/books">View books</Link>
+          </div>
+
+          <div className="market-resource-list">
+            {books.map(([title, author, track]) => (
+              <article className="market-resource-card" key={title}>
+                <div className="market-card-thumb">
+                  <div>
+                    <span>{track}</span>
+                    <strong>Book</strong>
+                  </div>
+                </div>
+                <div className="market-card-body">
+                  <span className="course-card-eyebrow">{track}</span>
+                  <h3>{title}</h3>
+                  <p>{author}</p>
+                </div>
+                <div className="market-card-action">Soon</div>
+              </article>
             ))}
           </div>
         </section>

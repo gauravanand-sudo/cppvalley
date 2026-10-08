@@ -5,6 +5,7 @@ import { AdSlot } from "@/components/AdSlot";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts } from "@/data/blog";
+import { blogHeroImage, heroImages, imageForBlog } from "@/data/media";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -49,16 +50,22 @@ export default function BlogPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
       <SiteHeader />
       <main className="page-main">
-        <section className="page-hero resources-hero">
-          <div className="site-container">
-            <div className="page-hero-badge">Engineering resources</div>
-            <h1 className="page-title">Learn the idea.<br />Then learn the trade-off.</h1>
-            <p>Deep-dive notes on C++, performance, low latency, HFT and systems design. Written to be useful when you come back six months later.</p>
-            {topics.length ? (
-              <div className="topic-strip" aria-label="Blog topics">
-                {topics.map((topic) => <span key={topic}>{topic}</span>)}
-              </div>
-            ) : null}
+        <section className="page-hero resources-hero image-page-hero">
+          <div className="site-container resources-hero-grid">
+            <div>
+              <div className="page-hero-badge">Engineering resources</div>
+              <h1 className="page-title">Learn the idea.<br />Then learn the trade-off.</h1>
+              <p>Deep-dive notes on C++, performance, low latency, HFT and systems design. Written to be useful when you come back six months later.</p>
+              {topics.length ? (
+                <div className="topic-strip" aria-label="Blog topics">
+                  {topics.map((topic) => <span key={topic}>{topic}</span>)}
+                </div>
+              ) : null}
+            </div>
+            <div className="resources-hero-media" aria-hidden="true">
+              <img className="resources-hero-main" src={blogHeroImage} alt="" />
+              <img src={heroImages[1]} alt="" />
+            </div>
           </div>
         </section>
 
@@ -69,30 +76,34 @@ export default function BlogPage() {
         <section className="section">
           <div className="site-container">
             {featuredPost ? (
-              <Link className="feature-card feature-card-wide" href={`/blog/${featuredPost.slug}`}>
-                <div className="resource-badge">Featured note</div>
-                <div className="meta-row">
-                  <span>{formatDate(featuredPost.publishedAt)}</span>
-                  {featuredPost.readingTime ? <span>{featuredPost.readingTime}</span> : null}
-                </div>
-                <h3>{featuredPost.title}</h3>
-                <p>{featuredPost.excerpt}</p>
-                {featuredPost.topics?.length ? (
-                  <div className="tag-row">
-                    {featuredPost.topics.map((topic) => <span className="tag" key={topic}>{topic}</span>)}
+              <Link className="feature-card feature-card-wide image-feature-card" href={`/blog/${featuredPost.slug}`}>
+                <img className="feature-card-image" src={imageForBlog(featuredPost.slug)} alt="" />
+                <div className="feature-card-overlay" />
+                <div className="feature-card-content">
+                  <div className="resource-badge">Featured note</div>
+                  <div className="meta-row">
+                    <span>{formatDate(featuredPost.publishedAt)}</span>
+                    {featuredPost.readingTime ? <span>{featuredPost.readingTime}</span> : null}
                   </div>
-                ) : null}
-                <span className="resource-link">Read note →</span>
+                  <h3>{featuredPost.title}</h3>
+                  <p>{featuredPost.excerpt}</p>
+                  {featuredPost.topics?.length ? (
+                    <div className="tag-row">
+                      {featuredPost.topics.map((topic) => <span className="tag" key={topic}>{topic}</span>)}
+                    </div>
+                  ) : null}
+                  <span className="resource-link">Read note →</span>
+                </div>
               </Link>
             ) : <div className="empty-state">No posts published yet.</div>}
 
             {otherPosts.length ? (
-              <div className="blog-list">
+              <div className="blog-list image-blog-list">
                 {otherPosts.map((post, index) => (
                   <Fragment key={post.slug}>
                     {index === 1 ? <AdSlot slot={blogFeedAdSlot} className="ad-slot-leaderboard" /> : null}
-                    <Link className="blog-list-card" href={`/blog/${post.slug}`}>
-                      <div className="blog-list-icon">↗</div>
+                    <Link className="blog-list-card image-blog-list-card" href={`/blog/${post.slug}`}>
+                      <img className="blog-list-image" src={imageForBlog(post.slug)} alt="" loading="lazy" />
                       <div>
                         <div className="meta-row">
                           <span>{formatDate(post.publishedAt)}</span>

@@ -7,23 +7,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts } from "@/data/blog";
 
 export const metadata: Metadata = {
-  title: "Blog — C++, HFT, EDA and Systems Notes",
-  description:
-    "cppvalley blog posts on C++, HFT, EDA software, low latency, systems design and interview preparation.",
+  title: "Blog",
+  description: "Long-form cppvalley notes on C++, HFT, low latency, EDA and systems engineering.",
   alternates: { canonical: "/blog" },
-  keywords: [
-    "C++ blog",
-    "HFT engineering blog",
-    "low latency C++ notes",
-    "EDA software blog",
-    "systems interview preparation"
-  ],
-  openGraph: {
-    title: "cppvalley Blog",
-    description: "Notes on C++, HFT, EDA, low latency, interviews and systems engineering.",
-    url: "/blog",
-    type: "website",
-  },
 };
 
 const blogTopAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_TOP_SLOT;
@@ -41,15 +27,15 @@ function formatDate(value: string) {
 export default function BlogPage() {
   const posts = [...blogPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
   const [featuredPost, ...otherPosts] = posts;
-  const topics = Array.from(new Set(posts.flatMap((post) => post.topics ?? []))).slice(0, 10);
+  const topics = Array.from(new Set(posts.flatMap((post) => post.topics ?? [])));
 
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Blog",
     name: "cppvalley Blog",
-    description: metadata.description,
+    description: "Long-form notes on C++ and systems engineering.",
     url: "https://cppvalley.com/blog",
-    blogPost: posts.slice(0, 20).map((post) => ({
+    blogPost: posts.map((post) => ({
       "@type": "BlogPosting",
       headline: post.title,
       description: post.excerpt,
@@ -59,124 +45,63 @@ export default function BlogPage() {
   };
 
   return (
-    <div className="blog-page lp-page modern-page market-page">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
-      />
+    <div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
       <SiteHeader />
-      <main className="blog-main lp-main">
-        <section className="market-page-hero">
+      <main className="page-main">
+        <section className="page-hero">
           <div className="site-container">
-            <div className="market-hero-copy">
-              <p className="lp-kicker">Engineering notes</p>
-              <h1>Blog deep dives</h1>
-              <p>Read technical notes as companion lessons to the courses: low latency, C++, HFT systems, EDA software and interview preparation.</p>
-            </div>
-            <aside className="market-hero-panel">
-              <strong>Use posts like course modules</strong>
-              <ul>
-                <li>Read one deep dive after the matching course topic.</li>
-                <li>Turn the key ideas into interview answers.</li>
-                <li>Use source boxes to track paper-based posts.</li>
-              </ul>
-            </aside>
+            <span className="cinema-line" aria-hidden="true" />
+            <p className="eyebrow">Blog</p>
+            <h1 className="page-title">Engineering notes<br />worth revisiting.</h1>
+            <p>Long-form explanations on performance, C++, HFT and systems design. Written to be useful after the tab is closed.</p>
+            {topics.length ? (
+              <div className="tag-row" style={{ marginTop: 24 }}>
+                {topics.map((topic) => <span className="tag" key={topic}>{topic}</span>)}
+              </div>
+            ) : null}
           </div>
         </section>
-
-        <div className="site-container market-topic-row" aria-label="Blog topics">
-          {topics.map((topic) => <a href="#latest-posts-heading" key={topic}>{topic}</a>)}
-        </div>
 
         <div className="site-container">
           <AdSlot slot={blogTopAdSlot} className="ad-slot-leaderboard" />
         </div>
 
-        <section className="site-container blog-index" aria-labelledby="latest-posts-heading">
-          <div className="market-layout">
-            <aside className="market-sidebar" aria-label="Blog reading guide">
-              <div className="market-sidebar-section">
-                <h3>Read by intent</h3>
-                <ul>
-                  <li>Architecture intuition</li>
-                  <li>Low-latency design</li>
-                  <li>Paper notes</li>
-                  <li>Interview vocabulary</li>
-                </ul>
-              </div>
-              <div className="market-sidebar-section">
-                <h3>Best next step</h3>
-                <ul>
-                  <li>Open a course first</li>
-                  <li>Read the related blog</li>
-                  <li>Practice interviews</li>
-                </ul>
-              </div>
-            </aside>
-
-            <div className="market-content-column">
-              <div className="market-section-head">
-                <div>
-                  <p className="lp-kicker">Latest posts</p>
-                  <h2 id="latest-posts-heading">{posts.length} published notes</h2>
-                  <p>Long-form articles are shown like marketplace lessons so students can choose what to read next.</p>
+        <section className="section">
+          <div className="site-container">
+            {featuredPost ? (
+              <Link className="feature-card" href={`/blog/${featuredPost.slug}`}>
+                <div className="meta-row">
+                  <span>{formatDate(featuredPost.publishedAt)}</span>
+                  {featuredPost.readingTime ? <span>{featuredPost.readingTime}</span> : null}
                 </div>
-              </div>
-
-              {featuredPost ? (
-                <Link className="market-featured-card" href={`/blog/${featuredPost.slug}`}>
-                  <div className="market-card-body">
-                    <span className="course-badge">Featured latest</span>
-                    <h2>{featuredPost.title}</h2>
-                    <p>{featuredPost.excerpt}</p>
-                    <div className="market-card-meta">
-                      <span>{formatDate(featuredPost.publishedAt)}</span>
-                      {featuredPost.readingTime ? <span>{featuredPost.readingTime}</span> : null}
-                      {featuredPost.topics?.length ? <span>{featuredPost.topics.join(" · ")}</span> : null}
-                    </div>
-                    <strong className="lp-link-text">Read post →</strong>
+                <h3>{featuredPost.title}</h3>
+                <p>{featuredPost.excerpt}</p>
+                {featuredPost.topics?.length ? (
+                  <div className="tag-row">
+                    {featuredPost.topics.map((topic) => <span className="tag" key={topic}>{topic}</span>)}
                   </div>
-                  <div className="market-featured-art" aria-hidden="true" />
-                </Link>
-              ) : null}
+                ) : null}
+              </Link>
+            ) : <div className="empty-state">No posts published yet.</div>}
 
-              {posts.length > 0 ? (
-                <div className="market-blog-list">
-                  {otherPosts.map((post, index) => (
-                    <Fragment key={post.slug}>
-                      {index === 1 ? (
-                        <AdSlot slot={blogFeedAdSlot} className="ad-slot-leaderboard" />
-                      ) : null}
-                      <Link className="market-blog-card" href={`/blog/${post.slug}`}>
-                        <div className="market-card-thumb">
-                          <div>
-                            <span>{formatDate(post.publishedAt)}</span>
-                            <strong>{post.readingTime ?? "Blog note"}</strong>
-                          </div>
-                        </div>
-                        <div className="market-card-body">
-                          <span className="course-card-eyebrow">Engineering note</span>
-                          <h3>{post.title}</h3>
-                          <p>{post.excerpt}</p>
-                          {post.topics?.length ? (
-                            <div className="market-card-meta">
-                              {post.topics.slice(0, 3).map((topic) => <span key={topic}>{topic}</span>)}
-                            </div>
-                          ) : null}
-                        </div>
-                        <div className="market-card-action">Read →</div>
-                      </Link>
-                    </Fragment>
-                  ))}
-                </div>
-              ) : (
-                <div className="market-note-card">
-                  <span className="course-badge">Coming soon</span>
-                  <h3>No blog posts published yet.</h3>
-                  <p>Deep engineering notes are being added gradually.</p>
-                </div>
-              )}
-            </div>
+            {otherPosts.length ? (
+              <div className="blog-list" style={{ marginTop: 16 }}>
+                {otherPosts.map((post, index) => (
+                  <Fragment key={post.slug}>
+                    {index === 1 ? <AdSlot slot={blogFeedAdSlot} className="ad-slot-leaderboard" /> : null}
+                    <Link className="blog-list-card" href={`/blog/${post.slug}`}>
+                      <span className="blog-date">{formatDate(post.publishedAt)}</span>
+                      <div>
+                        <h3>{post.title}</h3>
+                        <p>{post.excerpt}</p>
+                      </div>
+                      <span className="arrow" aria-hidden="true">→</span>
+                    </Link>
+                  </Fragment>
+                ))}
+              </div>
+            ) : null}
           </div>
         </section>
       </main>

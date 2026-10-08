@@ -2,13 +2,6 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import Script from "next/script";
 import "./globals.css";
-import "./ads.css";
-import "./video-course-player.css";
-import "./ui-system.css";
-import "./mdx-article.css";
-import "./udemy-ui.css";
-import "./market-detail-ui.css";
-import "./brand-restore.css";
 
 const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
@@ -16,26 +9,23 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://cppvalley.com"),
   applicationName: "cppvalley",
   title: {
-    default: "cppvalley — C++ Systems, HFT, EDA, GPU & AI Systems",
+    default: "cppvalley — C++ systems courses & engineering notes",
     template: "%s · cppvalley",
   },
   description:
-    "C++, HFT, EDA/CAD, CUDA, GPU and AI systems courses with interview questions, blog posts and book summaries.",
+    "Focused C++ systems courses and engineering notes for HFT, EDA, concurrency, GPU and AI infrastructure.",
   keywords: [
-    "C++ interview preparation",
     "C++ systems programming",
-    "HFT interview preparation",
+    "C++ courses",
+    "HFT engineering",
     "low latency C++",
-    "EDA software engineer roadmap",
-    "CUDA GPU programming",
-    "AI systems engineering",
-    "C++ interview questions",
-    "cppvalley"
+    "EDA software engineering",
+    "GPU programming",
+    "AI systems",
   ],
   authors: [{ name: "cppvalley", url: "https://www.youtube.com/@cppvalley" }],
   creator: "cppvalley",
   publisher: "cppvalley",
-  category: "Education",
   alternates: {
     canonical: "https://cppvalley.com",
     types: {
@@ -43,39 +33,29 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "cppvalley — C++ Systems Courses",
-    description:
-      "Courses for C++, HFT, EDA/CAD, CUDA, GPU and AI systems preparation.",
+    title: "cppvalley — C++ systems courses & engineering notes",
+    description: "Focused courses and long-form notes on C++, HFT, EDA, concurrency, GPU and AI systems.",
     url: "https://cppvalley.com",
     siteName: "cppvalley",
     type: "website",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "cppvalley C++ systems courses" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "cppvalley" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "cppvalley — C++ Systems Courses",
-    description: "C++, HFT, EDA, CUDA, GPU and AI systems courses.",
+    title: "cppvalley — C++ systems courses & engineering notes",
+    description: "Focused courses and engineering notes for serious systems learners.",
     images: ["/opengraph-image"],
   },
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
-  icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-  },
+  icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#365c7d",
+  themeColor: "#f7f3ee",
   colorScheme: "light",
 };
 
@@ -87,8 +67,7 @@ const structuredData = {
       "@id": "https://cppvalley.com/#website",
       name: "cppvalley",
       url: "https://cppvalley.com",
-      description:
-        "C++ systems learning platform for HFT, EDA/CAD, CUDA, GPU and AI systems preparation.",
+      description: "C++ systems courses and engineering notes.",
       inLanguage: "en",
     },
     {
@@ -97,26 +76,14 @@ const structuredData = {
       name: "cppvalley",
       url: "https://cppvalley.com",
       sameAs: ["https://www.youtube.com/@cppvalley"],
-      areaServed: "Worldwide",
-      teaches: [
-        "Modern C++",
-        "C++ interview preparation",
-        "EDA software engineering",
-        "HFT systems",
-        "CUDA and GPU programming",
-        "low-latency C++",
-        "AI systems engineering"
-      ],
+      teaches: ["Modern C++", "Systems programming", "HFT systems", "EDA software", "GPU programming", "AI systems"],
     },
     {
       "@type": "ItemList",
-      "@id": "https://cppvalley.com/#learning-hubs",
-      name: "cppvalley pages",
+      name: "cppvalley sections",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Courses", url: "https://cppvalley.com/courses" },
-        { "@type": "ListItem", position: 2, name: "Interview Questions", url: "https://cppvalley.com/interviews" },
-        { "@type": "ListItem", position: 3, name: "Blog", url: "https://cppvalley.com/blog" },
-        { "@type": "ListItem", position: 4, name: "Books", url: "https://cppvalley.com/books" }
+        { "@type": "ListItem", position: 2, name: "Blog", url: "https://cppvalley.com/blog" },
       ],
     },
   ],
@@ -126,10 +93,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   return (
     <html lang="en">
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       </head>
       <body>
         {adsenseClient ? (

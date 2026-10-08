@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Inter, Manrope } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import "./image-rich.css";
 
 const sans = Inter({
   subsets: ["latin"],

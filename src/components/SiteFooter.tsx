@@ -1,21 +1,13 @@
 import Link from "next/link";
 
-const links = [
-  ["Courses", "/courses"],
-  ["Interview Questions", "/interviews"],
-  ["Blog", "/blog"],
-  ["Books", "/books"],
-] as const;
-
 export function SiteFooter() {
   return (
-    <footer className="site-footer lp-footer compact-footer">
-      <div className="site-container compact-footer-inner">
-        <span>© cppvalley</span>
+    <footer className="site-footer">
+      <div className="site-container site-footer-inner">
+        <span>© {new Date().getFullYear()} cppvalley · C++ systems, without the noise.</span>
         <nav aria-label="Footer navigation">
-          {links.map(([label, href]) => (
-            <Link href={href} key={href}>{label}</Link>
-          ))}
+          <Link href="/courses">Courses</Link>
+          <Link href="/blog">Blog</Link>
         </nav>
       </div>
     </footer>

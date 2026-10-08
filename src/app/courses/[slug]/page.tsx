@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AdSlot } from "@/components/AdSlot";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { VideoCoursePlayer } from "@/components/VideoCoursePlayer";
-import { courses, coursesBySlug, type Course } from "@/data/courses";
+import { courses, coursesBySlug } from "@/data/courses";
 import { youtubeChannelUrl, youtubeEmbedUrl, youtubeSeries } from "@/data/youtube";
 
-type CoursePageProps = {
-  params: Promise<{ slug: string }>;
-};
+type CoursePageProps = { params: Promise<{ slug: string }> };
 
 const lessonCourseMap: Record<string, string> = {
   "core-cpp-interview-series": "core-cpp-interviews",
@@ -17,33 +16,25 @@ const lessonCourseMap: Record<string, string> = {
   "student-roadmap-lessons": "student-roadmap",
 };
 
+const courseAdSlot = process.env.NEXT_PUBLIC_ADSENSE_COURSE_SLOT;
+
 function getSeriesForCourse(slug: string) {
   const seriesSlug = lessonCourseMap[slug];
-  if (!seriesSlug) return undefined;
-  return youtubeSeries.find((series) => series.slug === seriesSlug);
-}
-
-function isCourseRoutable(course: Course) {
-  return course.href === `/courses/${course.slug}` || course.href === "/curriculum" || Boolean(getSeriesForCourse(course.slug));
+  return seriesSlug ? youtubeSeries.find((series) => series.slug === seriesSlug) : undefined;
 }
 
 export function generateStaticParams() {
-  return courses
-    .filter((course) => course.slug !== "third-year-cpp-eda-hft")
-    .map((course) => ({ slug: course.slug }));
+  return courses.map((course) => ({ slug: course.slug }));
 }
 
 export async function generateMetadata({ params }: CoursePageProps): Promise<Metadata> {
   const { slug } = await params;
   const course = coursesBySlug.get(slug);
-
-  if (!course || !isCourseRoutable(course)) return {};
-
+  if (!course) return {};
   const series = getSeriesForCourse(slug);
   const firstVideo = series?.videos[0];
-
   return {
-    title: `${course.title} — cppvalley Course`,
+    title: course.title,
     description: course.description,
     alternates: { canonical: `/courses/${course.slug}` },
     keywords: course.tags,
@@ -52,97 +43,18 @@ export async function generateMetadata({ params }: CoursePageProps): Promise<Met
       description: course.description,
       url: `/courses/${course.slug}`,
       type: series ? "video.other" : "website",
-      images: series && firstVideo
+      images: firstVideo
         ? [{ url: `https://img.youtube.com/vi/${firstVideo.videoId}/hqdefault.jpg`, alt: firstVideo.title }]
         : [{ url: `/courses/${course.slug}/opengraph-image`, alt: course.title }],
     },
-    twitter: {
-      card: "summary_large_image",
-      title: course.title,
-      description: course.description,
-      images: [`/courses/${course.slug}/opengraph-image`],
-    },
   };
-}
-
-function youtubeWatchUrl(videoId: string) {
-  return `https://www.youtube.com/watch?v=${videoId}`;
-}
-
-function courseSignal(course: Course) {
-  if (course.slug === "third-year-cpp-eda-hft") return "Recommended for students";
-  if (course.level.includes("Beginner")) return "Beginner friendly";
-  if (course.tags.some((tag) => tag.toLowerCase().includes("interview")) || course.title.toLowerCase().includes("interview")) return "Interview focused";
-  if (course.level.includes("Advanced") || course.level.includes("Senior")) return "Advanced systems";
-  if (course.pillar === "Roadmap") return "Roadmap";
-  return "Focused track";
-}
-
-function courseOutcome(course: Course) {
-  if (course.pillar === "Roadmap") return "Know the order to learn C++, systems, EDA and HFT topics without wasting months on unrelated material.";
-  if (course.pillar === "C++ Core") return "Build interview-ready C++ depth with ownership, language rules, design trade-offs and debugging intuition.";
-  if (course.pillar === "Systems") return "Understand how low-level systems, Linux, networking and latency-sensitive software are designed and measured.";
-  if (course.pillar === "EDA / CAD") return "Connect C++ systems skills to graph-heavy EDA/CAD software problems and interview themes.";
-  return "Learn the infrastructure concepts behind GPU, CUDA, AI serving and production backend systems.";
-}
-
-function courseGoodFor(course: Course) {
-  if (course.pillar === "Roadmap") return "3rd/4th year students, internship prep and learners choosing between EDA, HFT and systems paths.";
-  if (course.tags.includes("HFT") || course.title.includes("Low-Latency")) return "Students targeting HFT, low-latency C++ and performance-heavy systems roles.";
-  if (course.pillar === "GPU / AI") return "Students moving toward GPU programming, AI infra, backend infra or systems design interviews.";
-  if (course.pillar === "EDA / CAD") return "Students interested in EDA software, CAD tools, graph algorithms and C++ roles in semiconductor tooling.";
-  return "Students preparing for C++ interviews and engineers who want stronger systems foundations.";
-}
-
-function coursePrerequisites(course: Course) {
-  if (course.level.includes("Beginner")) return "Basic programming and willingness to write C++ examples while reading.";
-  if (course.pillar === "GPU / AI") return "Comfortable C++ or Python basics, arrays, memory concepts and basic command-line workflow.";
-  if (course.pillar === "Systems") return "C++ fundamentals, basic data structures and curiosity about Linux, CPUs and networking.";
-  return "Modern C++ basics, data structures and enough practice to read medium-sized examples.";
 }
 
 export default async function CoursePage({ params }: CoursePageProps) {
   const { slug } = await params;
   const course = coursesBySlug.get(slug);
-
-  if (!course || !isCourseRoutable(course)) notFound();
-
+  if (!course) notFound();
   const series = getSeriesForCourse(slug);
-
-  if (series) {
-    const structuredData = {
-      "@context": "https://schema.org",
-      "@type": "Course",
-      name: course.title,
-      description: course.description,
-      url: `https://cppvalley.com/courses/${course.slug}`,
-      provider: {
-        "@type": "Organization",
-        name: "cppvalley",
-        sameAs: youtubeChannelUrl,
-      },
-      hasCourseInstance: series.videos.map((video, index) => ({
-        "@type": "VideoObject",
-        position: index + 1,
-        name: video.title,
-        embedUrl: youtubeEmbedUrl(video.videoId),
-        url: youtubeWatchUrl(video.videoId),
-      })),
-    };
-
-    return (
-      <div className="page-shell lp-page modern-page video-course-watch-page">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
-        />
-        <SiteHeader />
-        <main className="course-player-page">
-          <VideoCoursePlayer series={series} />
-        </main>
-      </div>
-    );
-  }
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -150,102 +62,78 @@ export default async function CoursePage({ params }: CoursePageProps) {
     name: course.title,
     description: course.longDescription,
     url: `https://cppvalley.com/courses/${course.slug}`,
-    provider: {
-      "@type": "Organization",
-      name: "cppvalley",
-      sameAs: "https://www.youtube.com/@cppvalley",
-    },
+    provider: { "@type": "Organization", name: "cppvalley", sameAs: youtubeChannelUrl },
     educationalLevel: course.level,
     teaches: course.tags,
+    ...(series ? {
+      hasCourseInstance: series.videos.map((video, index) => ({
+        "@type": "VideoObject",
+        position: index + 1,
+        name: video.title,
+        embedUrl: youtubeEmbedUrl(video.videoId),
+        url: `https://www.youtube.com/watch?v=${video.videoId}`,
+      })),
+    } : {}),
   };
 
-  return (
-    <div className="page-shell lp-page course-detail-page modern-page market-page">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
-      />
-      <SiteHeader />
-
-      <main className="lp-main">
-        <section className="market-page-hero">
-          <div className="site-container">
-            <div className="market-hero-copy">
-              <nav className="lp-breadcrumb" aria-label="Breadcrumb">
-                <Link href="/courses">Courses</Link>
-                <span>/</span>
-                <span>{course.shortTitle}</span>
-              </nav>
-              <p className="lp-kicker">{course.pillar}</p>
-              <h1>{course.title}</h1>
-              <p>{course.description}</p>
-              <div className="market-rating-row"><strong>4.8</strong><span>{courseSignal(course)}</span><span>{course.level}</span><span>{course.duration}</span></div>
+  if (series) {
+    return (
+      <div>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
+        <SiteHeader />
+        <main className="page-main">
+          <section className="course-player-wrap">
+            <div className="site-container">
+              <div className="course-player-intro">
+                <p className="eyebrow">{course.pillar} · video course</p>
+                <h1>{course.title}</h1>
+                <p>{series.description}</p>
+                <Link className="text-link" href="/courses">← All courses</Link>
+              </div>
+              <VideoCoursePlayer series={series} />
+              <AdSlot slot={courseAdSlot} className="ad-slot-leaderboard" />
             </div>
-            <aside className="market-hero-panel">
-              <strong>Course preview</strong>
-              <ul>
-                <li>{course.modules.length} modules</li>
-                <li>{course.tags.slice(0, 3).join(" · ")}</li>
-                <li>Outcome, prerequisites and module map included</li>
-              </ul>
-              <Link className="lp-button primary" href="/interviews">Practice interview questions</Link>
-              <Link className="lp-button" href="/courses">All courses</Link>
-            </aside>
+          </section>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
+      <SiteHeader />
+      <main className="page-main">
+        <section className="page-hero">
+          <div className="site-container">
+            <Link className="text-link" href="/courses">← Courses</Link>
+            <p className="eyebrow" style={{ marginTop: 28 }}>{course.pillar}</p>
+            <h1 className="page-title">{course.title}</h1>
+            <p>{course.description}</p>
           </div>
         </section>
 
-        <section className="site-container lp-section">
-          <div className="market-layout">
-            <aside className="market-sidebar" aria-label="Course summary">
-              <div className="market-sidebar-section">
-                <h3>This course includes</h3>
-                <ul>
-                  <li>{course.modules.length} modules</li>
-                  <li>{course.level}</li>
-                  <li>{course.duration}</li>
-                  <li>{course.pillar}</li>
-                </ul>
-              </div>
-              <div className="market-sidebar-section">
-                <h3>Tags</h3>
-                <ul>{course.tags.map((tag) => <li key={tag}>{tag}</li>)}</ul>
-              </div>
-            </aside>
-
-            <div className="market-content-column">
-              <div className="course-insight-grid" aria-label="Course guidance">
-                <article className="course-insight-card">
-                  <span>Outcome</span>
-                  <p>{courseOutcome(course)}</p>
-                </article>
-                <article className="course-insight-card">
-                  <span>Good for</span>
-                  <p>{courseGoodFor(course)}</p>
-                </article>
-                <article className="course-insight-card">
-                  <span>Prerequisites</span>
-                  <p>{coursePrerequisites(course)}</p>
-                </article>
-              </div>
-
-              <div className="market-section-head">
-                <div>
-                  <p className="lp-kicker">Curriculum</p>
-                  <h2>What you will study</h2>
-                  <p>Modules are shown like a course curriculum so you can scan the path before starting.</p>
+        <section className="site-container course-detail-grid">
+          <div>
+            <p className="eyebrow">Course map</p>
+            <p className="course-summary">{course.longDescription}</p>
+            <div className="module-list">
+              {course.modules.map((module, index) => (
+                <div className="module-row" key={module}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <strong>{module}</strong>
                 </div>
-              </div>
-
-              <div className="course-module-grid">
-                {course.modules.map((module, index) => (
-                  <article className="course-module-card" key={module}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
-                    <strong>{module}</strong>
-                  </article>
-                ))}
-              </div>
+              ))}
             </div>
+            <AdSlot slot={courseAdSlot} className="ad-slot-leaderboard" />
           </div>
+          <aside className="panel course-facts" aria-label="Course details">
+            <div className="fact"><span>Level</span><strong>{course.level}</strong></div>
+            <div className="fact"><span>Scope</span><strong>{course.duration}</strong></div>
+            <div className="fact"><span>Track</span><strong>{course.pillar}</strong></div>
+            <div className="fact"><span>Topics</span><strong>{course.tags.join(" · ")}</strong></div>
+          </aside>
         </section>
       </main>
       <SiteFooter />

@@ -1,39 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AdSlot } from "@/components/AdSlot";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts } from "@/data/blog";
-import { courses, type Course } from "@/data/courses";
+import { courses } from "@/data/courses";
 
 export const metadata: Metadata = {
-  title: "cppvalley — C++ Systems Courses",
-  description:
-    "C++, HFT, EDA, CUDA, GPU and AI systems courses for students and engineers.",
+  title: "cppvalley — C++ systems, explained quietly",
+  description: "Focused C++ systems courses and long-form engineering notes.",
   alternates: { canonical: "/" },
 };
 
-const books = [
-  ["Effective Modern C++", "Scott Meyers", "Core C++"],
-  ["Effective STL", "Scott Meyers", "STL"],
-  ["C++ Concurrency in Action", "Anthony Williams", "Concurrency"],
-  ["C++ Software Design", "Klaus Iglberger", "Design"],
-  ["Designing Data-Intensive Applications", "Martin Kleppmann", "Systems"],
-  ["Elements of Programming Interviews in C++", "Aziz, Lee, Prakash", "DSA"],
-] as const;
-
-function courseHref(course: Course) {
-  if (course.href.startsWith("/youtube/") || course.href === "/curriculum") return `/courses/${course.slug}`;
-  return course.href;
-}
-
-function courseSignal(course: Course) {
-  if (course.slug === "third-year-cpp-eda-hft") return "Recommended for students";
-  if (course.level.includes("Beginner")) return "Beginner friendly";
-  if (course.title.toLowerCase().includes("interview")) return "Interview focused";
-  if (course.level.includes("Advanced") || course.level.includes("Senior")) return "Advanced systems";
-  if (course.pillar === "Roadmap") return "Roadmap";
-  return "Course";
-}
+const homeAdSlot = process.env.NEXT_PUBLIC_ADSENSE_HOME_SLOT;
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en", {
@@ -45,105 +24,110 @@ function formatDate(value: string) {
 }
 
 export default function Home() {
-  const sortedCourses = [...courses].sort((a, b) => a.priority - b.priority);
-  const latestPost = [...blogPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))[0];
+  const featuredCourses = [...courses].sort((a, b) => a.priority - b.priority).slice(0, 6);
+  const posts = [...blogPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+  const [latestPost, ...otherPosts] = posts;
 
   return (
-    <div className="page-shell lp-page modern-page simple-home-page">
+    <div>
       <SiteHeader />
-
-      <main className="lp-main">
-        <section className="site-container lp-section home-courses-section" id="courses">
-          <div className="market-section-head">
+      <main className="page-main">
+        <section className="hero">
+          <div className="site-container hero-grid">
             <div>
-              <p className="lp-kicker">Courses</p>
-              <h1>Courses</h1>
-              <p>C++ systems, HFT, EDA, GPU and AI infrastructure tracks.</p>
+              <span className="cinema-line" aria-hidden="true" />
+              <p className="eyebrow reveal">cppvalley · systems learning</p>
+              <h1 className="reveal">C++ systems,<br />explained quietly.</h1>
+              <p className="hero-copy reveal-delay">
+                Courses and engineering notes for people who want to understand what happens beneath the abstraction — memory, concurrency, Linux, HFT, EDA, GPU and AI infrastructure.
+              </p>
+              <div className="hero-actions reveal-delay">
+                <Link className="button primary" href="/courses">Browse courses</Link>
+                <Link className="button" href="/blog">Read the blog</Link>
+              </div>
             </div>
-            <Link className="lp-card-link" href="/courses">View all courses</Link>
+            <aside className="hero-note reveal-delay">
+              <strong>No dashboards. No filler.</strong>
+              Two things live here: structured courses and long-form technical writing. Ads, when enabled, sit between content rather than pretending to be content.
+            </aside>
           </div>
+        </section>
 
-          <div className="market-course-list">
-            {sortedCourses.map((course) => (
-              <Link className="market-course-card" href={courseHref(course)} key={course.slug}>
-                <div className="market-card-thumb">
-                  <div>
-                    <span>{course.pillar}</span>
-                    <strong>{course.shortTitle}</strong>
+        <div className="site-container">
+          <AdSlot slot={homeAdSlot} className="ad-slot-leaderboard" />
+        </div>
+
+        <section className="section">
+          <div className="site-container">
+            <div className="section-head">
+              <div>
+                <p className="eyebrow">Courses</p>
+                <h2>Learn one layer deeper.</h2>
+                <p>Focused paths across modern C++, low-latency systems, EDA, GPU programming and infrastructure.</p>
+              </div>
+              <Link className="text-link" href="/courses">All courses →</Link>
+            </div>
+            <div className="course-grid">
+              {featuredCourses.map((course, index) => (
+                <Link className="course-card" href={`/courses/${course.slug}`} key={course.slug}>
+                  <div className="card-top">
+                    <span className="kicker">{course.pillar}</span>
+                    <span className="card-index">{String(index + 1).padStart(2, "0")}</span>
                   </div>
-                </div>
-                <div className="market-card-body">
-                  <span className="course-card-eyebrow">{courseSignal(course)}</span>
-                  <h2>{course.title}</h2>
+                  <h3>{course.title}</h3>
                   <p>{course.description}</p>
-                  <div className="market-card-meta">
+                  <div className="meta-row">
                     <span>{course.level}</span>
                     <span>{course.duration}</span>
-                    <span>{course.tags.slice(0, 2).join(" · ")}</span>
                   </div>
-                </div>
-                <div className="market-card-action">Open →</div>
-              </Link>
-            ))}
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
 
         {latestPost ? (
-          <section className="site-container lp-section home-blog-section" aria-labelledby="daily-blog-heading">
-            <div className="market-section-head">
-              <div>
-                <p className="lp-kicker">Daily blog</p>
-                <h2 id="daily-blog-heading">Daily blog</h2>
+          <section className="section">
+            <div className="site-container">
+              <div className="section-head">
+                <div>
+                  <p className="eyebrow">Blog</p>
+                  <h2>Notes from the engineering side.</h2>
+                  <p>Long-form explanations built to be read slowly, revisited, and used in real technical conversations.</p>
+                </div>
+                <Link className="text-link" href="/blog">All posts →</Link>
               </div>
-              <Link className="lp-card-link" href="/blog">View blog</Link>
-            </div>
-
-            <Link className="market-featured-card" href={`/blog/${latestPost.slug}`}>
-              <div className="market-card-body">
-                <span className="course-card-eyebrow">{formatDate(latestPost.publishedAt)}</span>
-                <h2>{latestPost.title}</h2>
-                <p>{latestPost.excerpt}</p>
-                <div className="market-card-meta">
-                  {latestPost.readingTime ? <span>{latestPost.readingTime}</span> : null}
-                  {latestPost.topics?.slice(0, 3).map((topic) => <span key={topic}>{topic}</span>)}
+              <div className="blog-grid">
+                <Link className="feature-card" href={`/blog/${latestPost.slug}`}>
+                  <div className="meta-row">
+                    <span>{formatDate(latestPost.publishedAt)}</span>
+                    {latestPost.readingTime ? <span>{latestPost.readingTime}</span> : null}
+                  </div>
+                  <h3>{latestPost.title}</h3>
+                  <p>{latestPost.excerpt}</p>
+                  {latestPost.topics?.length ? (
+                    <div className="tag-row">
+                      {latestPost.topics.slice(0, 4).map((topic) => <span className="tag" key={topic}>{topic}</span>)}
+                    </div>
+                  ) : null}
+                </Link>
+                <div className="post-stack">
+                  {otherPosts.slice(0, 2).map((post) => (
+                    <Link className="post-card" href={`/blog/${post.slug}`} key={post.slug}>
+                      <div className="meta-row">
+                        <span>{formatDate(post.publishedAt)}</span>
+                        {post.readingTime ? <span>{post.readingTime}</span> : null}
+                      </div>
+                      <h3>{post.title}</h3>
+                      <p>{post.excerpt}</p>
+                    </Link>
+                  ))}
                 </div>
               </div>
-              <div className="market-card-action">Read →</div>
-            </Link>
+            </div>
           </section>
         ) : null}
-
-        <section className="site-container lp-section home-books-section" aria-labelledby="books-heading">
-          <div className="market-section-head">
-            <div>
-              <p className="lp-kicker">Books</p>
-              <h2 id="books-heading">Book section</h2>
-              <p>Only the core reading list for now. Detailed summaries can come later.</p>
-            </div>
-            <Link className="lp-card-link" href="/books">View books</Link>
-          </div>
-
-          <div className="market-resource-list">
-            {books.map(([title, author, track]) => (
-              <article className="market-resource-card" key={title}>
-                <div className="market-card-thumb">
-                  <div>
-                    <span>{track}</span>
-                    <strong>Book</strong>
-                  </div>
-                </div>
-                <div className="market-card-body">
-                  <span className="course-card-eyebrow">{track}</span>
-                  <h3>{title}</h3>
-                  <p>{author}</p>
-                </div>
-                <div className="market-card-action">Soon</div>
-              </article>
-            ))}
-          </div>
-        </section>
       </main>
-
       <SiteFooter />
     </div>
   );

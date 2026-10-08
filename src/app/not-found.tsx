@@ -4,20 +4,18 @@ import { SiteHeader } from "@/components/SiteHeader";
 
 export default function NotFound() {
   return (
-    <div className="page-shell lp-page">
+    <div>
       <SiteHeader />
-      <main className="lp-main">
-        <section className="platform-page-hero">
-          <div className="site-container lp-hero-inner">
-            <div>
-              <p className="lp-kicker">404</p>
-              <h1>We could not find that page.</h1>
-              <p>Browse the course catalog, video lessons or HFT curriculum instead.</p>
-              <div className="lp-actions">
-                <Link className="lp-button primary" href="/courses">Explore courses</Link>
-                <Link className="lp-button" href="/youtube">Watch videos</Link>
-                <Link className="lp-button" href="/curriculum">HFT curriculum</Link>
-              </div>
+      <main className="page-main">
+        <section className="hero">
+          <div className="site-container">
+            <span className="cinema-line" aria-hidden="true" />
+            <p className="eyebrow">404</p>
+            <h1 className="page-title">This scene isn’t here.</h1>
+            <p className="hero-copy">The page may have been removed during the cppvalley simplification.</p>
+            <div className="hero-actions">
+              <Link className="button primary" href="/courses">Courses</Link>
+              <Link className="button" href="/blog">Blog</Link>
             </div>
           </div>
         </section>

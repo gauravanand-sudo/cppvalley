@@ -7,12 +7,20 @@ import { blogPosts } from "@/data/blog";
 import { courses } from "@/data/courses";
 
 export const metadata: Metadata = {
-  title: "cppvalley — C++ systems study",
-  description: "Structured C++ systems courses and long-form engineering notes.",
+  title: "cppvalley — Learn C++ systems by patterns",
+  description: "Structured C++ systems courses and technical notes for modern C++, concurrency, HFT, EDA, GPU and AI infrastructure.",
   alternates: { canonical: "/" },
 };
 
 const homeAdSlot = process.env.NEXT_PUBLIC_ADSENSE_HOME_SLOT;
+
+const courseMarks: Record<string, string> = {
+  "C++ Core": "C++",
+  Systems: "SYS",
+  "EDA / CAD": "EDA",
+  "GPU / AI": "GPU",
+  Roadmap: "MAP",
+};
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("en", {
@@ -27,6 +35,10 @@ export default function Home() {
   const featuredCourses = [...courses].sort((a, b) => a.priority - b.priority).slice(0, 6);
   const posts = [...blogPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
   const [latestPost, ...otherPosts] = posts;
+  const learningPaths = Array.from(new Set(courses.map((course) => course.pillar))).map((pillar) => ({
+    pillar,
+    count: courses.filter((course) => course.pillar === pillar).length,
+  }));
 
   return (
     <div>
@@ -34,26 +46,40 @@ export default function Home() {
       <main className="page-main">
         <section className="hero">
           <div className="site-container hero-grid">
-            <div>
-              <span className="cinema-line" aria-hidden="true" />
-              <p className="eyebrow reveal">cppvalley / C++ Systems Study</p>
-              <h1 className="reveal">Systems engineering,<br />organized for study.</h1>
-              <p className="hero-copy reveal-delay">
-                Structured courses and technical notes on modern C++, memory, concurrency, Linux, low-latency systems, EDA, GPU programming and AI infrastructure.
+            <div className="hero-content">
+              <div className="hero-badge"><span /> Pattern-based C++ systems learning</div>
+              <h1>Understand the patterns behind <span>high-performance C++.</span></h1>
+              <p className="hero-copy">
+                Build depth in modern C++, concurrency, Linux, low-latency systems, HFT, EDA, GPU and AI infrastructure through structured courses and practical engineering notes.
               </p>
-              <div className="hero-actions reveal-delay">
-                <Link className="button primary" href="/courses">Open course catalogue</Link>
-                <Link className="button" href="/blog">Read technical notes</Link>
+              <div className="hero-actions">
+                <Link className="button primary" href="/courses">Explore courses <span aria-hidden="true">→</span></Link>
+                <Link className="button secondary" href="/blog">Read engineering notes</Link>
+              </div>
+              <div className="hero-stats" aria-label="cppvalley library summary">
+                <div><strong>{courses.length}</strong><span>Courses</span></div>
+                <div><strong>{learningPaths.length}</strong><span>Learning tracks</span></div>
+                <div><strong>{blogPosts.length}</strong><span>Deep-dive notes</span></div>
               </div>
             </div>
-            <aside className="hero-note reveal-delay" aria-label="Study areas">
-              <span className="note-label">Primary fields</span>
-              <ol>
-                <li>Modern C++ & memory</li>
-                <li>Concurrency & low latency</li>
-                <li>HFT & systems design</li>
-                <li>EDA, GPU & AI infrastructure</li>
-              </ol>
+
+            <aside className="hero-panel" aria-label="Learning paths">
+              <div className="hero-panel-head">
+                <div>
+                  <span className="mini-label">Learning paths</span>
+                  <strong>Choose a track</strong>
+                </div>
+                <span className="panel-code">C++</span>
+              </div>
+              <div className="path-list">
+                {learningPaths.map((path, index) => (
+                  <Link href="/courses" key={path.pillar}>
+                    <span className="path-icon">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="path-copy"><strong>{path.pillar}</strong><small>{path.count} {path.count === 1 ? "course" : "courses"}</small></span>
+                    <span className="path-arrow" aria-hidden="true">→</span>
+                  </Link>
+                ))}
+              </div>
             </aside>
           </div>
         </section>
@@ -62,28 +88,31 @@ export default function Home() {
           <AdSlot slot={homeAdSlot} className="ad-slot-leaderboard" />
         </div>
 
-        <section className="section section-ruled">
+        <section className="section">
           <div className="site-container">
             <div className="section-head">
               <div>
-                <p className="eyebrow">Course Catalogue</p>
-                <h2>Structured paths through systems C++.</h2>
-                <p>Each course is organized around a technical domain, level and defined set of modules.</p>
+                <p className="eyebrow">Start learning</p>
+                <h2>Courses built around reusable engineering ideas.</h2>
+                <p>Pick a focused path, understand the fundamentals, then move into the systems-level trade-offs that matter in real C++ work.</p>
               </div>
-              <Link className="text-link" href="/courses">View complete catalogue</Link>
+              <Link className="text-link" href="/courses">View all courses →</Link>
             </div>
             <div className="course-grid">
-              {featuredCourses.map((course, index) => (
+              {featuredCourses.map((course) => (
                 <Link className="course-card" href={`/courses/${course.slug}`} key={course.slug}>
-                  <div className="card-top">
-                    <span className="kicker">{course.pillar}</span>
-                    <span className="card-index">{String(index + 1).padStart(2, "0")}</span>
+                  <div className="course-card-visual">
+                    <span className="course-card-mark">{courseMarks[course.pillar] ?? "C++"}</span>
+                    <span className="course-card-track">{course.pillar}</span>
                   </div>
-                  <h3>{course.title}</h3>
-                  <p>{course.description}</p>
-                  <div className="meta-row">
-                    <span>{course.level}</span>
-                    <span>{course.duration}</span>
+                  <div className="course-card-body">
+                    <h3>{course.title}</h3>
+                    <p>{course.description}</p>
+                    <div className="meta-row">
+                      <span>{course.level}</span>
+                      <span>{course.duration}</span>
+                    </div>
+                    <span className="course-card-link">View course <span aria-hidden="true">→</span></span>
                   </div>
                 </Link>
               ))}
@@ -92,18 +121,19 @@ export default function Home() {
         </section>
 
         {latestPost ? (
-          <section className="section section-ruled">
+          <section className="section section-alt">
             <div className="site-container">
               <div className="section-head">
                 <div>
-                  <p className="eyebrow">Technical Notes</p>
-                  <h2>Recent writing from the archive.</h2>
-                  <p>Long-form explanations intended to function as reference material, not disposable posts.</p>
+                  <p className="eyebrow">Engineering notes</p>
+                  <h2>Go deeper than the course outline.</h2>
+                  <p>Long-form explanations, performance studies and roadmaps you can return to while building or preparing for systems roles.</p>
                 </div>
-                <Link className="text-link" href="/blog">Browse all notes</Link>
+                <Link className="text-link" href="/blog">Browse all notes →</Link>
               </div>
               <div className="blog-grid">
                 <Link className="feature-card" href={`/blog/${latestPost.slug}`}>
+                  <div className="resource-badge">Featured note</div>
                   <div className="meta-row">
                     <span>{formatDate(latestPost.publishedAt)}</span>
                     {latestPost.readingTime ? <span>{latestPost.readingTime}</span> : null}
@@ -115,6 +145,7 @@ export default function Home() {
                       {latestPost.topics.slice(0, 4).map((topic) => <span className="tag" key={topic}>{topic}</span>)}
                     </div>
                   ) : null}
+                  <span className="resource-link">Read note →</span>
                 </Link>
                 <div className="post-stack">
                   {otherPosts.slice(0, 2).map((post) => (
@@ -125,6 +156,7 @@ export default function Home() {
                       </div>
                       <h3>{post.title}</h3>
                       <p>{post.excerpt}</p>
+                      <span className="resource-link">Read note →</span>
                     </Link>
                   ))}
                 </div>

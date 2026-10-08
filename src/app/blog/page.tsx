@@ -49,15 +49,14 @@ export default function BlogPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
       <SiteHeader />
       <main className="page-main">
-        <section className="page-hero">
+        <section className="page-hero resources-hero">
           <div className="site-container">
-            <span className="cinema-line" aria-hidden="true" />
-            <p className="eyebrow">Technical Notes</p>
-            <h1 className="page-title">A working notebook<br />for systems engineers.</h1>
-            <p>Long-form writing on C++, performance, low latency, HFT and systems design, structured to remain useful as reference material.</p>
+            <div className="page-hero-badge">Engineering resources</div>
+            <h1 className="page-title">Learn the idea.<br />Then learn the trade-off.</h1>
+            <p>Deep-dive notes on C++, performance, low latency, HFT and systems design. Written to be useful when you come back six months later.</p>
             {topics.length ? (
-              <div className="tag-row" style={{ marginTop: 24 }}>
-                {topics.map((topic) => <span className="tag" key={topic}>{topic}</span>)}
+              <div className="topic-strip" aria-label="Blog topics">
+                {topics.map((topic) => <span key={topic}>{topic}</span>)}
               </div>
             ) : null}
           </div>
@@ -67,10 +66,11 @@ export default function BlogPage() {
           <AdSlot slot={blogTopAdSlot} className="ad-slot-leaderboard" />
         </div>
 
-        <section className="section section-ruled">
+        <section className="section">
           <div className="site-container">
             {featuredPost ? (
-              <Link className="feature-card" href={`/blog/${featuredPost.slug}`}>
+              <Link className="feature-card feature-card-wide" href={`/blog/${featuredPost.slug}`}>
+                <div className="resource-badge">Featured note</div>
                 <div className="meta-row">
                   <span>{formatDate(featuredPost.publishedAt)}</span>
                   {featuredPost.readingTime ? <span>{featuredPost.readingTime}</span> : null}
@@ -82,6 +82,7 @@ export default function BlogPage() {
                     {featuredPost.topics.map((topic) => <span className="tag" key={topic}>{topic}</span>)}
                   </div>
                 ) : null}
+                <span className="resource-link">Read note →</span>
               </Link>
             ) : <div className="empty-state">No posts published yet.</div>}
 
@@ -91,8 +92,12 @@ export default function BlogPage() {
                   <Fragment key={post.slug}>
                     {index === 1 ? <AdSlot slot={blogFeedAdSlot} className="ad-slot-leaderboard" /> : null}
                     <Link className="blog-list-card" href={`/blog/${post.slug}`}>
-                      <span className="blog-date">{formatDate(post.publishedAt)}</span>
+                      <div className="blog-list-icon">↗</div>
                       <div>
+                        <div className="meta-row">
+                          <span>{formatDate(post.publishedAt)}</span>
+                          {post.readingTime ? <span>{post.readingTime}</span> : null}
+                        </div>
                         <h3>{post.title}</h3>
                         <p>{post.excerpt}</p>
                       </div>

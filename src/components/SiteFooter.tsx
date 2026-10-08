@@ -4,9 +4,9 @@ export function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="site-container site-footer-inner">
-        <div>
+        <div className="footer-brand">
           <strong>cppvalley</strong>
-          <span>Independent study material for C++ systems engineering.</span>
+          <span>Structured learning for C++ systems engineering.</span>
         </div>
         <nav aria-label="Footer navigation">
           <Link href="/courses">Courses</Link>

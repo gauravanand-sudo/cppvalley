@@ -4,6 +4,7 @@ import { AdSlot } from "@/components/AdSlot";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { courses } from "@/data/courses";
+import { catalogHeroImage, heroImages, imageForCourse } from "@/data/media";
 
 export const metadata: Metadata = {
   title: "Courses",
@@ -33,13 +34,20 @@ export default function CoursesPage() {
     <div>
       <SiteHeader />
       <main className="page-main">
-        <section className="page-hero catalog-hero">
-          <div className="site-container">
-            <div className="page-hero-badge">Course library</div>
-            <h1 className="page-title">Learn C++ systems<br />one pattern at a time.</h1>
-            <p>Structured learning paths from core C++ through concurrency, low-latency systems, EDA, GPU and AI infrastructure. Every course shows its scope before you open it.</p>
-            <div className="topic-strip" aria-label="Course tracks">
-              {pillars.map((pillar) => <a href={`#${anchorFor(pillar)}`} key={pillar}>{pillar}</a>)}
+        <section className="page-hero catalog-hero image-page-hero">
+          <div className="site-container catalog-hero-grid">
+            <div>
+              <div className="page-hero-badge">Course library</div>
+              <h1 className="page-title">Learn C++ systems<br />one pattern at a time.</h1>
+              <p>Structured learning paths from core C++ through concurrency, low-latency systems, EDA, GPU and AI infrastructure. Every course shows its scope before you open it.</p>
+              <div className="topic-strip" aria-label="Course tracks">
+                {pillars.map((pillar) => <a href={`#${anchorFor(pillar)}`} key={pillar}>{pillar}</a>)}
+              </div>
+            </div>
+            <div className="page-hero-collage" aria-hidden="true">
+              <img className="page-hero-collage-main" src={catalogHeroImage} alt="" />
+              <img src={heroImages[1]} alt="" />
+              <img src={heroImages[2]} alt="" />
             </div>
           </div>
         </section>
@@ -56,10 +64,11 @@ export default function CoursesPage() {
                   </div>
                   <span>{pillarCourses.length} {pillarCourses.length === 1 ? "course" : "courses"}</span>
                 </div>
-                <div className="course-grid">
+                <div className="course-grid image-course-grid">
                   {pillarCourses.map((course) => (
-                    <Link className="course-card" href={`/courses/${course.slug}`} key={course.slug}>
+                    <Link className="course-card image-course-card" href={`/courses/${course.slug}`} key={course.slug}>
                       <div className="course-card-visual">
+                        <img className="course-card-photo" src={imageForCourse(course.slug, course.pillar)} alt="" loading="lazy" />
                         <span className="course-card-mark">{courseMarks[course.pillar] ?? "C++"}</span>
                         <span className="course-card-track">{course.tags.slice(0, 2).join(" · ")}</span>
                       </div>

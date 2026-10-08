@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts } from "@/data/blog";
 import { courses } from "@/data/courses";
+import { heroImages, imageForBlog, imageForCourse } from "@/data/media";
 
 export const metadata: Metadata = {
   title: "cppvalley — Learn C++ systems by patterns",
@@ -44,7 +45,7 @@ export default function Home() {
     <div>
       <SiteHeader />
       <main className="page-main">
-        <section className="hero">
+        <section className="hero image-hero">
           <div className="site-container hero-grid">
             <div className="hero-content">
               <div className="hero-badge"><span /> Pattern-based C++ systems learning</div>
@@ -63,24 +64,31 @@ export default function Home() {
               </div>
             </div>
 
-            <aside className="hero-panel" aria-label="Learning paths">
-              <div className="hero-panel-head">
-                <div>
-                  <span className="mini-label">Learning paths</span>
-                  <strong>Choose a track</strong>
-                </div>
-                <span className="panel-code">C++</span>
+            <aside className="hero-media" aria-label="C++ systems engineering imagery">
+              <figure className="hero-photo hero-photo-main">
+                <img src={heroImages[0]} alt="Programming workstation with code and development hardware" />
+              </figure>
+              <div className="hero-photo-row">
+                <figure className="hero-photo"><img src={heroImages[1]} alt="Server infrastructure in a data center" /></figure>
+                <figure className="hero-photo"><img src={heroImages[2]} alt="Close-up of computer hardware and circuitry" /></figure>
               </div>
-              <div className="path-list">
-                {learningPaths.map((path, index) => (
-                  <Link href="/courses" key={path.pillar}>
-                    <span className="path-icon">{String(index + 1).padStart(2, "0")}</span>
-                    <span className="path-copy"><strong>{path.pillar}</strong><small>{path.count} {path.count === 1 ? "course" : "courses"}</small></span>
-                    <span className="path-arrow" aria-hidden="true">→</span>
-                  </Link>
-                ))}
+              <div className="hero-media-note">
+                <span>From code to hardware</span>
+                <strong>C++ · Linux · HFT · EDA · GPU</strong>
               </div>
             </aside>
+          </div>
+        </section>
+
+        <section className="track-ribbon" aria-label="Learning tracks">
+          <div className="site-container track-ribbon-inner">
+            {learningPaths.map((path, index) => (
+              <Link href={`/courses#${path.pillar.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`} key={path.pillar}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{path.pillar}</strong>
+                <small>{path.count} {path.count === 1 ? "course" : "courses"}</small>
+              </Link>
+            ))}
           </div>
         </section>
 
@@ -98,10 +106,11 @@ export default function Home() {
               </div>
               <Link className="text-link" href="/courses">View all courses →</Link>
             </div>
-            <div className="course-grid">
+            <div className="course-grid image-course-grid">
               {featuredCourses.map((course) => (
-                <Link className="course-card" href={`/courses/${course.slug}`} key={course.slug}>
+                <Link className="course-card image-course-card" href={`/courses/${course.slug}`} key={course.slug}>
                   <div className="course-card-visual">
+                    <img className="course-card-photo" src={imageForCourse(course.slug, course.pillar)} alt="" loading="lazy" />
                     <span className="course-card-mark">{courseMarks[course.pillar] ?? "C++"}</span>
                     <span className="course-card-track">{course.pillar}</span>
                   </div>
@@ -121,7 +130,7 @@ export default function Home() {
         </section>
 
         {latestPost ? (
-          <section className="section section-alt">
+          <section className="section section-alt image-editorial-section">
             <div className="site-container">
               <div className="section-head">
                 <div>
@@ -131,32 +140,39 @@ export default function Home() {
                 </div>
                 <Link className="text-link" href="/blog">Browse all notes →</Link>
               </div>
-              <div className="blog-grid">
-                <Link className="feature-card" href={`/blog/${latestPost.slug}`}>
-                  <div className="resource-badge">Featured note</div>
-                  <div className="meta-row">
-                    <span>{formatDate(latestPost.publishedAt)}</span>
-                    {latestPost.readingTime ? <span>{latestPost.readingTime}</span> : null}
-                  </div>
-                  <h3>{latestPost.title}</h3>
-                  <p>{latestPost.excerpt}</p>
-                  {latestPost.topics?.length ? (
-                    <div className="tag-row">
-                      {latestPost.topics.slice(0, 4).map((topic) => <span className="tag" key={topic}>{topic}</span>)}
+              <div className="blog-grid image-blog-grid">
+                <Link className="feature-card image-feature-card" href={`/blog/${latestPost.slug}`}>
+                  <img className="feature-card-image" src={imageForBlog(latestPost.slug)} alt="" loading="lazy" />
+                  <div className="feature-card-overlay" />
+                  <div className="feature-card-content">
+                    <div className="resource-badge">Featured note</div>
+                    <div className="meta-row">
+                      <span>{formatDate(latestPost.publishedAt)}</span>
+                      {latestPost.readingTime ? <span>{latestPost.readingTime}</span> : null}
                     </div>
-                  ) : null}
-                  <span className="resource-link">Read note →</span>
+                    <h3>{latestPost.title}</h3>
+                    <p>{latestPost.excerpt}</p>
+                    {latestPost.topics?.length ? (
+                      <div className="tag-row">
+                        {latestPost.topics.slice(0, 4).map((topic) => <span className="tag" key={topic}>{topic}</span>)}
+                      </div>
+                    ) : null}
+                    <span className="resource-link">Read note →</span>
+                  </div>
                 </Link>
                 <div className="post-stack">
                   {otherPosts.slice(0, 2).map((post) => (
-                    <Link className="post-card" href={`/blog/${post.slug}`} key={post.slug}>
-                      <div className="meta-row">
-                        <span>{formatDate(post.publishedAt)}</span>
-                        {post.readingTime ? <span>{post.readingTime}</span> : null}
+                    <Link className="post-card image-post-card" href={`/blog/${post.slug}`} key={post.slug}>
+                      <img className="post-card-image" src={imageForBlog(post.slug)} alt="" loading="lazy" />
+                      <div className="post-card-content">
+                        <div className="meta-row">
+                          <span>{formatDate(post.publishedAt)}</span>
+                          {post.readingTime ? <span>{post.readingTime}</span> : null}
+                        </div>
+                        <h3>{post.title}</h3>
+                        <p>{post.excerpt}</p>
+                        <span className="resource-link">Read note →</span>
                       </div>
-                      <h3>{post.title}</h3>
-                      <p>{post.excerpt}</p>
-                      <span className="resource-link">Read note →</span>
                     </Link>
                   ))}
                 </div>

@@ -10,12 +10,12 @@ export default function NotFound() {
         <section className="hero">
           <div className="site-container">
             <span className="cinema-line" aria-hidden="true" />
-            <p className="eyebrow">404</p>
-            <h1 className="page-title">This scene isn’t here.</h1>
-            <p className="hero-copy">The page may have been removed during the cppvalley simplification.</p>
+            <p className="eyebrow">404 / Archive notice</p>
+            <h1 className="page-title">Page not found.</h1>
+            <p className="hero-copy">This address is not part of the current cppvalley course or technical-note archive.</p>
             <div className="hero-actions">
-              <Link className="button primary" href="/courses">Courses</Link>
-              <Link className="button" href="/blog">Blog</Link>
+              <Link className="button primary" href="/courses">Course catalogue</Link>
+              <Link className="button" href="/blog">Technical notes</Link>
             </div>
           </div>
         </section>

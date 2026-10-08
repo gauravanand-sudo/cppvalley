@@ -6,6 +6,7 @@ import { MdxArticle, getMdxHeadings } from "@/components/MdxArticle";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts, blogPostsBySlug } from "@/data/blog";
+import { imageForBlog } from "@/data/media";
 
 type BlogPostPageProps = { params: Promise<{ slug: string }> };
 
@@ -101,6 +102,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 {post.readingTime ? <span>{post.readingTime}</span> : null}
                 {post.topics?.length ? <span>{post.topics.join(" · ")}</span> : null}
               </div>
+              <figure className="article-hero-image">
+                <img src={imageForBlog(post.slug)} alt="" />
+                <figcaption>Systems engineering visual · cppvalley</figcaption>
+              </figure>
             </header>
 
             <AdSlot slot={blogArticleTopAdSlot} className="ad-slot-leaderboard" />
@@ -126,7 +131,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               <section className="related-posts">
                 <h2>Keep reading</h2>
                 {relatedPosts.map((related) => (
-                  <Link className="related-link" href={`/blog/${related.slug}`} key={related.slug}>{related.title} →</Link>
+                  <Link className="related-link related-link-image" href={`/blog/${related.slug}`} key={related.slug}>
+                    <img src={imageForBlog(related.slug)} alt="" loading="lazy" />
+                    <span>{related.title} →</span>
+                  </Link>
                 ))}
               </section>
             ) : null}

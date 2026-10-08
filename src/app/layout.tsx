@@ -1,7 +1,21 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { Inter, Manrope } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import "./image-rich.css";
+
+const sans = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const display = Manrope({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
 
 const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
@@ -55,7 +69,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f7f3ee",
+  themeColor: "#ffffff",
   colorScheme: "light",
 };
 
@@ -91,7 +105,7 @@ const structuredData = {
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${sans.variable} ${display.variable}`}>
       <head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       </head>

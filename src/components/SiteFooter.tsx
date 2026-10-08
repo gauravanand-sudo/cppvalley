@@ -4,11 +4,15 @@ export function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="site-container site-footer-inner">
-        <span>© {new Date().getFullYear()} cppvalley · C++ systems, without the noise.</span>
+        <div>
+          <strong>cppvalley</strong>
+          <span>Independent study material for C++ systems engineering.</span>
+        </div>
         <nav aria-label="Footer navigation">
           <Link href="/courses">Courses</Link>
           <Link href="/blog">Blog</Link>
         </nav>
+        <small>© {new Date().getFullYear()} cppvalley</small>
       </div>
     </footer>
   );

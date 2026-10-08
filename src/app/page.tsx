@@ -7,8 +7,8 @@ import { blogPosts } from "@/data/blog";
 import { courses } from "@/data/courses";
 
 export const metadata: Metadata = {
-  title: "cppvalley — C++ systems, explained quietly",
-  description: "Focused C++ systems courses and long-form engineering notes.",
+  title: "cppvalley — C++ systems study",
+  description: "Structured C++ systems courses and long-form engineering notes.",
   alternates: { canonical: "/" },
 };
 
@@ -36,19 +36,24 @@ export default function Home() {
           <div className="site-container hero-grid">
             <div>
               <span className="cinema-line" aria-hidden="true" />
-              <p className="eyebrow reveal">cppvalley · systems learning</p>
-              <h1 className="reveal">C++ systems,<br />explained quietly.</h1>
+              <p className="eyebrow reveal">cppvalley / C++ Systems Study</p>
+              <h1 className="reveal">Systems engineering,<br />organized for study.</h1>
               <p className="hero-copy reveal-delay">
-                Courses and engineering notes for people who want to understand what happens beneath the abstraction — memory, concurrency, Linux, HFT, EDA, GPU and AI infrastructure.
+                Structured courses and technical notes on modern C++, memory, concurrency, Linux, low-latency systems, EDA, GPU programming and AI infrastructure.
               </p>
               <div className="hero-actions reveal-delay">
-                <Link className="button primary" href="/courses">Browse courses</Link>
-                <Link className="button" href="/blog">Read the blog</Link>
+                <Link className="button primary" href="/courses">Open course catalogue</Link>
+                <Link className="button" href="/blog">Read technical notes</Link>
               </div>
             </div>
-            <aside className="hero-note reveal-delay">
-              <strong>No dashboards. No filler.</strong>
-              Two things live here: structured courses and long-form technical writing. Ads, when enabled, sit between content rather than pretending to be content.
+            <aside className="hero-note reveal-delay" aria-label="Study areas">
+              <span className="note-label">Primary fields</span>
+              <ol>
+                <li>Modern C++ & memory</li>
+                <li>Concurrency & low latency</li>
+                <li>HFT & systems design</li>
+                <li>EDA, GPU & AI infrastructure</li>
+              </ol>
             </aside>
           </div>
         </section>
@@ -57,15 +62,15 @@ export default function Home() {
           <AdSlot slot={homeAdSlot} className="ad-slot-leaderboard" />
         </div>
 
-        <section className="section">
+        <section className="section section-ruled">
           <div className="site-container">
             <div className="section-head">
               <div>
-                <p className="eyebrow">Courses</p>
-                <h2>Learn one layer deeper.</h2>
-                <p>Focused paths across modern C++, low-latency systems, EDA, GPU programming and infrastructure.</p>
+                <p className="eyebrow">Course Catalogue</p>
+                <h2>Structured paths through systems C++.</h2>
+                <p>Each course is organized around a technical domain, level and defined set of modules.</p>
               </div>
-              <Link className="text-link" href="/courses">All courses →</Link>
+              <Link className="text-link" href="/courses">View complete catalogue</Link>
             </div>
             <div className="course-grid">
               {featuredCourses.map((course, index) => (
@@ -87,15 +92,15 @@ export default function Home() {
         </section>
 
         {latestPost ? (
-          <section className="section">
+          <section className="section section-ruled">
             <div className="site-container">
               <div className="section-head">
                 <div>
-                  <p className="eyebrow">Blog</p>
-                  <h2>Notes from the engineering side.</h2>
-                  <p>Long-form explanations built to be read slowly, revisited, and used in real technical conversations.</p>
+                  <p className="eyebrow">Technical Notes</p>
+                  <h2>Recent writing from the archive.</h2>
+                  <p>Long-form explanations intended to function as reference material, not disposable posts.</p>
                 </div>
-                <Link className="text-link" href="/blog">All posts →</Link>
+                <Link className="text-link" href="/blog">Browse all notes</Link>
               </div>
               <div className="blog-grid">
                 <Link className="feature-card" href={`/blog/${latestPost.slug}`}>

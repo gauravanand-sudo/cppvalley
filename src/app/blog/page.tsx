@@ -52,9 +52,9 @@ export default function BlogPage() {
         <section className="page-hero">
           <div className="site-container">
             <span className="cinema-line" aria-hidden="true" />
-            <p className="eyebrow">Blog</p>
-            <h1 className="page-title">Engineering notes<br />worth revisiting.</h1>
-            <p>Long-form explanations on performance, C++, HFT and systems design. Written to be useful after the tab is closed.</p>
+            <p className="eyebrow">Technical Notes</p>
+            <h1 className="page-title">A working notebook<br />for systems engineers.</h1>
+            <p>Long-form writing on C++, performance, low latency, HFT and systems design, structured to remain useful as reference material.</p>
             {topics.length ? (
               <div className="tag-row" style={{ marginTop: 24 }}>
                 {topics.map((topic) => <span className="tag" key={topic}>{topic}</span>)}
@@ -67,7 +67,7 @@ export default function BlogPage() {
           <AdSlot slot={blogTopAdSlot} className="ad-slot-leaderboard" />
         </div>
 
-        <section className="section">
+        <section className="section section-ruled">
           <div className="site-container">
             {featuredPost ? (
               <Link className="feature-card" href={`/blog/${featuredPost.slug}`}>
@@ -86,7 +86,7 @@ export default function BlogPage() {
             ) : <div className="empty-state">No posts published yet.</div>}
 
             {otherPosts.length ? (
-              <div className="blog-list" style={{ marginTop: 16 }}>
+              <div className="blog-list">
                 {otherPosts.map((post, index) => (
                   <Fragment key={post.slug}>
                     {index === 1 ? <AdSlot slot={blogFeedAdSlot} className="ad-slot-leaderboard" /> : null}
@@ -96,7 +96,7 @@ export default function BlogPage() {
                         <h3>{post.title}</h3>
                         <p>{post.excerpt}</p>
                       </div>
-                      <span className="arrow" aria-hidden="true">→</span>
+                      <span className="arrow" aria-hidden="true">Read →</span>
                     </Link>
                   </Fragment>
                 ))}

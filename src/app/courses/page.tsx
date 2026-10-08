@@ -24,9 +24,9 @@ export default function CoursesPage() {
         <section className="page-hero">
           <div className="site-container">
             <span className="cinema-line" aria-hidden="true" />
-            <p className="eyebrow">Courses</p>
-            <h1 className="page-title">Choose a layer.<br />Go deeper.</h1>
-            <p>No fake ratings or marketplace clutter. Each course card shows only the track, level, scope and material already defined in cppvalley.</p>
+            <p className="eyebrow">Course Catalogue</p>
+            <h1 className="page-title">Structured study paths<br />in C++ systems.</h1>
+            <p>A catalogue organized by technical field, with the level, scope, topics and modules made explicit before you begin.</p>
           </div>
         </section>
 

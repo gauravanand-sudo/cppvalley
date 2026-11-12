@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const lock = await fetch(config.redisUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer " + config.redisToken },
-      body: JSON.stringify(["SET", "cppvalley:practice:private-smoketest:v1", "1", "EX", "3600", "NX"]),
+      body: JSON.stringify(["SET", "cppvalley:practice:private-smoketest:v2", "1", "EX", "3600", "NX"]),
       cache: "no-store",
       signal: AbortSignal.timeout(5000),
     });

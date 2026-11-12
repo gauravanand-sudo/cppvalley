@@ -23,9 +23,26 @@ function json(payload: Record<string, unknown>, status = 200, extraHeaders?: Rec
   });
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const config = pilotJudgeConfig();
   const enabled = config !== null;
+  if (request.nextUrl.searchParams.get("diagnose") === "1" &&
+      request.nextUrl.hostname.endsWith(".vercel.app") &&
+      process.env.VERCEL_ENV !== "production") {
+    // Boolean-only operational diagnostic: never return token contents.
+    return json({
+      enabled,
+      checks: {
+        previewEnvironment: process.env.VERCEL_ENV === "preview",
+        enabledFlag: process.env.CPPVALLEY_PRACTICE_JUDGE_ENABLED === "true",
+        sandboxBackend: process.env.CPPVALLEY_PRACTICE_JUDGE_BACKEND === "sandbox",
+        previewAuthMode: process.env.CPPVALLEY_PRACTICE_AUTH_MODE === "vercel-preview",
+        redisEndpointSet: Boolean(process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL),
+        redisTokenSet: Boolean(process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN),
+        gitRefPresent: Boolean(process.env.VERCEL_GIT_COMMIT_REF),
+      },
+    });
+  }
   return json({
     enabled,
     authRequired: config?.authMode === "pilot-key",

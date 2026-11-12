@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { blogPosts } from "@/data/blog";
 import { courses } from "@/data/courses";
+import { practiceProblems } from "@/data/practice";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://cppvalley.com";
@@ -8,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: base, changeFrequency: "weekly", priority: 1 },
     { url: `${base}/courses`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${base}/blog`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${base}/practice`, changeFrequency: "weekly", priority: 0.9 },
   ];
 
   const courseRoutes: MetadataRoute.Sitemap = courses.map((course) => ({
@@ -23,5 +25,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  return [...staticRoutes, ...courseRoutes, ...blogRoutes];
+  const practiceRoutes: MetadataRoute.Sitemap = practiceProblems.map(problem => ({
+    url: `${base}/practice/${problem.slug}`,
+    changeFrequency: "monthly",
+    priority: 0.8,
+  }));
+
+  return [...staticRoutes, ...courseRoutes, ...blogRoutes, ...practiceRoutes];
 }

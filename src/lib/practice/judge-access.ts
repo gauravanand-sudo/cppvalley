@@ -1,13 +1,18 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 
-export type PilotJudgeConfig = {
-  judgeBase: string;
-  judgeToken: string;
-  languageId: number;
+export type PilotAccessConfig = {
   redisUrl: string;
   redisToken: string;
   previewKey: string;
 };
+export type Judge0PilotConfig = PilotAccessConfig & {
+  backend: "judge0";
+  judgeBase: string;
+  judgeToken: string;
+  languageId: number;
+};
+export type SandboxPilotConfig = PilotAccessConfig & { backend: "sandbox" };
+export type PilotJudgeConfig = Judge0PilotConfig | SandboxPilotConfig;
 
 function secureHttpsEndpoint(raw: string, expectedHost?: string): string | null {
   try {
@@ -26,34 +31,35 @@ function secureHttpsEndpoint(raw: string, expectedHost?: string): string | null 
 }
 
 /**
- * No credentials or execution by default.
- * Enabled only for a short-lived private pilot with an external, authenticated
- * Judge0 installation AND a centrally shared Redis quota.
- *
- * The public version must replace previewKey with real account-based auth.
+ * Execution is ALWAYS opt-in and preview-pilot-only. A private pilot access
+ * key and atomic Redis quota are mandatory for both backends.
+ * Vercel Sandbox authenticates automatically via deployment OIDC and does not
+ * require maintaining a separate Judge0 installation.
  */
 export function pilotJudgeConfig(): PilotJudgeConfig | null {
   if (process.env.CPPVALLEY_PRACTICE_JUDGE_ENABLED !== "true") return null;
+  if (process.env.VERCEL_ENV === "production") return null;
 
   const previewKey = process.env.CPPVALLEY_PRACTICE_PREVIEW_KEY || "";
+  const redisUrl = secureHttpsEndpoint(process.env.UPSTASH_REDIS_REST_URL || "");
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || "";
+  if (previewKey.length < 32 || !redisUrl || !redisToken) return null;
+
+  const common = { previewKey, redisUrl, redisToken };
+  if (process.env.CPPVALLEY_PRACTICE_JUDGE_BACKEND === "sandbox") {
+    return { ...common, backend: "sandbox" };
+  }
+
+  if (process.env.CPPVALLEY_PRACTICE_JUDGE_BACKEND !== "judge0") return null;
+
   const judgeToken = process.env.JUDGE0_AUTH_TOKEN || "";
   const allowedHost = process.env.JUDGE0_ALLOWED_HOSTNAME || "";
   const judgeBase = secureHttpsEndpoint(process.env.JUDGE0_BASE_URL || "", allowedHost);
-  const redisUrl = secureHttpsEndpoint(process.env.UPSTASH_REDIS_REST_URL || "");
-  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || "";
   const languageId = Number(process.env.JUDGE0_CPP17_LANGUAGE_ID);
-  if (
-    previewKey.length < 32 ||
-    judgeToken.length < 16 ||
-    !allowedHost ||
-    !judgeBase ||
-    !redisUrl ||
-    !redisToken ||
-    !Number.isInteger(languageId) ||
-    languageId < 1
-  ) return null;
+  if (!judgeBase || !allowedHost || judgeToken.length < 16 ||
+    !Number.isInteger(languageId) || languageId < 1) return null;
 
-  return { previewKey, judgeToken, judgeBase, languageId, redisUrl, redisToken };
+  return { ...common, backend: "judge0", judgeBase, judgeToken, languageId };
 }
 
 export function validPreviewKey(header: string | null, actual: string) {
@@ -73,7 +79,7 @@ const PILOT_REQUESTS_PER_MINUTE = 12;
  * Fail closed if Redis is unavailable. This is a protection against accidental
  * rapid usage, not a substitute for identity-specific quotas or a job queue.
  */
-export async function consumePilotQuota(config: PilotJudgeConfig) {
+export async function consumePilotQuota(config: PilotAccessConfig) {
   const minuteBucket = Math.floor(Date.now() / (FIXED_WINDOW_SECONDS * 1000));
   const key = "cppvalley:practice:pilot:" + createHash("sha256")
     .update(config.previewKey).digest("hex").slice(0, 16) + ":" + minuteBucket;

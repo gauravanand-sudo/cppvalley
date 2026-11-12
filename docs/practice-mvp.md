@@ -54,6 +54,17 @@ Every proposed problem should pass this editorial checklist **before** becoming 
 7. For concurrency problems, separate functional tests from sanitizer/stress tests.
 8. For latency problems, benchmark on controlled dedicated hardware; never use arbitrary cloud timing as an HFT ranking.
 
+### Curated candidate backlogs (400 ideas)
+
+These are **editorial candidates**, not publicly runnable questions:
+
+- [100 HFT Systems ideas](practice-backlog/hft-systems.md)
+- [100 Concurrency ideas](practice-backlog/concurrency.md)
+- [100 Core C++ ideas](practice-backlog/core-cpp.md)
+- [100 Design Patterns / LLD ideas](practice-backlog/design-patterns.md)
+
+Each list is organized as **25 Easy, 45 Medium, and 30 Hard** problems. Expand the verified, executable bank iteratively.
+
 ## Next engineering milestones
 
 1. Integrate a production code editor (Monaco or CodeMirror) with syntax highlighting, C++ completion, themes, and multi-file templates.

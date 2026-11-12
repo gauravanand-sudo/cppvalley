@@ -1,30 +1,18 @@
 import Link from "next/link";
-import { BrandLockup } from "@/components/BrandLockup";
+
+const navigation = [
+  ["Problems","/problems"],["Study Plans","/study-plans"],
+  ["Courses","/courses"],["Contests","/contests"],
+  ["Discuss","/discuss"],["Articles","/blog"],
+] as const;
 
 export function SiteHeader() {
-  return (
-    <header className="site-header g-site-header">
-      <div className="g-topline">
-        <span>Deep C++ learning, from language fundamentals to real systems.</span>
-        <Link href="/courses">Explore the learning library <span aria-hidden="true">↗</span></Link>
-      </div>
-      <div className="site-container g-nav-shell">
-        <Link className="site-logo" href="/" aria-label="cppvalley home"><BrandLockup /></Link>
-        <nav className="g-primary-nav" aria-label="Primary navigation">
-          <Link href="/">Home</Link>
-          <Link href="/courses">Courses</Link>
-          <Link href="/practice">Practice</Link>
-          <Link href="/blog">Blog</Link>
-        </nav>
-        <div className="g-nav-actions">
-          <form className="g-header-search" action="/courses" role="search">
-            <label className="g-sr-only" htmlFor="header-course-search">Search courses</label>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg>
-            <input id="header-course-search" type="search" name="q" placeholder="Search courses..." />
-          </form>
-          <Link className="g-nav-cta" href="/courses">Start learning <span aria-hidden="true">→</span></Link>
-        </div>
-      </div>
-    </header>
-  );
+  return <header className="cv-header"><div className="cv-nav-inner">
+    <Link href="/" className="cv-logo" aria-label="CppValley home"><span className="cv-logo-mark">C<span>+</span></span><span>cpp<b>valley</b><i>.</i></span></Link>
+    <nav className="cv-main-nav" aria-label="Main navigation">
+      {navigation.map(([label,href])=><Link href={href} key={href}>{label}</Link>)}
+    </nav>
+    <form action="/problems" role="search" className="cv-nav-search"><label className="cv-sr-only" htmlFor="cv-search">Search problems</label><span>⌕</span><input id="cv-search" name="q" type="search" placeholder="Search problems…" /><kbd>/</kbd></form>
+    <Link className="cv-profile-link" href="/dashboard"><span>◉</span><span>My Progress</span></Link>
+  </div></header>;
 }

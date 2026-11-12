@@ -1,3 +1,23 @@
+## Verified deployed execution (November 12, 2026)
+
+Successfully exercised a protected Vercel Preview deployment using a single-use server-side smoke test:
+
+- Backend: `sandbox` with `KV_REST_API_URL` / `KV_REST_API_TOKEN` already present in Vercel.
+- Scope: branch-specific Preview settings and Vercel Authentication.
+- Rate limiting: the existing Upstash atomic quota admitted the test.
+- Runner: separate Vercel Sandbox VM with outbound networking disabled.
+- Input: `2 4`; output: `6`; verdict: **Accepted**.
+- The first test uncovered a missing sandbox working directory; fixed by using the existing `/vercel` directory.
+- Temporary smoke-test endpoint and boolean configuration diagnostics were removed afterward.
+
+**What this verifies:** the server-side path through authenticated preview configuration, Redis quota, VM creation, GCC compilation, executable launch and verdict return.
+
+**What remains unverified:** a human-browser Monaco Run/Submit interaction, adversarial execution with malicious inputs, and all production load/security testing. Production execution must remain disabled.
+
+**Security:** Redis credentials have been copied into chat and must be rotated in Upstash and the connected Vercel environment before any public rollout; do not repost new credentials.
+
+---
+
 ## Updated setup — existing Vercel KV integration (November 12, 2026)
 
 The `cppvalley` project already contains `KV_REST_API_URL` and

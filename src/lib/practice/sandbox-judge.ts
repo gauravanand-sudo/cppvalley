@@ -32,8 +32,12 @@ function normalize(output: string) {
 }
 
 function classifyExit(exitCode: number | null, stage: "compile" | "run") {
-  if (exitCode === 124 || exitCode === 137) {
+  if (exitCode === 124) {
     return stage === "compile" ? "Compilation Time Limit Exceeded" : "Time Limit Exceeded";
+  }
+  if (exitCode === 137) {
+    // SIGKILL can mean the timeout grace period expired or a resource kill.
+    return stage === "compile" ? "Compilation Resource Limit Exceeded" : "Time or Memory Limit Exceeded";
   }
   if (stage === "compile") return "Compilation Error";
   if (exitCode === 0) return "Executed";

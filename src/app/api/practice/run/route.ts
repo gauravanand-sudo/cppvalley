@@ -6,7 +6,8 @@ import {
   pilotJudgeConfig,
   validPreviewKey,
 } from "@/lib/practice/judge-access";
-import { executeJudge0 } from "@/lib/practice/judge0";
+import { executeJudge0, type JudgeVerdict } from "@/lib/practice/judge0";
+import { executeSandboxCases } from "@/lib/practice/sandbox-judge";
 
 export const runtime = "nodejs";
 export const maxDuration = 45;
@@ -130,9 +131,25 @@ export async function POST(request: NextRequest) {
   }> = [];
 
   try {
-    for (let i = 0; i < cases.length; i++) {
+    const verdicts: JudgeVerdict[] = [];
+    if (config.backend === "sandbox") {
+      // One temporary Firecracker VM compiles the source once, then runs
+      // each case in a separate process, stopping after the first failure.
+      verdicts.push(...await executeSandboxCases(value.source, cases));
+    } else {
+      // Legacy external Judge0 adapter, useful for teams with a managed runner.
+      for (const testCase of cases) {
+        const verdict = await executeJudge0(
+          config, value.source, testCase.input, testCase.expected,
+        );
+        verdicts.push(verdict);
+        if (!verdict.passed || verdict.compileOutput) break;
+      }
+    }
+
+    for (let i = 0; i < verdicts.length; i++) {
       const testCase = cases[i];
-      const verdict = await executeJudge0(config, value.source, testCase.input, testCase.expected);
+      const verdict = verdicts[i];
       const detailsVisible = value.mode === "run";
       results.push({
         index: i + 1,

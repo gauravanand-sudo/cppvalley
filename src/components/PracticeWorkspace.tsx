@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MonacoCppEditor } from "@/components/MonacoCppEditor";
+import { getSupabaseClient } from "@/lib/supabase-client";
 import { practiceProblems, type PracticeProblem } from "@/data/practice";
 
 type CaseResult = {
@@ -24,6 +25,7 @@ type JudgeResult = {
   total?: number;
   cases?: CaseResult[];
   code?: string;
+  persisted?: boolean;
 };
 type PilotStatus = { enabled: boolean; authRequired: boolean; message: string };
 
@@ -106,11 +108,14 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
     setShowTests(true);
     setResult(null);
     try {
+      const auth=await getSupabaseClient()?.auth.getSession();
+      const jwt=auth?.data.session?.access_token;
       const response = await fetch("/api/practice/run", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           ...(pilotStatus.authRequired ? { Authorization: "Bearer " + pilotKey } : {}),
+          ...(jwt ? { "X-CppValley-User-JWT": jwt } : {}),
         },
         body: JSON.stringify({
           slug: problem.slug,
@@ -275,6 +280,7 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
               <div className={"pv-run-result " + (result.accepted === true ? "pv-result-passed" : "pv-result-info")} role="status">
                 <strong>{result.accepted === true ? "✓ Accepted" : result.accepted === false ? "Not accepted" : "Execution status"}</strong>
                 <p>{result.message}</p>
+                {result.mode === "submit" ? <p>{result.persisted ? "✓ Submission saved to your account." : "This verdict is stored locally only. Account submission storage is not configured or you are not signed in."}</p> : null}
                 {typeof result.passed === "number" && <p>{result.passed}/{result.total} cases passed or executed</p>}
                 {result.cases?.map(item => (
                   <div className="pv-case-result" key={item.index}>

@@ -97,8 +97,13 @@ export async function consumePilotQuota(config: PilotJudgeConfig) {
   });
   if (!response.ok) throw new Error("Shared quota service unavailable.");
   const body = (await response.json()) as RateResponse;
-  if (body.error || !Number.isFinite(Number(body.result))) {
+  const count = typeof body.result === "number"
+    ? body.result
+    : typeof body.result === "string" && /^\d+$/.test(body.result)
+      ? Number(body.result)
+      : Number.NaN;
+  if (body.error || !Number.isSafeInteger(count) || count < 1) {
     throw new Error("Shared quota service returned an invalid response.");
   }
-  return Number(body.result) <= PILOT_REQUESTS_PER_MINUTE;
+  return count <= PILOT_REQUESTS_PER_MINUTE;
 }

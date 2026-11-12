@@ -4,6 +4,7 @@ export type PilotAccessConfig = {
   redisUrl: string;
   redisToken: string;
   previewKey: string;
+  authMode: "pilot-key" | "vercel-preview";
 };
 export type Judge0PilotConfig = PilotAccessConfig & {
   backend: "judge0";
@@ -31,21 +32,33 @@ function secureHttpsEndpoint(raw: string, expectedHost?: string): string | null 
 }
 
 /**
- * Execution is ALWAYS opt-in and preview-pilot-only. A private pilot access
- * key and atomic Redis quota are mandatory for both backends.
- * Vercel Sandbox authenticates automatically via deployment OIDC and does not
- * require maintaining a separate Judge0 installation.
+ * Private preview judge. Production execution is hard-disabled here.
+ *
+ * vercel-preview auth is permitted ONLY for the feature branch, on
+ * Vercel-authenticated, non-custom preview hostnames (checked again per request).
+ * The project MUST have Vercel Authentication enabled on preview deployments.
+ * This is an internal pilot, not a substitute for real user accounts.
  */
 export function pilotJudgeConfig(): PilotJudgeConfig | null {
   if (process.env.CPPVALLEY_PRACTICE_JUDGE_ENABLED !== "true") return null;
-  if (process.env.VERCEL_ENV === "production") return null;
+  if (process.env.VERCEL_ENV !== "preview") return null;
+
+  const rawAuthMode = process.env.CPPVALLEY_PRACTICE_AUTH_MODE || "pilot-key";
+  if (rawAuthMode !== "pilot-key" && rawAuthMode !== "vercel-preview") return null;
+  if (rawAuthMode === "vercel-preview" &&
+      process.env.VERCEL_GIT_COMMIT_REF !== "feature/practice-workspace-mvp") return null;
 
   const previewKey = process.env.CPPVALLEY_PRACTICE_PREVIEW_KEY || "";
-  const redisUrl = secureHttpsEndpoint(process.env.UPSTASH_REDIS_REST_URL || "");
-  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || "";
-  if (previewKey.length < 32 || !redisUrl || !redisToken) return null;
+  if (rawAuthMode === "pilot-key" && previewKey.length < 32) return null;
 
-  const common = { previewKey, redisUrl, redisToken };
+  // Vercel KV / Upstash integrations use either naming convention.
+  const redisUrl = secureHttpsEndpoint(
+    process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || "",
+  );
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || "";
+  if (!redisUrl || !redisToken) return null;
+
+  const common = { authMode: rawAuthMode, previewKey, redisUrl, redisToken };
   if (process.env.CPPVALLEY_PRACTICE_JUDGE_BACKEND === "sandbox") {
     return { ...common, backend: "sandbox" };
   }
@@ -82,7 +95,8 @@ const PILOT_REQUESTS_PER_MINUTE = 12;
 export async function consumePilotQuota(config: PilotAccessConfig) {
   const minuteBucket = Math.floor(Date.now() / (FIXED_WINDOW_SECONDS * 1000));
   const key = "cppvalley:practice:pilot:" + createHash("sha256")
-    .update(config.previewKey).digest("hex").slice(0, 16) + ":" + minuteBucket;
+    .update(config.previewKey || "vercel-preview:" + (process.env.VERCEL_GIT_COMMIT_REF || ""))
+    .digest("hex").slice(0, 16) + ":" + minuteBucket;
   const command = [
     "EVAL",
     "local count=redis.call('INCR',KEYS[1]); if count==1 then redis.call('EXPIRE',KEYS[1],ARGV[1]); end; return count;",

@@ -1,123 +1,178 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPracticeProblem } from "@/data/practice";
-import { practiceJudgeCases, type JudgeCase } from "@/data/practice-judge-cases";
+import { practiceJudgeCases } from "@/data/practice-judge-cases";
+import {
+  consumePilotQuota,
+  pilotJudgeConfig,
+  validPreviewKey,
+} from "@/lib/practice/judge-access";
+import { executeJudge0 } from "@/lib/practice/judge0";
 
 export const runtime = "nodejs";
-export const maxDuration = 30;
+export const maxDuration = 45;
 
-type Mode = "run" | "submit";
-type JudgeReply = {
-  token?: string;
-  status?: { id: number; description: string };
-  stdout?: string | null;
-  stderr?: string | null;
-  compile_output?: string | null;
-  message?: string | null;
-};
+type JudgeMode = "run" | "submit";
+type JudgeRequest = { slug: string; source: string; mode: JudgeMode; customInput?: string };
+type InputCase = { input: string; expected?: string };
 
-function normalize(output: string) {
-  return output.replace(/\r\n/g, "\n").trimEnd();
+function json(payload: Record<string, unknown>, status = 200, extraHeaders?: Record<string, string>) {
+  return NextResponse.json(payload, {
+    status,
+    headers: { "Cache-Control": "no-store", ...extraHeaders },
+  });
 }
 
-async function evaluate(source: string, test: JudgeCase, base: string, languageId: number, headers: HeadersInit): Promise<JudgeReply> {
-  const created = await fetch(base + "/submissions?base64_encoded=false", {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      source_code: source,
-      language_id: languageId,
-      stdin: test.input,
-      cpu_time_limit: 2,
-      wall_time_limit: 5,
-      memory_limit: 131072,
-      max_file_size: 1024,
-    }),
-    cache: "no-store",
-    signal: AbortSignal.timeout(8000),
+export async function GET() {
+  const enabled = pilotJudgeConfig() !== null;
+  return json({
+    enabled,
+    authRequired: enabled,
+    message: enabled
+      ? "Private C++ judge pilot is available. Enter your temporary access key to run code."
+      : "Real C++ execution is not configured. Code editing and local drafts remain available.",
   });
-  if (!created.ok) throw new Error("Judge submission failed");
-  const newJob = (await created.json()) as JudgeReply;
-  if (!newJob.token || !/^[\w-]{5,128}$/.test(newJob.token)) throw new Error("Judge returned an invalid token");
-
-  for (let i = 0; i < 16; i++) {
-    await new Promise(resolve => setTimeout(resolve, 350));
-    const poll = await fetch(base + "/submissions/" + encodeURIComponent(newJob.token) + "?base64_encoded=false", {
-      headers,
-      cache: "no-store",
-      signal: AbortSignal.timeout(6000),
-    });
-    if (!poll.ok) throw new Error("Judge polling failed");
-    const output = (await poll.json()) as JudgeReply;
-    if (typeof output.status?.id === "number" && output.status.id > 2) return output;
-  }
-  throw new Error("Judge processing timed out");
 }
 
 export async function POST(request: NextRequest) {
-  // Intentionally opt-in: public access must not be enabled until production
-  // authentication, distributed rate limiting, abuse protection and judge quotas exist.
-  if (process.env.CPPVALLEY_PRACTICE_JUDGE_ENABLED !== "true") {
-    return NextResponse.json({
-      message: "Code execution is not enabled yet. Your editor and local drafts work; the isolated C++ judge will be connected after infrastructure and abuse controls are configured.",
-    }, { status: 503 });
+  const config = pilotJudgeConfig();
+  if (!config) {
+    return json({
+      message: "The isolated C++ judge is not configured or is disabled. Drafts are saved locally.",
+      code: "JUDGE_DISABLED",
+    }, 503);
   }
 
-  const baseUrl = process.env.JUDGE0_BASE_URL?.replace(/\/+$/, "");
-  const languageId = Number(process.env.JUDGE0_CPP17_LANGUAGE_ID || "54");
-  if (!baseUrl || !/^https:\/\//.test(baseUrl) || !Number.isInteger(languageId) || languageId <= 0) {
-    return NextResponse.json({ message: "The judge backend is not configured." }, { status: 503 });
+  // Until user accounts arrive in Step 3, the isolated runner is private pilot only.
+  if (!validPreviewKey(request.headers.get("authorization"), config.previewKey)) {
+    return json({ message: "A valid pilot access key is required to execute code.", code: "UNAUTHORIZED" }, 401);
   }
 
-  let payload: unknown;
-  try { payload = await request.json(); } catch { return NextResponse.json({ message: "Invalid JSON body." }, { status: 400 }); }
-  if (!payload || typeof payload !== "object") return NextResponse.json({ message: "Invalid request." }, { status: 400 });
-
-  const value = payload as Record<string, unknown>;
-  const slug = value.slug;
-  const source = value.source;
-  const mode = value.mode;
-  if (typeof slug !== "string" || typeof source !== "string" || (mode !== "run" && mode !== "submit")) {
-    return NextResponse.json({ message: "Expected slug, C++ source, and run/submit mode." }, { status: 400 });
-  }
-  if (source.length < 1 || source.length > 25000) {
-    return NextResponse.json({ message: "Source code must be between 1 and 25,000 characters." }, { status: 400 });
+  // Defence in depth: browser requests must originate from this deployment.
+  const origin = request.headers.get("origin");
+  if (origin && origin !== request.nextUrl.origin) {
+    return json({ message: "Cross-site judge requests are not allowed.", code: "ORIGIN_MISMATCH" }, 403);
   }
 
-  const problem = getPracticeProblem(slug);
-  if (!problem) return NextResponse.json({ message: "Problem not found." }, { status: 404 });
+  // Atomic, shared quota is checked BEFORE processing source or calling the
+  // runner. An outage fails closed, never bypassing the quota.
+  try {
+    if (!(await consumePilotQuota(config))) {
+      return json({
+        message: "The private judge has reached its shared execution quota. Try again after a minute.",
+        code: "RATE_LIMITED",
+      }, 429, { "Retry-After": "60" });
+    }
+  } catch {
+    return json({
+      message: "The shared execution quota service is unavailable; code execution is temporarily paused.",
+      code: "QUOTA_UNAVAILABLE",
+    }, 503);
+  }
 
-  const modeValue: Mode = mode;
-  const allCases = practiceJudgeCases[slug];
-  if (!allCases?.length) return NextResponse.json({ message: "This problem has no verified judge cases yet." }, { status: 503 });
-  const cases = modeValue === "run" ? allCases.slice(0, 1) : allCases;
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (process.env.JUDGE0_AUTH_TOKEN) headers["X-Auth-Token"] = process.env.JUDGE0_AUTH_TOKEN;
+  const contentLength = Number(request.headers.get("content-length") || "0");
+  if (contentLength > 40000) return json({ message: "Submission is too large.", code: "TOO_LARGE" }, 413);
+
+  let value: Partial<JudgeRequest>;
+  try {
+    const body: unknown = await request.json();
+    if (body === null || typeof body !== "object" || Array.isArray(body)) {
+      return json({ message: "Invalid JSON body." }, 400);
+    }
+    value = body as Partial<JudgeRequest>;
+  } catch {
+    return json({ message: "Invalid JSON body." }, 400);
+  }
+
+  if (
+    typeof value.slug !== "string" ||
+    typeof value.source !== "string" ||
+    (value.mode !== "run" && value.mode !== "submit")
+  ) {
+    return json({ message: "Expected a problem, C++ source, and run/submit mode." }, 400);
+  }
+  if (value.source.length < 1 || value.source.length > 25000) {
+    return json({ message: "C++ source must be between 1 and 25,000 characters." }, 400);
+  }
+  if (
+    value.customInput !== undefined &&
+    (typeof value.customInput !== "string" || value.customInput.length > 8000)
+  ) {
+    return json({ message: "Custom input must be at most 8,000 characters." }, 400);
+  }
+  if (value.mode === "submit" && value.customInput !== undefined) {
+    return json({ message: "Custom input is only supported for Run." }, 400);
+  }
+
+  const problem = getPracticeProblem(value.slug);
+  if (!problem) return json({ message: "Problem not found." }, 404);
+
+  const custom = value.mode === "run" && value.customInput !== undefined;
+  const cases: InputCase[] = custom
+    ? [{ input: value.customInput as string }]
+    : value.mode === "run"
+      ? problem.examples.slice(0, 5).map(example => ({ input: example.input, expected: example.output }))
+      : (practiceJudgeCases[problem.slug] || []).slice(0, 10);
+
+  if (cases.length === 0) {
+    return json({ message: "This problem has no verified test fixtures yet." }, 503);
+  }
+
+  const results: Array<{
+    index: number;
+    passed: boolean;
+    status: string;
+    stdout?: string;
+    stderr?: string;
+    expected?: string;
+    compileOutput?: string;
+    timeMs?: number;
+    memoryKb?: number;
+  }> = [];
 
   try {
-    const results = [];
     for (let i = 0; i < cases.length; i++) {
-      const output = await evaluate(source, cases[i], baseUrl, languageId, headers);
-      const stdout = output.stdout ?? "";
-      const passed = output.status?.id === 3 && normalize(stdout) === normalize(cases[i].expected);
+      const testCase = cases[i];
+      const verdict = await executeJudge0(config, value.source, testCase.input, testCase.expected);
+      const detailsVisible = value.mode === "run";
       results.push({
         index: i + 1,
-        passed,
-        status: passed ? "Accepted" : (output.compile_output ? "Compilation error" : output.status?.description || "Wrong answer"),
-        // Only reveal public sample output. Hidden test fixtures must stay server-side.
-        ...(modeValue === "run" ? { stdout: output.compile_output || output.stderr || stdout, expected: cases[i].expected } : {}),
+        passed: verdict.passed,
+        status: verdict.status,
+        ...(detailsVisible ? {
+          stdout: verdict.stdout,
+          stderr: verdict.stderr,
+          ...(testCase.expected === undefined ? {} : { expected: testCase.expected }),
+        } : {}),
+        // Compiler errors do not contain protected fixture input; always show.
+        ...(verdict.compileOutput ? { compileOutput: verdict.compileOutput } : {}),
+        ...(verdict.timeMs === undefined ? {} : { timeMs: verdict.timeMs }),
+        ...(verdict.memoryKb === undefined ? {} : { memoryKb: verdict.memoryKb }),
       });
-      if (!passed && modeValue === "submit") break;
+      if (!verdict.passed || verdict.compileOutput) break;
     }
-    const passedCount = results.filter(result => result.passed).length;
+
+    const passedCount = results.filter(caseResult => caseResult.passed).length;
     const accepted = passedCount === cases.length;
-    return NextResponse.json({
-      accepted,
+    const message = custom
+      ? (accepted ? "Custom input executed successfully. Output is shown below." : "Custom execution finished with an error.")
+      : accepted
+        ? (value.mode === "run" ? "All public sample cases passed." : "All configured validation cases passed.")
+        : value.mode === "run"
+          ? "A sample case failed. Compare actual and expected output."
+          : "Submission did not pass all validation cases.";
+
+    return json({
+      message,
+      mode: value.mode,
+      ...(custom ? {} : { accepted }),
       passed: passedCount,
       total: cases.length,
-      message: accepted ? "All verified test cases passed." : "One or more test cases failed. Review your algorithm and edge cases.",
       cases: results,
     });
   } catch {
-    return NextResponse.json({ message: "The isolated judge failed or exceeded its time limit. Please try again later." }, { status: 502 });
+    return json({
+      message: "The isolated judge is unavailable or timed out. Your C++ draft was not lost.",
+      code: "JUDGE_ERROR",
+    }, 502);
   }
 }

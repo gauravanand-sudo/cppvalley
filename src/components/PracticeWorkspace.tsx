@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import type { PracticeProblem } from "@/data/practice";
 
 type CaseResult = { index: number; passed: boolean; status: string; stdout?: string; expected?: string };
@@ -9,6 +9,7 @@ type JudgeResult = { message: string; accepted?: boolean; passed?: number; total
 
 export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
   const storageKey = "cppvalley-practice-code-" + problem.slug;
+  const lineNumberRef = useRef<HTMLPreElement>(null);
   const [source, setSource] = useState(problem.starterCode);
   const [split, setSplit] = useState(48);
   const [activeSample, setActiveSample] = useState(0);
@@ -116,11 +117,12 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
           <div className="pv-pane-header"><span className="pv-tab-active">⌘ Code</span><span className="pv-pane-meta">C++17</span></div>
           <div className="pv-editor-toolbar"><span className="pv-language-dot" /> <span>GNU C++17 · standard input/output</span><button type="button" onClick={resetEditor} aria-label="Reset source to starter code">↺ Reset</button></div>
           <div className="pv-code-shell">
-            <pre aria-hidden="true" className="pv-line-numbers">{lineNumbers}</pre>
+            <pre ref={lineNumberRef} aria-hidden="true" className="pv-line-numbers">{lineNumbers}</pre>
             <textarea
               value={source}
               onChange={event => setSource(event.target.value)}
               onKeyDown={insertTab}
+              onScroll={event => { if (lineNumberRef.current) lineNumberRef.current.scrollTop = event.currentTarget.scrollTop; }}
               className="pv-code-input"
               aria-label="C++ source code"
               autoCapitalize="off"

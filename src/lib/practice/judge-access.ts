@@ -41,7 +41,11 @@ function secureHttpsEndpoint(raw: string, expectedHost?: string): string | null 
  */
 export function pilotJudgeConfig(): PilotJudgeConfig | null {
   if (process.env.CPPVALLEY_PRACTICE_JUDGE_ENABLED !== "true") return null;
-  if (process.env.VERCEL_ENV !== "preview") return null;
+  // Vercel system env exposure is optional: VERCEL_ENV may be absent at runtime.
+  // Restrict the pilot using an explicit flag scoped ONLY to this Preview branch
+  // in Vercel settings, and reject production if VERCEL_ENV is available.
+  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "preview") return null;
+  if (process.env.CPPVALLEY_PRACTICE_PREVIEW_SCOPE !== "feature-practice") return null;
 
   const rawAuthMode = process.env.CPPVALLEY_PRACTICE_AUTH_MODE || "pilot-key";
   if (rawAuthMode !== "pilot-key" && rawAuthMode !== "vercel-preview") return null;

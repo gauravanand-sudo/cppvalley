@@ -24,13 +24,16 @@ function json(payload: Record<string, unknown>, status = 200, extraHeaders?: Rec
 }
 
 export async function GET() {
-  const enabled = pilotJudgeConfig() !== null;
+  const config = pilotJudgeConfig();
+  const enabled = config !== null;
   return json({
     enabled,
-    authRequired: enabled,
-    message: enabled
-      ? "Private C++ judge pilot is available. Enter your temporary access key to run code."
-      : "Real C++ execution is not configured. Code editing and local drafts remain available.",
+    authRequired: config?.authMode === "pilot-key",
+    message: !enabled
+      ? "Real C++ execution is not configured. Code editing and local drafts remain available."
+      : config.authMode === "vercel-preview"
+        ? "Private C++ judge pilot is available to authenticated members of this protected Vercel preview."
+        : "Private C++ judge pilot is available. Enter your temporary access key to run code.",
   });
 }
 
@@ -43,9 +46,22 @@ export async function POST(request: NextRequest) {
     }, 503);
   }
 
-  // Until user accounts arrive in Step 3, the isolated runner is private pilot only.
-  if (!validPreviewKey(request.headers.get("authorization"), config.previewKey)) {
-    return json({ message: "A valid pilot access key is required to execute code.", code: "UNAUTHORIZED" }, 401);
+  // Pilot credentials are never accepted for production deployments.
+  // A protected-preview mode is permitted only on the exact feature branch,
+  // under Vercel's SSO-protected *.vercel.app hostname.
+  if (config.authMode === "pilot-key") {
+    if (!validPreviewKey(request.headers.get("authorization"), config.previewKey)) {
+      return json({ message: "A valid pilot access key is required to execute code.", code: "UNAUTHORIZED" }, 401);
+    }
+  } else {
+    const hostname = request.nextUrl.hostname.toLowerCase();
+    if (!hostname.endsWith(".vercel.app") || hostname === "vercel.app" ||
+        process.env.VERCEL_GIT_COMMIT_REF !== "feature/practice-workspace-mvp") {
+      return json({
+        message: "C++ execution is restricted to the authenticated feature-branch preview.",
+        code: "PREVIEW_ONLY",
+      }, 403);
+    }
   }
 
   // Defence in depth: browser requests must originate from this deployment.

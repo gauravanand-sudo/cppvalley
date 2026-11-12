@@ -58,7 +58,7 @@ export function pilotJudgeConfig(): PilotJudgeConfig | null {
   const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || "";
   if (!redisUrl || !redisToken) return null;
 
-  const common = { authMode: rawAuthMode, previewKey, redisUrl, redisToken };
+  const common: PilotAccessConfig = { authMode: rawAuthMode, previewKey, redisUrl, redisToken };
   if (process.env.CPPVALLEY_PRACTICE_JUDGE_BACKEND === "sandbox") {
     return { ...common, backend: "sandbox" };
   }

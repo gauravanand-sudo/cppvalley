@@ -5,14 +5,37 @@ import { useEffect, useState } from "react";
 import { MonacoCppEditor } from "@/components/MonacoCppEditor";
 import type { PracticeProblem } from "@/data/practice";
 
-type CaseResult = { index: number; passed: boolean; status: string; stdout?: string; expected?: string };
-type JudgeResult = { message: string; accepted?: boolean; passed?: number; total?: number; cases?: CaseResult[] };
+type CaseResult = {
+  index: number;
+  passed: boolean;
+  status: string;
+  stdout?: string;
+  stderr?: string;
+  expected?: string;
+  compileOutput?: string;
+  timeMs?: number;
+  memoryKb?: number;
+};
+type JudgeResult = {
+  message: string;
+  mode?: "run" | "submit";
+  accepted?: boolean;
+  passed?: number;
+  total?: number;
+  cases?: CaseResult[];
+  code?: string;
+};
+type PilotStatus = { enabled: boolean; authRequired: boolean; message: string };
 
 export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
   const storageKey = "cppvalley-practice-code-" + problem.slug;
   const [source, setSource] = useState(problem.starterCode);
   const [split, setSplit] = useState(48);
   const [activeSample, setActiveSample] = useState(0);
+  const [inputMode, setInputMode] = useState<"samples" | "custom">("samples");
+  const [customInput, setCustomInput] = useState("");
+  const [pilotStatus, setPilotStatus] = useState<PilotStatus | null>(null);
+  const [pilotKey, setPilotKey] = useState("");
   const [busy, setBusy] = useState<"run" | "submit" | null>(null);
   const [result, setResult] = useState<JudgeResult | null>(null);
   const [editorTheme, setEditorTheme] = useState<"vs-dark" | "vs">("vs-dark");
@@ -48,6 +71,19 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
     } catch { /* Preferences are optional. */ }
   }, [editorTheme, editorFontSize, preferencesReady]);
 
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/practice/run", { cache: "no-store", signal: controller.signal })
+      .then(response => response.json())
+      .then((status: PilotStatus) => setPilotStatus(status))
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPilotStatus({ enabled: false, authRequired: false, message: "Judge status is unavailable." });
+        }
+      });
+    return () => controller.abort();
+  }, []);
+
   function resetEditor() {
     setSource(problem.starterCode);
     setResult(null);
@@ -55,13 +91,26 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
 
   async function execute(mode: "run" | "submit") {
     if (busy) return;
+    if (!pilotStatus?.enabled) {
+      setResult({ message: "Code execution is not configured yet. Your draft is saved locally.", code: "JUDGE_DISABLED" });
+      return;
+    }
+    if (!pilotKey.trim()) {
+      setResult({ message: "Enter the private pilot access key before running C++ code.", code: "UNAUTHORIZED" });
+      return;
+    }
     setBusy(mode);
     setResult(null);
     try {
       const response = await fetch("/api/practice/run", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: problem.slug, source, mode }),
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + pilotKey },
+        body: JSON.stringify({
+          slug: problem.slug,
+          source,
+          mode,
+          ...(mode === "run" && inputMode === "custom" ? { customInput } : {}),
+        }),
       });
       const body = (await response.json()) as JudgeResult;
       setResult(body);
@@ -156,33 +205,90 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
             />
           </div>
           <div className="pv-tests">
+            <div className="pv-judge-gate">
+              <div>
+                <span className={"pv-judge-status " + (pilotStatus?.enabled ? "pv-judge-ready" : "pv-judge-offline")}>
+                  <span aria-hidden="true">{pilotStatus?.enabled ? "●" : "○"}</span>
+                  {pilotStatus === null ? "Checking judge..." : pilotStatus.enabled ? "Private judge pilot" : "Judge not configured"}
+                </span>
+                <p>{pilotStatus?.message || "Checking whether the external C++ judge is available."}</p>
+              </div>
+              {pilotStatus?.enabled && (
+                <label className="pv-judge-key">
+                  Pilot access key
+                  <input
+                    type="password"
+                    value={pilotKey}
+                    onChange={event => setPilotKey(event.target.value)}
+                    placeholder="Enter access key"
+                    autoComplete="off"
+                    aria-label="Private judge pilot access key"
+                  />
+                </label>
+              )}
+            </div>
             <div className="pv-tests-head">
               <span>⌁ Test cases & results</span>
               <span>Public samples: {problem.examples.length}</span>
             </div>
-            <div className="pv-sample-tabs">
-              {problem.examples.map((_, index) => <button className={activeSample === index ? "pv-sample-selected" : ""} key={index} type="button" onClick={() => setActiveSample(index)}>Case {index + 1}</button>)}
+            <div className="pv-input-mode" role="group" aria-label="Select sample or custom input">
+              <button type="button" className={inputMode === "samples" ? "pv-input-active" : ""} onClick={() => setInputMode("samples")}>Sample cases</button>
+              <button type="button" className={inputMode === "custom" ? "pv-input-active" : ""} onClick={() => setInputMode("custom")}>Custom input</button>
             </div>
-            <div className="pv-sample-content">
-              <div><span>Input</span><pre>{selectedExample.input}</pre></div>
-              <div><span>Expected output</span><pre>{selectedExample.output}</pre></div>
-            </div>
+            {inputMode === "samples" ? (
+              <>
+                <div className="pv-sample-tabs">
+                  {problem.examples.map((_, index) => <button className={activeSample === index ? "pv-sample-selected" : ""} key={index} type="button" onClick={() => setActiveSample(index)}>Case {index + 1}</button>)}
+                </div>
+                <div className="pv-sample-content">
+                  <div><span>Input</span><pre>{selectedExample.input}</pre></div>
+                  <div><span>Expected output</span><pre>{selectedExample.output}</pre></div>
+                </div>
+              </>
+            ) : (
+              <div className="pv-custom-input">
+                <label htmlFor="pv-custom-stdin">Standard input (stdin)</label>
+                <textarea
+                  id="pv-custom-stdin"
+                  value={customInput}
+                  onChange={event => setCustomInput(event.target.value)}
+                  placeholder="Type custom input here..."
+                  maxLength={8000}
+                  spellCheck={false}
+                />
+                <small>Custom input is supported for Run, not Submit.</small>
+              </div>
+            )}
             {result && (
               <div className={"pv-run-result " + (result.accepted === true ? "pv-result-passed" : "pv-result-info")} role="status">
-                <strong>{result.accepted === true ? "✓ Accepted" : result.accepted === false ? "Tests completed" : "Judge status"}</strong>
+                <strong>{result.accepted === true ? "✓ Accepted" : result.accepted === false ? "Not accepted" : "Execution status"}</strong>
                 <p>{result.message}</p>
-                {typeof result.passed === "number" && <p>{result.passed}/{result.total} cases passed</p>}
+                {typeof result.passed === "number" && <p>{result.passed}/{result.total} cases passed or executed</p>}
                 {result.cases?.map(item => (
-                  <div className="pv-case-result" key={item.index}><span>{item.passed ? "✓" : "×"} Case {item.index}: {item.status}</span>{item.stdout !== undefined && <pre>Output: {item.stdout || "(empty)"}</pre>}{item.expected !== undefined && <pre>Expected: {item.expected}</pre>}</div>
+                  <div className="pv-case-result" key={item.index}>
+                    <strong className={item.passed ? "pv-case-pass" : "pv-case-fail"}>
+                      {item.passed ? "✓" : "×"} Case {item.index}: {item.status}
+                    </strong>
+                    {(item.timeMs !== undefined || item.memoryKb !== undefined) && (
+                      <p className="pv-case-metrics">
+                        {item.timeMs !== undefined && <span>CPU time: {item.timeMs} ms</span>}
+                        {item.memoryKb !== undefined && <span>Memory: {item.memoryKb} KB</span>}
+                      </p>
+                    )}
+                    {item.compileOutput && <div className="pv-output-field"><span>Compiler output</span><pre>{item.compileOutput}</pre></div>}
+                    {item.stderr && <div className="pv-output-field"><span>Standard error</span><pre>{item.stderr}</pre></div>}
+                    {item.stdout !== undefined && <div className="pv-output-field"><span>Actual output</span><pre>{item.stdout || "(empty)"}</pre></div>}
+                    {item.expected !== undefined && <div className="pv-output-field"><span>Expected output</span><pre>{item.expected}</pre></div>}
+                  </div>
                 ))}
               </div>
             )}
           </div>
           <div className="pv-submit-bar">
-            <span>Ctrl/Cmd + Enter: Run · Ctrl/Cmd + Shift + Enter: Submit</span>
+            <span>{pilotStatus?.enabled ? "Ctrl/Cmd + Enter: Run · Ctrl/Cmd + Shift + Enter: Submit" : "Execution requires a secure external judge."}</span>
             <div>
-              <button type="button" className="pv-run-button" onClick={() => execute("run")} disabled={busy !== null}>{busy === "run" ? "Running…" : "▷ Run samples"}</button>
-              <button type="button" className="pv-submit-button" onClick={() => execute("submit")} disabled={busy !== null}>{busy === "submit" ? "Judging…" : "Submit solution →"}</button>
+              <button type="button" className="pv-run-button" onClick={() => execute("run")} disabled={busy !== null || !pilotStatus?.enabled}>{busy === "run" ? "Running…" : "▷ Run samples"}</button>
+              <button type="button" className="pv-submit-button" onClick={() => execute("submit")} disabled={busy !== null || !pilotStatus?.enabled}>{busy === "submit" ? "Judging…" : "Submit solution →"}</button>
             </div>
           </div>
         </section>

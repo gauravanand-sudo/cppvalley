@@ -95,7 +95,7 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
       setResult({ message: "Code execution is not configured yet. Your draft is saved locally.", code: "JUDGE_DISABLED" });
       return;
     }
-    if (!pilotKey.trim()) {
+    if (pilotStatus.authRequired && !pilotKey.trim()) {
       setResult({ message: "Enter the private pilot access key before running C++ code.", code: "UNAUTHORIZED" });
       return;
     }
@@ -104,7 +104,10 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
     try {
       const response = await fetch("/api/practice/run", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: "Bearer " + pilotKey },
+        headers: {
+          "Content-Type": "application/json",
+          ...(pilotStatus.authRequired ? { Authorization: "Bearer " + pilotKey } : {}),
+        },
         body: JSON.stringify({
           slug: problem.slug,
           source,
@@ -213,7 +216,7 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
                 </span>
                 <p>{pilotStatus?.message || "Checking whether the external C++ judge is available."}</p>
               </div>
-              {pilotStatus?.enabled && (
+              {pilotStatus?.enabled && pilotStatus.authRequired && (
                 <label className="pv-judge-key">
                   Pilot access key
                   <input

@@ -1,4 +1,4 @@
-import type { PilotJudgeConfig } from "./judge-access";
+import type { Judge0PilotConfig } from "./judge-access";
 
 /**
  * Judge0 client. Runs code only on a separate, patched, authenticated service.
@@ -46,7 +46,7 @@ function safeNumber(value: number | string | null | undefined) {
   const number = Number(value);
   return value != null && Number.isFinite(number) && number >= 0 ? number : undefined;
 }
-function judgeHeaders(config: PilotJudgeConfig): Record<string, string> {
+function judgeHeaders(config: Judge0PilotConfig): Record<string, string> {
   return { "Content-Type": "application/json", "X-Auth-Token": config.judgeToken };
 }
 function sleep(ms: number) {
@@ -54,7 +54,7 @@ function sleep(ms: number) {
 }
 
 export async function executeJudge0(
-  config: PilotJudgeConfig,
+  config: Judge0PilotConfig,
   source: string,
   input: string,
   expected?: string,

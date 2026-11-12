@@ -7,7 +7,7 @@
 import assert from "node:assert/strict";
 import { Sandbox } from "@vercel/sandbox";
 
-const dir = "/vercel/sandbox";
+const dir = "/vercel";
 const image = "vercel/sandbox/arch@sha256:9dd04e0294a3711bdc071acd768748c3b1141751de19fa254eb99ae74f108bdc";
 const sandbox = await Sandbox.create({
   image,

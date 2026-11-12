@@ -1,3 +1,34 @@
+## Updated setup — existing Vercel KV integration (November 12, 2026)
+
+The `cppvalley` project already contains `KV_REST_API_URL` and
+`KV_REST_API_TOKEN` in Vercel. CppValley Practice now reads these
+server-side credentials automatically, falling back to
+`UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` if supplied.
+
+The feature branch also supports **Vercel Authentication** for the private
+pilot (verified enabled on preview deployments). This mode requires all three
+branch-scoped, Preview-only environment variables:
+
+- `CPPVALLEY_PRACTICE_JUDGE_ENABLED=true`
+- `CPPVALLEY_PRACTICE_JUDGE_BACKEND=sandbox`
+- `CPPVALLEY_PRACTICE_AUTH_MODE=vercel-preview`
+
+In this mode the API only enables if `VERCEL_ENV=preview` and
+`VERCEL_GIT_COMMIT_REF=feature/practice-workspace-mvp`. POST additionally
+requires a `*.vercel.app` hostname, exact same-origin request, and an atomic
+12-request/minute Redis quota. No extra pilot key needs to be copied into the
+browser. **Do not use this authentication mode on publicly accessible preview
+domains, custom domains, or production; keep Vercel Authentication enabled.**
+For any wider rollout replace it with real application-user authentication.
+
+**Credential incident:** The Upstash Redis credentials were pasted into a
+conversation. Rotate the exposed Upstash **write token** and **read-only token**
+using the Upstash dashboard, then update the connected Vercel secrets without
+putting new values in messages or Git. Do this before opening the compiler to
+other users. Redis must continue to fail closed if credentials are invalid.
+
+---
+
 # CppValley Practice — Vercel Sandbox compiler setup
 
 **Preferred pilot backend:** Vercel Sandbox (GCC, C++17), not an always-on Judge0 server.

@@ -18,8 +18,8 @@ export type PracticeProblem = {
 export const practiceCategories: PracticeCategory[] = ["HFT Systems", "Concurrency", "Core C++", "Design Patterns"];
 export const practiceDifficulties: PracticeDifficulty[] = ["Easy", "Medium", "Hard"];
 
-/** Editorial target: 100 fully verified, original problems per category AND difficulty. */
-export const practiceTargetPerCategoryDifficulty = 100;
+/** Editorial target: at least 100 fully verified original problems per category, balanced across difficulties. */
+export const practiceTargetPerCategory = 100;
 
 /** Original seed problems. Only publish problems with statements, starter code, and independently checked test fixtures. */
 export const practiceProblems: PracticeProblem[] = [

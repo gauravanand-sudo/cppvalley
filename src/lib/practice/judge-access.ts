@@ -45,7 +45,11 @@ export function pilotJudgeConfig(): PilotJudgeConfig | null {
 
   const rawAuthMode = process.env.CPPVALLEY_PRACTICE_AUTH_MODE || "pilot-key";
   if (rawAuthMode !== "pilot-key" && rawAuthMode !== "vercel-preview") return null;
+  // Vercel can omit git metadata from runtime system env. The three enable
+  // flags are already scoped to this exact Preview branch in Vercel Settings.
+  // If the ref is exposed, reject any mismatched branch.
   if (rawAuthMode === "vercel-preview" &&
+      process.env.VERCEL_GIT_COMMIT_REF &&
       process.env.VERCEL_GIT_COMMIT_REF !== "feature/practice-workspace-mvp") return null;
 
   const previewKey = process.env.CPPVALLEY_PRACTICE_PREVIEW_KEY || "";

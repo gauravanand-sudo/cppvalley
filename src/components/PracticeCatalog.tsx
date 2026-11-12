@@ -37,7 +37,7 @@ export function PracticeCatalog() {
           <span><strong>{practiceCategories.length}</strong> technical tracks</span>
           <span><strong>{solvedCount}</strong> solved locally</span>
         </div>
-        <p className="pv-hero-footnote">Roadmap: 100 verified questions per difficulty in each track. The catalog below shows only problems actually published.</p>
+        <p className="pv-hero-footnote">Roadmap: 100+ verified questions in each track, spanning Easy, Medium, and Hard. Only published problems appear below.</p>
       </section>
 
       <section className="pv-catalog">

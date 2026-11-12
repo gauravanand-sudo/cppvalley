@@ -153,3 +153,100 @@
   .pv-submit-bar > span { display: none; }
   .pv-submit-bar > div { width: 100%; justify-content: flex-end; }
 }
+
+
+/* Monaco C++ editor (Step 1): fills the right-hand editor pane. */
+.pv-code-shell {
+  min-height: 210px;
+  position: relative;
+}
+.pv-monaco-editor {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  background: #0e1729;
+}
+.pv-monaco-host,
+.pv-editor-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.pv-editor-fallback {
+  display: flex;
+  flex-direction: column;
+  background: #0d1526;
+  color: #d9e8ff;
+}
+.pv-editor-fallback textarea {
+  flex: 1;
+  display: block;
+  width: 100%;
+  min-height: 0;
+  padding: 18px 20px;
+  resize: none;
+  border: 0;
+  outline: none;
+  background: #0d1526;
+  color: #d9e8ff;
+  caret-color: #91b4ff;
+  font: 14px/1.7 "Cascadia Code", Consolas, "Liberation Mono", monospace;
+  white-space: pre;
+  overflow: auto;
+  tab-size: 4;
+}
+.pv-editor-fallback-note,
+.pv-editor-loading {
+  margin: 0;
+  padding: 8px 18px;
+  color: #b8c7de;
+  background: #233652;
+  font-size: .73rem;
+  line-height: 1.5;
+}
+.pv-editor-loading { background: #1a2944; }
+.pv-monaco-light,
+.pv-monaco-light .pv-editor-fallback,
+.pv-monaco-light .pv-editor-fallback textarea {
+  background: #ffffff;
+  color: #25324a;
+  caret-color: #343ca9;
+}
+.pv-editor-toolbar {
+  flex-wrap: wrap;
+  min-height: 47px;
+  gap: 10px;
+}
+.pv-editor-language { margin-right: auto; }
+.pv-editor-setting {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #c0d1f1;
+  font-size: .7rem;
+  white-space: nowrap;
+}
+.pv-editor-setting select {
+  border: 1px solid #3b4c65;
+  border-radius: 5px;
+  background: #202d43;
+  color: #c0d1f1;
+  padding: 5px;
+  cursor: pointer;
+  font-size: .72rem;
+}
+.pv-editor-toolbar .pv-editor-theme-button,
+.pv-editor-toolbar .pv-editor-reset-button {
+  margin-left: 0;
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .pv-editor-toolbar { gap: 6px; padding: 9px 10px; }
+  .pv-editor-language { font-size: .68rem; }
+  .pv-editor-setting { font-size: .65rem; }
+  .pv-editor-toolbar .pv-editor-theme-button,
+  .pv-editor-toolbar .pv-editor-reset-button { font-size: .7rem; padding: 5px 7px; }
+}

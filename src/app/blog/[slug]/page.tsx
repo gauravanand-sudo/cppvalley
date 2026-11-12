@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdSlot } from "@/components/AdSlot";
 import { MdxArticle, getMdxHeadings } from "@/components/MdxArticle";
+import { ReadingProgress } from "@/components/ReadingProgress";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts, blogPostsBySlug } from "@/data/blog";
@@ -89,10 +90,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
       <SiteHeader />
-      <main className="page-main">
+      <ReadingProgress />
+      <main className="page-main g-article-page">
         <div className="site-container article-shell">
           <div>
-            <Link className="text-link" href="/blog">← Blog</Link>
+            <div className="g-breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/blog">Blog</Link><span>/</span><strong>Engineering note</strong></div>
             <header className="article-header" style={{ marginTop: 28 }}>
               <p className="eyebrow">Engineering note</p>
               <h1>{post.title}</h1>

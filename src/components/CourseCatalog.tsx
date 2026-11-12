@@ -4,10 +4,10 @@ import { useMemo, useState } from "react";
 import type { Course } from "@/data/courses";
 import { CourseCard } from "@/components/CourseCard";
 
-type Props = { courses: Course[]; initialQuery?: string };
-export function CourseCatalog({ courses, initialQuery = "" }: Props) {
+type Props = { courses: Course[]; initialQuery?: string; initialTrack?: string };
+export function CourseCatalog({ courses, initialQuery = "", initialTrack = "All tracks" }: Props) {
   const [query, setQuery] = useState(initialQuery);
-  const [track, setTrack] = useState("All tracks");
+  const [track, setTrack] = useState(initialTrack);
   const [sort, setSort] = useState("recommended");
   const tracks = ["All tracks", ...Array.from(new Set(courses.map(course => course.pillar)))];
   const results = useMemo(() => {

@@ -1,35 +1,12 @@
 import type { MetadataRoute } from "next";
 import { blogPosts } from "@/data/blog";
-import { courses } from "@/data/courses";
-import { practiceProblems } from "@/data/practice";
-
-export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://cppvalley.com";
-  const staticRoutes: MetadataRoute.Sitemap = [
-    { url: base, changeFrequency: "weekly", priority: 1 },
-    { url: `${base}/courses`, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${base}/blog`, changeFrequency: "daily", priority: 0.9 },
-    { url: `${base}/practice`, changeFrequency: "weekly", priority: 0.9 },
-  ];
-
-  const courseRoutes: MetadataRoute.Sitemap = courses.map((course) => ({
-    url: `${base}/courses/${course.slug}`,
-    changeFrequency: "monthly",
-    priority: 0.75,
-  }));
-
-  const blogRoutes: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-    url: `${base}/blog/${post.slug}`,
-    lastModified: new Date(`${post.publishedAt}T00:00:00Z`),
-    changeFrequency: "monthly",
-    priority: 0.8,
-  }));
-
-  const practiceRoutes: MetadataRoute.Sitemap = practiceProblems.map(problem => ({
-    url: `${base}/practice/${problem.slug}`,
-    changeFrequency: "monthly",
-    priority: 0.8,
-  }));
-
-  return [...staticRoutes, ...courseRoutes, ...blogRoutes, ...practiceRoutes];
+import { eliteCourses } from "@/data/elite-courses";
+import { problemBank } from "@/data/problem-bank";
+export default function sitemap():MetadataRoute.Sitemap{
+ const base="https://cppvalley.com";
+ const statics=["","/problems","/study-plans","/courses","/videos","/blog"].map((path,i)=>({url:base+path,changeFrequency:"weekly" as const,priority:i===0?1:0.85}));
+ const courses=eliteCourses.map(c=>({url:base+"/courses/"+c.slug,changeFrequency:"monthly" as const,priority:0.75}));
+ const problems=problemBank.filter(p=>p.status==="runnable").map(p=>({url:base+"/problems/"+p.slug,changeFrequency:"monthly" as const,priority:0.8}));
+ const posts=blogPosts.map(p=>({url:base+"/blog/"+p.slug,lastModified:new Date(p.publishedAt+"T00:00:00Z"),changeFrequency:"monthly" as const,priority:0.72}));
+ return [...statics,...courses,...problems,...posts];
 }

@@ -95,7 +95,7 @@ export function PracticeCatalog() {
       </section>
       <section className="pv-roadmap">
         <div><span className="pv-kicker">CONTENT ROADMAP</span><h2>Depth first. Scale next.</h2></div>
-        <p>We're building toward 100 original, reviewed problems for each Easy, Medium, and Hard level in every track: 1,200 total. Real problems need correct specifications, edge-case tests, and reliable grading—not just generated titles.</p>
+        <p>We're building toward at least 100 original, reviewed problems in each of four tracks: 400+ total across Easy, Medium, and Hard. Real problems need correct specifications, edge-case tests, and reliable grading—not just generated titles.</p>
       </section>
     </div>
   );

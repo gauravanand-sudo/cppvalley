@@ -12,6 +12,7 @@ export function SiteFooter() {
           <div className="g-footer-links">
             <strong>Explore</strong>
             <Link href="/courses">All courses</Link>
+            <Link href="/practice">C++ coding practice</Link>
             <Link href="/courses#catalog">Learning tracks</Link>
             <Link href="/blog">Engineering blog</Link>
           </div>

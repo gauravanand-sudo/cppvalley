@@ -91,7 +91,7 @@ function loadMonaco(): Promise<MonacoApi> {
       );
     };
 
-    if (window.require) {
+    if (typeof window.require === "function") {
       startMonaco();
       return;
     }

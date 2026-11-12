@@ -33,7 +33,7 @@ The Run/Submit API now includes an asynchronous Judge0 adapter, sample and custo
 
 **The execution feature remains OFF by default** until you provision and approve an isolated judge, secure pilot key, and shared Redis quota service. It is not yet a publicly usable online judge.
 
-Read the [Step 2 installation and security checklist](practice-judge-setup.md), including all preview-only environment variables and the standalone smoke test. Do not set the enable flag in Production.
+The **preferred native backend** and private-preview activation instructions are in [Vercel Sandbox compiler setup](practice-vercel-sandbox.md). A separate [Judge0 integration guide](practice-judge-setup.md) remains available if you choose to maintain an external judge. Do not enable either backend in Production.
 
 Important: the existing validation fixtures are excluded from browser bundles, but CppValley uses a public GitHub repository. Until test fixtures move to private storage, they cannot be considered secret anti-cheating tests.
 

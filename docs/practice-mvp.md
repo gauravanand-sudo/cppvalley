@@ -17,6 +17,16 @@ This feature is implemented **inside the existing Next.js application** at:
 - Problem metadata and hidden tests are separate files; never expose server fixture files in client bundles.
 - Practice catalog is linked in global navigation, footer, and sitemap.
 
+## Step 1: Monaco editor integration
+
+- `MonacoCppEditor.tsx` adds C++ token highlighting, line numbers, bracket matching, editor suggestions, and accessible fallback to a text area.
+- Keyboard shortcuts: **Ctrl/Cmd+Enter** runs the sample; **Ctrl/Cmd+Shift+Enter** submits the solution; **Ctrl/Cmd+S** keeps editor focus (drafts are auto-saved).
+- The editor toolbar controls light/dark themes and 12–20 px font sizes; preferences persist locally.
+- Existing local draft persistence, sample case tabs, and split pane remain intact.
+- The Monaco 0.52.2 AMD assets and workers are **loaded from a version-pinned Cloudflare CDN** so this step does not introduce npm dependency or lockfile changes. The app remains dependent on that external CDN while advanced editing is active; blocked CDN/network requests transparently leave a working textarea.
+- **Production hardening:** self-host the editor assets and worker scripts, implement a strict CSP, verify accessibility and responsive behavior in real browsers, and consider bundled Monaco/CodeMirror for long-term maintenance.
+- Monaco only edits text. **No code runs in the browser** or in the Next.js application: the isolated backend judge is a separate future milestone.
+
 ## Judge: disabled by default
 
 **Do not enable public C++ execution in production without authentication, distributed rate limits, quotas, monitoring, and a dedicated isolated runner.**

@@ -15,17 +15,17 @@ export type SandboxInputCase = { input: string; expected?: string };
 const CPP_SANDBOX_IMAGE =
   "vercel/sandbox/arch@sha256:9dd04e0294a3711bdc071acd768748c3b1141751de19fa254eb99ae74f108bdc";
 
-const ROOT = "/vercel/sandbox";
+const ROOT = "/vercel";
 const OUTPUT_LIMIT = 5000;
 const SANDBOX_TIMEOUT_MS = 40000;
 const COMPILE_COMMAND =
   "timeout -k 1s 8s prlimit --cpu=6 --as=805306368 --fsize=131072 --nproc=32 -- " +
-  "g++ -std=c++17 -O2 -pipe -pthread -o /vercel/sandbox/solution /vercel/sandbox/main.cpp " +
-  "> /vercel/sandbox/compile.stdout 2> /vercel/sandbox/compile.stderr";
+  "g++ -std=c++17 -O2 -pipe -pthread -o /vercel/solution /vercel/main.cpp " +
+  "> /vercel/compile.stdout 2> /vercel/compile.stderr";
 const RUN_COMMAND =
   "timeout -k 1s 2s prlimit --cpu=2 --as=536870912 --fsize=65536 --nproc=16 -- " +
-  "/vercel/sandbox/solution < /vercel/sandbox/stdin.txt " +
-  "> /vercel/sandbox/stdout.txt 2> /vercel/sandbox/stderr.txt";
+  "/vercel/solution < /vercel/stdin.txt " +
+  "> /vercel/stdout.txt 2> /vercel/stderr.txt";
 
 function normalize(output: string) {
   return output.replace(/\r\n?/g, "\n").trimEnd();

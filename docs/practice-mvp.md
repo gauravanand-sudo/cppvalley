@@ -12,7 +12,7 @@ This feature is implemented **inside the existing Next.js application** at:
 - Each published problem has a full statement, input/output contract, constraints, starter code, at least one sample, and three server-side judge fixtures.
 - Desktop split screen with a description-width slider; mobile stacked layout.
 - Editor supports local draft persistence, Tab indentation, reset, and synchronized line numbers.
-- Run/Submit controls call a server endpoint; it explicitly reports unavailability until an isolated judge is configured.
+- Run/Submit controls call a guarded server endpoint that explicitly reports unavailability until an isolated judge is configured.
 - On successful judged submission, solved state is stored locally in this browser.
 - Problem metadata and hidden tests are separate files; never expose server fixture files in client bundles.
 - Practice catalog is linked in global navigation, footer, and sitemap.
@@ -27,20 +27,15 @@ This feature is implemented **inside the existing Next.js application** at:
 - **Production hardening:** self-host the editor assets and worker scripts, implement a strict CSP, verify accessibility and responsive behavior in real browsers, and consider bundled Monaco/CodeMirror for long-term maintenance.
 - Monaco only edits text. **No code runs in the browser** or in the Next.js application: the isolated backend judge is a separate future milestone.
 
-## Judge: disabled by default
+## Step 2: isolated C++ judge integration
 
-**Do not enable public C++ execution in production without authentication, distributed rate limits, quotas, monitoring, and a dedicated isolated runner.**
+The Run/Submit API now includes an asynchronous Judge0 adapter, sample and custom-input execution, compiler/runtime diagnostics, and client-side verdict display.
 
-Provision a patched, independently hosted Judge0 deployment and set the following **server-side** environment variables:
+**The execution feature remains OFF by default** until you provision and approve an isolated judge, secure pilot key, and shared Redis quota service. It is not yet a publicly usable online judge.
 
-- \`CPPVALLEY_PRACTICE_JUDGE_ENABLED=true\`
-- \`JUDGE0_BASE_URL=https://your-trusted-judge.example\`
-- \`JUDGE0_CPP17_LANGUAGE_ID=54\` (verify your installed language IDs: not guaranteed to be 54)
-- \`JUDGE0_AUTH_TOKEN=...\` if the judge instance requires it
+Read the [Step 2 installation and security checklist](practice-judge-setup.md), including all preview-only environment variables and the standalone smoke test. Do not set the enable flag in Production.
 
-The API creates a submission for each fixture and polls the judge, never compiling arbitrary code inside the Next.js/Vercel process. At present, the feature is **a development integration**, not a public-grade judge. It has no distributed rate limiter or user authentication. It should remain disabled for production until those are built.
-
-A proper scaled submission service should also use a durable queue, separate unprivileged sandbox workers or microVMs, output caps, CPU/memory quotas, no network access, per-user cost quotas, persisted verdicts, repeatable golden tests, and abuse controls. Concurrency grading needs repeatable stress schedules and sanitizer jobs; a handful of passing stdin/stdout tests is insufficient proof of thread safety.
+Important: the existing validation fixtures are excluded from browser bundles, but CppValley uses a public GitHub repository. Until test fixtures move to private storage, they cannot be considered secret anti-cheating tests.
 
 ## Problem bank editorial pipeline
 

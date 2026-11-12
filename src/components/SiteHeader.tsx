@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AccountLink } from "@/components/AccountLink";
 
 const navigation = [
   ["Problems","/problems"],["Study Plans","/study-plans"],
@@ -13,6 +14,6 @@ export function SiteHeader() {
       {navigation.map(([label,href])=><Link href={href} key={href}>{label}</Link>)}
     </nav>
     <form action="/problems" role="search" className="cv-nav-search"><label className="cv-sr-only" htmlFor="cv-search">Search problems</label><span>⌕</span><input id="cv-search" name="q" type="search" placeholder="Search problems…" /><kbd>/</kbd></form>
-    <Link className="cv-profile-link" href="/dashboard"><span>◉</span><span>My Progress</span></Link>
+    <AccountLink/>
   </div></header>;
 }

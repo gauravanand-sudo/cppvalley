@@ -1,111 +1,56 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Fragment } from "react";
 import { AdSlot } from "@/components/AdSlot";
+import { BlogLibrary } from "@/components/BlogLibrary";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts } from "@/data/blog";
+import { blogHeroImage, heroImages } from "@/data/media";
 
 export const metadata: Metadata = {
-  title: "Blog",
-  description: "Long-form cppvalley notes on C++, HFT, low latency, EDA and systems engineering.",
-  alternates: { canonical: "/blog" },
+  title: "C++ & Systems Engineering Blog",
+  description: "Long-form cppvalley notes on C++, concurrency, HFT, low latency, EDA and systems engineering.",
+  alternates: {canonical: "/blog"},
 };
-
 const blogTopAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_TOP_SLOT;
 const blogFeedAdSlot = process.env.NEXT_PUBLIC_ADSENSE_BLOG_FEED_SLOT;
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(`${value}T00:00:00Z`));
-}
-
 export default function BlogPage() {
   const posts = [...blogPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
-  const [featuredPost, ...otherPosts] = posts;
-  const topics = Array.from(new Set(posts.flatMap((post) => post.topics ?? [])));
-
+  const teasers = posts.map(({slug,title,excerpt,publishedAt,readingTime,topics}) => ({slug,title,excerpt,publishedAt,readingTime,topics}));
   const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Blog",
-    name: "cppvalley Blog",
-    description: "Long-form notes on C++ and systems engineering.",
-    url: "https://cppvalley.com/blog",
-    blogPost: posts.map((post) => ({
-      "@type": "BlogPosting",
-      headline: post.title,
-      description: post.excerpt,
-      datePublished: post.publishedAt,
-      url: `https://cppvalley.com/blog/${post.slug}`,
-    })),
+    "@context": "https://schema.org", "@type": "Blog", name: "cppvalley Blog",
+    url: "https://cppvalley.com/blog", blogPost: posts.map(post => ({
+      "@type": "BlogPosting", headline: post.title, description: post.excerpt,
+      datePublished: post.publishedAt, url: "https://cppvalley.com/blog/" + post.slug
+    }))
   };
-
   return (
     <div>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(structuredData).replace(/</g,"\\u003c")}}/>
       <SiteHeader />
       <main className="page-main">
-        <section className="page-hero">
-          <div className="site-container">
-            <span className="cinema-line" aria-hidden="true" />
-            <p className="eyebrow">Blog</p>
-            <h1 className="page-title">Engineering notes<br />worth revisiting.</h1>
-            <p>Long-form explanations on performance, C++, HFT and systems design. Written to be useful after the tab is closed.</p>
-            {topics.length ? (
-              <div className="tag-row" style={{ marginTop: 24 }}>
-                {topics.map((topic) => <span className="tag" key={topic}>{topic}</span>)}
-              </div>
-            ) : null}
+        <section className="g-catalog-hero g-blog-hero">
+          <div className="site-container g-catalog-hero-layout">
+            <div><div className="g-breadcrumb"><Link href="/">Home</Link><span>/</span><strong>Blog</strong></div><span className="g-pill">THE ENGINEERING JOURNAL</span>
+              <h1>Ideas worth <span>understanding deeply.</span></h1>
+              <p>Research breakdowns, performance explorations and learning roadmaps. Carefully written notes to return to when the next systems problem gets complicated.</p>
+              <div className="g-catalog-facts"><span>✓ Long-form explanations</span><span>✓ Real references</span><span>✓ Practical takeaways</span></div>
+            </div>
+            <div className="g-catalog-art" aria-hidden="true"><img src={blogHeroImage} alt="" /><img src={heroImages[1]} alt="" /></div>
           </div>
         </section>
-
-        <div className="site-container">
-          <AdSlot slot={blogTopAdSlot} className="ad-slot-leaderboard" />
-        </div>
-
-        <section className="section">
+        <div className="site-container"><AdSlot slot={blogTopAdSlot} className="ad-slot-leaderboard" /></div>
+        <section className="g-section g-catalog-section">
           <div className="site-container">
-            {featuredPost ? (
-              <Link className="feature-card" href={`/blog/${featuredPost.slug}`}>
-                <div className="meta-row">
-                  <span>{formatDate(featuredPost.publishedAt)}</span>
-                  {featuredPost.readingTime ? <span>{featuredPost.readingTime}</span> : null}
-                </div>
-                <h3>{featuredPost.title}</h3>
-                <p>{featuredPost.excerpt}</p>
-                {featuredPost.topics?.length ? (
-                  <div className="tag-row">
-                    {featuredPost.topics.map((topic) => <span className="tag" key={topic}>{topic}</span>)}
-                  </div>
-                ) : null}
-              </Link>
-            ) : <div className="empty-state">No posts published yet.</div>}
-
-            {otherPosts.length ? (
-              <div className="blog-list" style={{ marginTop: 16 }}>
-                {otherPosts.map((post, index) => (
-                  <Fragment key={post.slug}>
-                    {index === 1 ? <AdSlot slot={blogFeedAdSlot} className="ad-slot-leaderboard" /> : null}
-                    <Link className="blog-list-card" href={`/blog/${post.slug}`}>
-                      <span className="blog-date">{formatDate(post.publishedAt)}</span>
-                      <div>
-                        <h3>{post.title}</h3>
-                        <p>{post.excerpt}</p>
-                      </div>
-                      <span className="arrow" aria-hidden="true">→</span>
-                    </Link>
-                  </Fragment>
-                ))}
-              </div>
-            ) : null}
+            <div className="g-section-header"><div><p className="g-section-kicker">LATEST ENGINEERING NOTES</p><h2>Explore the journal</h2><p>Search a topic, filter by subject or read the newest research-based explanation.</p></div></div>
+            <BlogLibrary posts={teasers}/>
+            <AdSlot slot={blogFeedAdSlot} className="ad-slot-leaderboard"/>
           </div>
         </section>
+        <section className="g-bottom-cta"><div className="site-container"><div><p className="g-section-kicker">LEARNING DOESN'T END HERE</p><h2>Turn technical notes into practical depth.</h2><p>Discover our structured courses in C++, systems engineering and low latency.</p></div><Link href="/courses" className="g-button g-button-white">Explore courses →</Link></div></section>
       </main>
-      <SiteFooter />
+      <SiteFooter/>
     </div>
   );
 }

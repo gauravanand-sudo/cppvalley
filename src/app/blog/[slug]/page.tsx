@@ -3,9 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdSlot } from "@/components/AdSlot";
 import { MdxArticle, getMdxHeadings } from "@/components/MdxArticle";
+import { ReadingProgress } from "@/components/ReadingProgress";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { blogPosts, blogPostsBySlug } from "@/data/blog";
+import { imageForBlog } from "@/data/media";
 
 type BlogPostPageProps = { params: Promise<{ slug: string }> };
 
@@ -88,10 +90,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
       <SiteHeader />
-      <main className="page-main">
+      <ReadingProgress />
+      <main className="page-main g-article-page">
         <div className="site-container article-shell">
           <div>
-            <Link className="text-link" href="/blog">← Blog</Link>
+            <div className="g-breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/blog">Blog</Link><span>/</span><strong>Engineering note</strong></div>
             <header className="article-header" style={{ marginTop: 28 }}>
               <p className="eyebrow">Engineering note</p>
               <h1>{post.title}</h1>
@@ -101,6 +104,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 {post.readingTime ? <span>{post.readingTime}</span> : null}
                 {post.topics?.length ? <span>{post.topics.join(" · ")}</span> : null}
               </div>
+              <figure className="article-hero-image">
+                <img src={imageForBlog(post.slug)} alt="" />
+                <figcaption>Systems engineering visual · cppvalley</figcaption>
+              </figure>
             </header>
 
             <AdSlot slot={blogArticleTopAdSlot} className="ad-slot-leaderboard" />
@@ -126,7 +133,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               <section className="related-posts">
                 <h2>Keep reading</h2>
                 {relatedPosts.map((related) => (
-                  <Link className="related-link" href={`/blog/${related.slug}`} key={related.slug}>{related.title} →</Link>
+                  <Link className="related-link related-link-image" href={`/blog/${related.slug}`} key={related.slug}>
+                    <img src={imageForBlog(related.slug)} alt="" loading="lazy" />
+                    <span>{related.title} →</span>
+                  </Link>
                 ))}
               </section>
             ) : null}

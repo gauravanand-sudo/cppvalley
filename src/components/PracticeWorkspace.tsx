@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useState } from "react";
+import { MonacoCppEditor } from "@/components/MonacoCppEditor";
 import type { PracticeProblem } from "@/data/practice";
 
 type CaseResult = { index: number; passed: boolean; status: string; stdout?: string; expected?: string };
@@ -9,13 +10,14 @@ type JudgeResult = { message: string; accepted?: boolean; passed?: number; total
 
 export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
   const storageKey = "cppvalley-practice-code-" + problem.slug;
-  const lineNumberRef = useRef<HTMLPreElement>(null);
   const [source, setSource] = useState(problem.starterCode);
   const [split, setSplit] = useState(48);
   const [activeSample, setActiveSample] = useState(0);
   const [busy, setBusy] = useState<"run" | "submit" | null>(null);
   const [result, setResult] = useState<JudgeResult | null>(null);
-  const lineNumbers = useMemo(() => source.split("\n").map((_, index) => index + 1).join("\n"), [source]);
+  const [editorTheme, setEditorTheme] = useState<"vs-dark" | "vs">("vs-dark");
+  const [editorFontSize, setEditorFontSize] = useState(14);
+  const [preferencesReady, setPreferencesReady] = useState(false);
 
   useEffect(() => {
     try {
@@ -28,21 +30,27 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
     try { window.localStorage.setItem(storageKey, source); } catch { /* Optional local draft */ }
   }, [source, storageKey]);
 
+  useEffect(() => {
+    try {
+      const savedTheme = window.localStorage.getItem("cppvalley-practice-editor-theme");
+      const savedSize = Number(window.localStorage.getItem("cppvalley-practice-editor-fontsize"));
+      if (savedTheme === "vs" || savedTheme === "vs-dark") setEditorTheme(savedTheme);
+      if (Number.isInteger(savedSize) && savedSize >= 12 && savedSize <= 20) setEditorFontSize(savedSize);
+    } catch { /* Preferences are optional. */ }
+    setPreferencesReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!preferencesReady) return;
+    try {
+      window.localStorage.setItem("cppvalley-practice-editor-theme", editorTheme);
+      window.localStorage.setItem("cppvalley-practice-editor-fontsize", String(editorFontSize));
+    } catch { /* Preferences are optional. */ }
+  }, [editorTheme, editorFontSize, preferencesReady]);
+
   function resetEditor() {
     setSource(problem.starterCode);
     setResult(null);
-  }
-
-  function insertTab(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key === "Tab") {
-      event.preventDefault();
-      const field = event.currentTarget;
-      const before = source.slice(0, field.selectionStart);
-      const after = source.slice(field.selectionEnd);
-      const cursor = before.length + 4;
-      setSource(before + "    " + after);
-      requestAnimationFrame(() => { field.selectionStart = field.selectionEnd = cursor; });
-    }
   }
 
   async function execute(mode: "run" | "submit") {
@@ -115,20 +123,36 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
         </section>
         <section className="pv-pane pv-editor-pane" aria-label="C++ code editor and tests">
           <div className="pv-pane-header"><span className="pv-tab-active">⌘ Code</span><span className="pv-pane-meta">C++17</span></div>
-          <div className="pv-editor-toolbar"><span className="pv-language-dot" /> <span>GNU C++17 · standard input/output</span><button type="button" onClick={resetEditor} aria-label="Reset source to starter code">↺ Reset</button></div>
+          <div className="pv-editor-toolbar">
+            <span className="pv-language-dot" />
+            <span className="pv-editor-language">GNU C++17 · main.cpp</span>
+            <label className="pv-editor-setting" htmlFor="pv-editor-font-size">Font
+              <select
+                id="pv-editor-font-size"
+                value={editorFontSize}
+                onChange={event => setEditorFontSize(Number(event.target.value))}
+              >
+                {[12, 13, 14, 16, 18, 20].map(size => <option key={size} value={size}>{size}px</option>)}
+              </select>
+            </label>
+            <button
+              type="button"
+              className="pv-editor-theme-button"
+              onClick={() => setEditorTheme(theme => theme === "vs-dark" ? "vs" : "vs-dark")}
+              aria-label={"Switch to " + (editorTheme === "vs-dark" ? "light" : "dark") + " editor theme"}
+            >
+              {editorTheme === "vs-dark" ? "☀ Light" : "☾ Dark"}
+            </button>
+            <button type="button" className="pv-editor-reset-button" onClick={resetEditor} aria-label="Reset source to starter code">↺ Reset</button>
+          </div>
           <div className="pv-code-shell">
-            <pre ref={lineNumberRef} aria-hidden="true" className="pv-line-numbers">{lineNumbers}</pre>
-            <textarea
+            <MonacoCppEditor
               value={source}
-              onChange={event => setSource(event.target.value)}
-              onKeyDown={insertTab}
-              onScroll={event => { if (lineNumberRef.current) lineNumberRef.current.scrollTop = event.currentTarget.scrollTop; }}
-              className="pv-code-input"
-              aria-label="C++ source code"
-              autoCapitalize="off"
-              autoCorrect="off"
-              spellCheck={false}
-              wrap="off"
+              onChange={setSource}
+              onRun={() => execute("run")}
+              onSubmit={() => execute("submit")}
+              theme={editorTheme}
+              fontSize={editorFontSize}
             />
           </div>
           <div className="pv-tests">
@@ -155,7 +179,7 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
             )}
           </div>
           <div className="pv-submit-bar">
-            <span>Running code requires a configured isolated judge.</span>
+            <span>Ctrl/Cmd + Enter: Run · Ctrl/Cmd + Shift + Enter: Submit</span>
             <div>
               <button type="button" className="pv-run-button" onClick={() => execute("run")} disabled={busy !== null}>{busy === "run" ? "Running…" : "▷ Run samples"}</button>
               <button type="button" className="pv-submit-button" onClick={() => execute("submit")} disabled={busy !== null}>{busy === "submit" ? "Judging…" : "Submit solution →"}</button>

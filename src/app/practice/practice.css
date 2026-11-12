@@ -250,3 +250,68 @@
   .pv-editor-toolbar .pv-editor-theme-button,
   .pv-editor-toolbar .pv-editor-reset-button { font-size: .7rem; padding: 5px 7px; }
 }
+
+
+/* Step 2 — private judge status, input selection and execution results. */
+.pv-judge-gate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #102034;
+  border-bottom: 1px solid #2b3b55;
+}
+.pv-judge-gate > div { min-width: 0; flex: 1; }
+.pv-judge-gate p { margin: 5px 0 0; color: #93a6c4; font-size: .70rem; line-height: 1.55; }
+.pv-judge-status { display: inline-flex; align-items: center; gap: 7px; font-weight: 800; font-size: .73rem; }
+.pv-judge-ready { color: #7ce4b9; }
+.pv-judge-offline { color: #efbd70; }
+.pv-judge-key { display: grid; gap: 5px; color: #aab9d1; font-size: .68rem; font-weight: 750; }
+.pv-judge-key input {
+  width: min(100%, 230px);
+  padding: 8px 10px;
+  border: 1px solid #38506d;
+  border-radius: 7px;
+  background: #1b2c45;
+  color: #f2f7ff;
+  font: 12px/1.4 inherit;
+}
+.pv-judge-key input::placeholder { color: #8193ad; }
+.pv-input-mode { display: flex; align-items: center; gap: 8px; padding: 12px 15px 0; }
+.pv-input-mode button {
+  font-size: .72rem; font-weight: 760; border-radius: 7px;
+  padding: 7px 11px; cursor: pointer;
+  color: #a8bbd7; background: #1b2d47; border: 1px solid #2f4262;
+}
+.pv-input-mode button.pv-input-active { background: #425589; border-color: #768cdb; color: #fff; }
+.pv-custom-input { padding: 12px 16px 16px; display: grid; gap: 8px; }
+.pv-custom-input label { font-size: .7rem; font-weight: 850; color: #b7c9e4; }
+.pv-custom-input textarea {
+  min-height: 98px; resize: vertical;
+  border: 1px solid #344969; border-radius: 7px; padding: 11px 12px;
+  font: 12px/1.6 "Cascadia Code", Consolas, monospace;
+  background: #0c172b; color: #d6e3f8; outline-color: #748be8;
+}
+.pv-custom-input small { color: #8da3bf; }
+.pv-case-result { display: grid; gap: 7px; }
+.pv-case-result > strong { font-size: .73rem; }
+.pv-case-pass { color: #86e1b8; }
+.pv-case-fail { color: #ffb0ac; }
+.pv-case-metrics { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 !important; color: #9eb5d0; font-size: .69rem; }
+.pv-output-field > span {
+  display: block; text-transform: uppercase; letter-spacing: .06em;
+  color: #9cacc3; font-size: .64rem; font-weight: 850;
+  padding: 6px 0;
+}
+.pv-output-field pre {
+  white-space: pre-wrap; overflow-wrap: anywhere; margin: 0;
+  padding: 11px; border-radius: 7px;
+  background: #101c32; border: 1px solid #304362;
+  color: #dbe9ff; line-height: 1.55; font-size: .72rem;
+}
+@media (max-width: 680px) {
+  .pv-judge-gate { align-items: start; }
+  .pv-judge-key, .pv-judge-key input { width: 100%; }
+}

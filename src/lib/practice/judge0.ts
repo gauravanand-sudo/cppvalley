@@ -37,7 +37,7 @@ function b64(value: string) {
 }
 function fromB64(value: string | null | undefined) {
   if (!value) return "";
-  return Buffer.from(value, "base64").toString("utf8").slice(0, MAX_DIAGNOSTIC_CHARS);
+  return Buffer.from(value, "base64").toString("utf8");
 }
 function normalizedOutput(value: string) {
   return value.replace(/\r\n?/g, "\n").trimEnd();
@@ -125,9 +125,9 @@ export async function executeJudge0(
   return {
     status,
     passed,
-    stdout,
-    stderr,
-    compileOutput,
+    stdout: stdout.slice(0, MAX_DIAGNOSTIC_CHARS),
+    stderr: stderr.slice(0, MAX_DIAGNOSTIC_CHARS),
+    compileOutput: compileOutput.slice(0, MAX_DIAGNOSTIC_CHARS),
     ...(seconds === undefined ? {} : { timeMs: Math.round(seconds * 1000) }),
     ...(safeNumber(completed.memory) === undefined ? {} : { memoryKb: safeNumber(completed.memory) }),
   };

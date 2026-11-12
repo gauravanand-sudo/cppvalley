@@ -13,6 +13,7 @@ export function SiteHeader() {
         <nav className="g-primary-nav" aria-label="Primary navigation">
           <Link href="/">Home</Link>
           <Link href="/courses">Courses</Link>
+          <Link href="/practice">Practice</Link>
           <Link href="/blog">Blog</Link>
         </nav>
         <div className="g-nav-actions">

@@ -7,6 +7,7 @@ import "./image-rich.css";
 import "./grokking.css";
 import "./practice/practice.css";
 import "./platform.css";
+import "./brand-theme.css";
 
 const sans = Inter({subsets:["latin"],variable:"--font-sans",display:"swap"});
 const display = Manrope({subsets:["latin"],variable:"--font-display",display:"swap"});
@@ -24,7 +25,7 @@ export const metadata:Metadata={
   twitter:{card:"summary_large_image",title:"CppValley — C++ Practice & Courses",description:"Practice serious C++. Build real systems.",images:["/opengraph-image"]},
   robots:{index:true,follow:true},icons:{icon:"/favicon.svg",shortcut:"/favicon.svg"},
 };
-export const viewport:Viewport={themeColor:"#111723",colorScheme:"light"};
+export const viewport:Viewport={themeColor:"#b01443",colorScheme:"light"};
 export default function RootLayout({children}:Readonly<{children:ReactNode}>){
  return <html lang="en" className={sans.variable+" "+display.variable}><body>
    {adsenseClient?<Script id="adsense-script" async strategy="afterInteractive" src={"https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client="+adsenseClient} crossOrigin="anonymous"/>:null}

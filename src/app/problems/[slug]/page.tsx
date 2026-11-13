@@ -18,7 +18,14 @@ export async function generateMetadata({params}:Props):Promise<Metadata>{
 export default async function ProblemDetails({params}:Props){
  const {slug}=await params;const problem=getBankProblem(slug);if(!problem)notFound();
  const ready=getPracticeProblem(slug);
- if(ready)return <><SiteHeader/><main className="pv-workspace-main cv-workspace-main"><PracticeWorkspace problem={ready}/></main></>;
+ if(ready){
+  const relatedLessons=lessonsForProblem(slug).map(lesson=>({
+    href:"/courses/"+lesson.courseSlug+"/lessons/"+lesson.slug,
+    title:lesson.title,
+    course:eliteCoursesBySlug.get(lesson.courseSlug)?.shortTitle||"C++ course",
+  }));
+  return <><SiteHeader/><main className="pv-workspace-main cv-workspace-main"><PracticeWorkspace problem={ready} relatedLessons={relatedLessons}/></main></>;
+ }
  const related=lessonsForProblem(slug);
  return <><SiteHeader/><main className="cv-subpage"><div className="cv-shell cv-draft-page">
   <nav className="cv-mini-breadcrumb"><Link href="/problems">← Problem library</Link><span>/</span><span>{problem.category}</span></nav>

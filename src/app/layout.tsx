@@ -9,6 +9,7 @@ import "./practice/practice.css";
 import "./platform.css";
 import "./brand-theme.css";
 import "./career-paths.css";
+import "./focus-ui.css";
 
 const sans = Inter({subsets:["latin"],variable:"--font-sans",display:"swap"});
 const display = Manrope({subsets:["latin"],variable:"--font-display",display:"swap"});

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { CareerPath } from "@/data/career-paths";
 
-type CourseStep={slug:string;code:string;title:string;summary:string;lessons:number};
+export type CourseStep={slug:string;code:string;title:string;summary:string;lessons:number};
 type Props={path:CareerPath;courses:CourseStep[];electives:CourseStep[]};
 const tabs=[["courses","Courses"],["interviews","Interview prep"],["project","Capstone"]] as const;
 type Tab=typeof tabs[number][0];

@@ -10,6 +10,8 @@ export type EliteCourse = {
   track: EliteTrack;
   level: string;
   status: "recording" | "curriculum";
+  /** Intended initial one-time purchase price in INR; checkout is not enabled. */
+  priceInr: number;
   focus: string[];
   modules: string[];
   priority: number;
@@ -29,7 +31,7 @@ export const eliteCourses: EliteCourse[] = [
     code:"C1",slug:"core-cpp-interviews",title:"Modern C++ & Software Engineering",
     shortTitle:"Modern C++",summary:"From the object model to maintainable, performance-conscious C++ APIs.",
     description:"The shared C++ foundation: lifetime, RAII, STL internals, C++17/20/23, templates, testing, exception safety, API design and correct object-oriented design. This is not a concurrency, kernel or trading course.",
-    track:"C++ Foundations",level:"Foundation → Advanced",status:"curriculum",priority:1,icon:"C++",color:"blue",
+    track:"C++ Foundations",level:"Foundation → Advanced",status:"curriculum",priceInr:299,priority:1,icon:"C++",color:"blue",
     focus:["RAII & ownership","STL & object model","C++17/20/23","Testing & C++ API design"],
     modules:["Compilation, Types & Object Lifetime","RAII, Ownership & Exception Safety","Classes, Polymorphism & API Contracts","STL Containers, Iterators & Algorithms","Templates, Deduction & Value Categories","Move Semantics & Perfect Forwarding","Modern C++17 Features","C++20 Concepts, Ranges & Coroutines","C++23 Library Evolution & Portability","Performance-Aware Library Design","Testing, Debugging & Low-Level Design Foundations","Capstone: Reliable C++ Component"],
     required:[],recommended:[],entryKnowledge:"Basic programming experience; no HFT, GPU or ML knowledge required.",
@@ -42,7 +44,7 @@ export const eliteCourses: EliteCourse[] = [
     code:"C2",slug:"cpp-concurrency-lockfree-systems",title:"C++ Concurrency, Atomics & Lock-Free Systems",
     shortTitle:"Concurrency & Lock-Free",summary:"Reason about thread safety, the memory model and concurrent progress.",
     description:"Correct concurrent C++ from thread lifetimes and mutexes to happens-before, atomic orders, concurrent containers, memory reclamation, lock-free queues, work stealing and stress verification. No market-feed or AI-framework material.",
-    track:"C++ Foundations",level:"Intermediate → Expert",status:"recording",priority:2,icon:"⧉",color:"violet",
+    track:"C++ Foundations",level:"Intermediate → Expert",status:"recording",priceInr:799,priority:2,icon:"⧉",color:"violet",
     focus:["Threads & synchronization","Happens-before","CAS & atomics","SPSC/MPMC & reclamation"],
     modules:["Threads, Lifetimes & Concurrency Foundations","Shared Data, Mutexes & Deadlock Avoidance","Condition Variables, Futures & Coordination","Memory Ordering, Atomics & Progress Guarantees","Thread-Safe Containers & Lock Granularity","Task Scheduling, Cancellation & Parallel Performance","Lock-Free Stacks, Ring Buffers & Queues","ABA, Reclamation & Advanced Lock-Free Design","Testing, Debugging & Proving Concurrent Correctness"],
     required:["core-cpp-interviews"],recommended:["linux-os-networking-systems-engineers"],
@@ -56,7 +58,7 @@ export const eliteCourses: EliteCourse[] = [
     code:"C3",slug:"linux-os-networking-systems-engineers",title:"Linux, Networking & CPU Performance Engineering",
     shortTitle:"Linux & CPU Performance",summary:"Understand how your C++ code interacts with the OS, network and processor.",
     description:"Processes, scheduling, virtual memory, sockets, TCP/UDP, epoll, cache coherence, NUMA, branch prediction, Linux profiling and reproducible tail-latency measurements. Teaches systems mechanisms, not trading business rules.",
-    track:"C++ Foundations",level:"Intermediate → Advanced",status:"curriculum",priority:3,icon:"⌘",color:"cyan",
+    track:"C++ Foundations",level:"Intermediate → Advanced",status:"curriculum",priceInr:499,priority:3,icon:"⌘",color:"cyan",
     focus:["Linux syscalls","TCP/UDP & epoll","Caches, NUMA & SIMD","perf & tail latency"],
     modules:["Linux Toolchain, Processes & Runtime","Threads, Scheduling & CPU Affinity","Virtual Memory, Paging & NUMA","System Calls, Files & IPC","TCP, Stream Framing & Backpressure","UDP, Multicast & Packet Recovery","Nonblocking I/O, epoll & Event Loops","Cache Hierarchy, Layout & Coherence","CPU Pipelines, SIMD & Allocators","Profiling, Benchmarking & Network-Server Capstone"],
     required:["core-cpp-interviews"],recommended:[],entryKnowledge:"Modern C++ fundamentals and familiarity with command-line development.",
@@ -69,7 +71,7 @@ export const eliteCourses: EliteCourse[] = [
     code:"C4",slug:"low-latency-cpp-hft-systems",title:"Quant/HFT C++ & Low-Latency Trading Systems",
     shortTitle:"Quant/HFT C++",summary:"Apply C++ systems expertise to exchange connectivity and the trading execution path.",
     description:"An applied 96-lesson trading specialization: market microstructure, binary exchange feeds, order books, gateways, order entry, pre-trade risk, deterministic replay, operational safety and tail-latency evidence. Early modules reinforce prerequisite concepts using trading-specific laboratories rather than replacing C1–C3.",
-    track:"Quant / HFT",level:"Advanced → Expert",status:"recording",priority:4,icon:"⌁",color:"amber",
+    track:"Quant / HFT",level:"Advanced → Expert",status:"recording",priceInr:999,priority:4,icon:"⌁",color:"amber",
     focus:["Market microstructure","Market data & order books","Order routing & risk","Deterministic replay"],
     modules:["Trading Latency & Measurement Laboratories","CPU and Memory in the Exchange Data Path","Linux Determinism for Trading Hosts","Exchange Feed Networking & Multicast","Binary Protocol and Order-Book Engineering","Concurrent Trading Pipelines","Market Microstructure, Matching & Execution","Trading Risk, Recovery & Operations","Exchange-to-Order Capstone & Interview Defense"],
     required:["core-cpp-interviews","cpp-concurrency-lockfree-systems","linux-os-networking-systems-engineers"],recommended:[],
@@ -83,7 +85,7 @@ export const eliteCourses: EliteCourse[] = [
     code:"C5",slug:"cuda-gpu-programming",title:"CUDA C++ & GPU Programming",
     shortTitle:"CUDA Foundations",summary:"Program GPUs correctly: SIMT execution, memory, synchronization and kernels.",
     description:"NVIDIA GPU execution fundamentals, CUDA C++ toolchains, grids, warps, device memory, host transfers, coalescing, shared memory, basic reductions, streams, events and correctness tools. Advanced GEMM/attention optimization belongs in C6.",
-    track:"GPU / CUDA",level:"Beginner GPU → Intermediate",status:"curriculum",priority:5,icon:"▦",color:"green",
+    track:"GPU / CUDA",level:"Beginner GPU → Intermediate",status:"curriculum",priceInr:599,priority:5,icon:"▦",color:"green",
     focus:["CUDA kernels & grids","SIMT & warps","Device memory","Correctness & profiling"],
     modules:["CUDA Environment, Execution Model & Grid Geometry","GPU Memory, Host Transfers & Data Layout","Warp Execution, Synchronization & Atomics","Parallel Patterns: Reductions, Scans & Stencils","Streams, Events & Asynchronous Pipelines","CUDA Debugging, Profiling & Foundation Capstone"],
     required:[],recommended:["core-cpp-interviews"],
@@ -97,7 +99,7 @@ export const eliteCourses: EliteCourse[] = [
     code:"C6",slug:"gpu-kernel-performance-engineering",title:"GPU Kernel Performance Engineering",
     shortTitle:"GPU Kernel Optimization",summary:"Make kernels demonstrably fast with roofline analysis, tiling and numerical discipline.",
     description:"Advanced GPU optimization: arithmetic intensity, memory transactions, register pressure, shared-memory banking, Tensor Cores, CUTLASS, Triton, custom PyTorch operators, fused kernels, numerical precision and reproducible benchmarking. Assumes C5 correctness foundations.",
-    track:"GPU / CUDA",level:"Advanced → Expert",status:"curriculum",priority:6,icon:"▥",color:"purple",
+    track:"GPU / CUDA",level:"Advanced → Expert",status:"curriculum",priceInr:899,priority:6,icon:"▥",color:"purple",
     focus:["Roofline & occupancy","Tensor Core GEMM","Triton & CUTLASS","Profiling & kernel fusion"],
     modules:["Roofline Modeling, Memory and Occupancy","Warp Pipelines, Shared Memory & PTX Analysis","Tensor Cores, GEMM & Mixed Precision","Triton, CUTLASS & PyTorch Operators","Kernel Fusion, Attention & Numerical Validation","GPU Optimization Benchmark Capstone"],
     required:["cuda-gpu-programming"],recommended:["linux-os-networking-systems-engineers"],
@@ -111,7 +113,7 @@ export const eliteCourses: EliteCourse[] = [
     code:"C7",slug:"ai-inference-engines",title:"LLM Inference Engines & Model Serving",
     shortTitle:"LLM Inference",summary:"Understand inference runtimes, KV memory, batching and serving SLOs.",
     description:"The internals of production LLM inference: transformer compute path, prefill/decode, KV-cache layouts, paging, continuous batching, speculative decoding, quantization, model serving, TTFT, ITL, throughput and admission control. This course operates beneath the model API, not inside RAG apps.",
-    track:"AI Systems",level:"Intermediate → Advanced",status:"curriculum",priority:7,icon:"◈",color:"blue",
+    track:"AI Systems",level:"Intermediate → Advanced",status:"curriculum",priceInr:699,priority:7,icon:"◈",color:"blue",
     focus:["Prefill & decode","KV cache & batching","Quantization","Inference serving SLOs"],
     modules:["Transformer Compute Path & Inference Metrics","KV Cache, Paged Attention & Memory Budgets","Batching, Scheduling & Speculative Decoding","Quantization, Engine Selection & Deployment","Serving Reliability, Load Testing & Observability","Inference Scheduler Capstone"],
     required:[],recommended:["cuda-gpu-programming","linux-os-networking-systems-engineers"],
@@ -125,7 +127,7 @@ export const eliteCourses: EliteCourse[] = [
     code:"C8",slug:"production-llm-rag-agents",title:"Production LLM Applications, RAG & Agents",
     shortTitle:"RAG & Agents",summary:"Build reliable products using models, retrieval, tools and evaluation.",
     description:"Model APIs, context and structured outputs, document ingestion, embeddings, hybrid retrieval, reranking, secure RAG, agent workflows, MCP tools, permissions, prompt-injection defense, evaluation, testing and rollout. API-facing application engineering is distinct from inference engine internals.",
-    track:"AI Systems",level:"Intermediate → Advanced",status:"curriculum",priority:8,icon:"◎",color:"pink",
+    track:"AI Systems",level:"Intermediate → Advanced",status:"curriculum",priceInr:499,priority:8,icon:"◎",color:"pink",
     focus:["RAG & evaluation","Agents & tool use","Security & tenancy","Production reliability"],
     modules:["LLM APIs, Context Engineering & Structured Outputs","Retrieval, Chunking, Embeddings & Reranking","RAG Grounding, Evaluation & Access Control","Agents, Tools, MCP & Durable Workflows","Application Security, Evals & Reliability","Production RAG/Agent Platform Capstone"],
     required:[],recommended:["ai-inference-engines"],
@@ -139,7 +141,7 @@ export const eliteCourses: EliteCourse[] = [
     code:"C9",slug:"distributed-ai-gpu-infrastructure",title:"Distributed AI Systems & GPU Infrastructure",
     shortTitle:"Distributed AI",summary:"Scale model workloads across GPU nodes while engineering for failure.",
     description:"GPU/CPU topology, NCCL and collectives, tensor/pipeline/data parallelism, cross-node transfers, cluster scheduling, multi-tenant capacity, resilience, inference deployment, observability and recovery. This owns the distributed infrastructure layer rather than single-kernel optimization.",
-    track:"AI Systems",level:"Advanced → Expert",status:"curriculum",priority:9,icon:"▧",color:"cyan",
+    track:"AI Systems",level:"Advanced → Expert",status:"curriculum",priceInr:899,priority:9,icon:"▧",color:"cyan",
     focus:["Multi-GPU communication","NCCL collectives","Cluster scheduling","Failure & recovery"],
     modules:["Distributed Systems & GPU Topology","NCCL, Collectives & Communication Overlap","Distributed Training and Inference Parallelism","GPU Scheduling, Kubernetes & Resource Isolation","Reliability, Observability & Capacity Planning","Multi-GPU Deployment and Failure Capstone"],
     required:["ai-inference-engines"],recommended:["cuda-gpu-programming","gpu-kernel-performance-engineering"],
@@ -153,7 +155,7 @@ export const eliteCourses: EliteCourse[] = [
     code:"C10",slug:"ai-systems-architecture",title:"AI Systems Architecture & Technical Leadership",
     shortTitle:"AI Architecture",summary:"Design, review and lead secure, cost-aware AI platforms.",
     description:"Architect-level engineering for application and infrastructure decisions: requirements, ML/LLM platform patterns, multi-tenancy, privacy, evaluation governance, model routing, SLOs, observability, security, cost modeling, build-versus-buy, incident leadership and technical communication. This course does not make you a lead without experience; it trains measurable architecture skills.",
-    track:"AI Architecture",level:"Senior → Architect",status:"curriculum",priority:10,icon:"◇",color:"amber",
+    track:"AI Architecture",level:"Senior → Architect",status:"curriculum",priceInr:999,priority:10,icon:"◇",color:"amber",
     focus:["AI system design","Security & governance","FinOps & SLOs","Architecture leadership"],
     modules:["Requirements, Quality Attributes & Architecture Review","Model Selection, Build-vs-Buy & Platform Boundaries","Secure Multi-Tenant AI and Governance","Evaluation, SLOs, Observability & FinOps","Distributed Architecture, Resilience & Operations","Technical Leadership, ADRs & Architecture Capstone"],
     required:["production-llm-rag-agents"],recommended:["ai-inference-engines","distributed-ai-gpu-infrastructure"],

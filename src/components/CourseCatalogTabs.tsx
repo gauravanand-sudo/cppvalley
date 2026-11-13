@@ -11,6 +11,7 @@ export type CourseCard = {
   group:"cpp"|"gpu"|"ai"|"architecture";
   lessons:number;
   required:string;
+  priceInr:number;
 };
 
 const tabs=[
@@ -43,13 +44,13 @@ export function CourseCatalogTabs({courses}:{courses:CourseCard[]}) {
     <div id="course-catalog-panel" role="tabpanel" aria-labelledby={"course-tab-"+active} tabIndex={0}>
       <div className="cv-focus-course-grid">
         {visible.map(course=><Link className="cv-focus-course-card" key={course.slug} href={"/courses/"+course.slug}>
-          <div className="cv-focus-course-card-top"><span className="cv-focus-code">{course.code}</span><span className="cv-focus-draft">Outline</span></div>
+          <div className="cv-focus-course-card-top"><span className="cv-focus-code">{course.code}</span><span className="cv-focus-intro-price">₹{course.priceInr.toLocaleString("en-IN")}</span></div>
           <h2>{course.title}</h2>
           <p>{course.summary}</p>
           <div className="cv-focus-course-card-bottom"><span>{course.lessons} lessons</span><span>{course.required}</span><b aria-hidden="true">→</b></div>
         </Link>)}
       </div>
     </div>
-    <p className="cv-focus-footnote">Curricula are outlines. Published exercises are labeled separately.</p>
+    <p className="cv-focus-footnote">Planned introductory prices · One-time per course. Enrollment is not open yet.</p>
   </section>;
 }

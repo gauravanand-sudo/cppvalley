@@ -11,7 +11,7 @@ const pillarFallbacks: Record<string, string> = {
   "C++ Core": "/generated/cpp-core.svg",
   Systems: "/generated/systems.svg",
   "EDA / CAD": "/generated/eda-cad.svg",
-  "GPU / AI": "/generated/eda-cad.svg",
+  "GPU / AI": "/generated/gpu-ai.svg",
   Roadmap: "/generated/hero.svg",
 };
 
@@ -29,7 +29,12 @@ const courseImages: Record<string, string> = {
 
   "eda-cad-software-engineering": "/generated/eda-cad.svg",
 
-  "cuda-gpu-programming": "/generated/eda-cad.svg",
+  "cuda-gpu-programming": "/generated/gpu-ai.svg",
+  "gpu-kernel-performance-engineering": "/generated/gpu-ai.svg",
+  "ai-inference-engines": "/generated/gpu-ai.svg",
+  "production-llm-rag-agents": "/generated/gpu-ai.svg",
+  "distributed-ai-gpu-infrastructure": "/generated/gpu-ai.svg",
+  "ai-systems-architecture": "/generated/gpu-ai.svg",
   "ai-systems-engineering": "/generated/eda-cad.svg",
   "distributed-systems-ai-backend-infrastructure": "/generated/systems.svg",
 

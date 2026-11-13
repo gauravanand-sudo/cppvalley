@@ -24,24 +24,24 @@ export default async function Image({ params }: BlogOgProps) {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          background: "linear-gradient(135deg, #ffffff 0%, #eaf2f8 100%)",
-          color: "#17202a",
+          background: "linear-gradient(135deg, #fffafb 0%, #fbe6ec 100%)",
+          color: "#242125",
           fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ fontSize: 30, fontWeight: 800, color: "#365c7d" }}>cppvalley Blog</div>
-          <div style={{ fontSize: 22, color: "#667085" }}>{post?.readingTime ?? "Engineering note"}</div>
+          <div style={{ fontSize: 30, fontWeight: 800, color: "#b01443" }}>cppvalley Blog</div>
+          <div style={{ fontSize: 22, color: "#786d73" }}>{post?.readingTime ?? "Engineering note"}</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           <div style={{ fontSize: 64, lineHeight: 1, letterSpacing: -2.3, fontWeight: 850, maxWidth: 1020 }}>
             {title}
           </div>
-          <div style={{ fontSize: 30, color: "#496273", maxWidth: 1000 }}>
+          <div style={{ fontSize: 30, color: "#8b435c", maxWidth: 1000 }}>
             {topics}
           </div>
         </div>
-        <div style={{ fontSize: 24, color: "#667085" }}>Technical notes for serious students</div>
+        <div style={{ fontSize: 24, color: "#786d73" }}>Technical notes for serious students</div>
       </div>
     ),
     size

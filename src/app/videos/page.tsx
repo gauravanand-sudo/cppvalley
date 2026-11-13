@@ -1,0 +1,7 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { youtubeSeries } from "@/data/youtube";
+export const metadata:Metadata={title:"Original CppValley Video Lessons",description:"Watch original C++ interview, concurrency and systems video lessons from CppValley.",alternates:{canonical:"/videos"}};
+export default function VideoLibrary(){return <><SiteHeader/><main className="cv-subpage"><div className="cv-shell"><div className="cv-page-intro"><span className="cv-eyebrow">VIDEO LIBRARY</span><h1>Watch published lessons.</h1><p>Real CppValley video lessons remain available separately from planned course curricula.</p></div>{youtubeSeries.map(series=><section key={series.slug} className="cv-video-section"><div className="cv-section-head"><div><h2>{series.title}</h2><p>{series.description}</p></div><span>{series.videos.length} published videos</span></div><div className="cv-video-grid">{series.videos.map((v,i)=><a key={v.videoId} href={"https://www.youtube.com/watch?v="+encodeURIComponent(v.videoId)} target="_blank" rel="noopener noreferrer" className="cv-white-card cv-video-item"><span>▶</span><div><small>VIDEO {String(i+1).padStart(2,"0")} · {v.duration}</small><strong>{v.title}</strong><p>{v.intent}</p></div><b>↗</b></a>)}</div></section>)}<div className="cv-editorial-note"><Link href="/courses">Explore structured courses →</Link></div></div></main><SiteFooter/></>;}

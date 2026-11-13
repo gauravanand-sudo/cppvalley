@@ -22,6 +22,8 @@ export function assertContentIntegrity() {
   const courseLessonKeys = new Set<string>();
 
   fail(eliteCourses.length === 10, "Exactly ten bounded career courses are required.");
+  fail(courseLessons.length === 444, "Expected 444 structured lesson outlines.");
+  fail(specialtyLabs.length === 366, "Expected 366 drafted GPU/AI specialty lab briefs.");
   fail(problemBank.length === 400, "The curated problem bank must include exactly 400 topics.");
   fail(problems.size === problemBank.length, "Problem slugs must be unique.");
   fail(courses.size === eliteCourses.length, "Course slugs must be unique.");
@@ -64,8 +66,18 @@ export function assertContentIntegrity() {
 
   for (const path of careerPaths) {
     fail(path.courseSlugs.length >= 2,"Career path missing core progression: "+path.slug);
-    for (const slug of [...path.courseSlugs,...path.optionalCourseSlugs]) {
-      fail(courses.has(slug),"Career path references missing course: "+path.slug+" → "+slug);
+    const completed = new Set<string>();
+    for (const slug of path.courseSlugs) {
+      const course=courses.get(slug);
+      fail(Boolean(course),"Career path references missing course: "+path.slug+" → "+slug);
+      for(const prerequisite of course?.required || []) {
+        fail(completed.has(prerequisite),
+          "Path "+path.slug+" must teach prerequisite "+prerequisite+" before "+slug);
+      }
+      completed.add(slug);
+    }
+    for (const slug of path.optionalCourseSlugs) {
+      fail(courses.has(slug),"Career path references missing optional course: "+path.slug+" → "+slug);
     }
   }
 

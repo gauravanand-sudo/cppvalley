@@ -42,7 +42,7 @@ export default async function Image({ params }: CourseOgProps) {
             {description}
           </div>
         </div>
-        <div style={{ fontSize: 24, color: "#eac9d3" }}>C++ · Algorithms · Concurrency · Systems Engineering</div>
+        <div style={{ fontSize: 24, color: "#eac9d3" }}>Quant/HFT C++ · CUDA · AI Systems · Architecture</div>
       </div>
     ),
     size

@@ -5,6 +5,7 @@ import { eliteCourses } from "@/data/elite-courses";
 import { courseLessons, lessonsByCourse } from "@/data/course-lessons";
 import { problemBank, problemBankStats } from "@/data/problem-bank";
 import { getSupabaseClient } from "@/lib/supabase-client";
+import { ProfileSettings } from "@/components/ProfileSettings";
 
 type CloudState = "loading" | "guest" | "connected" | "unavailable";
 type RecentSubmission = { problem_slug: string; verdict: string; created_at: string };
@@ -126,6 +127,7 @@ export function LocalDashboard() {
       <div><span>Lesson outlines reviewed</span><strong>{hydrated ? reviewed.length : "—"}<small> / {courseLessons.length}</small></strong></div>
       <div><span>Curated problem topics</span><strong>{problemBankStats.total}</strong></div>
     </div>
+    <ProfileSettings />
     <div className="cv-section-head"><div><span className="cv-eyebrow">COURSE PROGRESS</span><h2>Your seven learning paths</h2></div><Link href="/courses">Browse courses →</Link></div>
     <div className="cv-dashboard-courses">
       {eliteCourses.map(course => {

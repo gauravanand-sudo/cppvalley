@@ -1,8 +1,10 @@
 import type { MetadataRoute } from "next";
+import { assertContentIntegrity } from "@/lib/practice/content-audit";
 import { blogPosts } from "@/data/blog";
 import { eliteCourses } from "@/data/elite-courses";
 import { problemBank } from "@/data/problem-bank";
 export default function sitemap():MetadataRoute.Sitemap{
+ assertContentIntegrity();
  const base="https://cppvalley.com";
  const statics=["","/problems","/study-plans","/courses","/videos","/blog"].map((path,i)=>({url:base+path,changeFrequency:"weekly" as const,priority:i===0?1:0.85}));
  const courses=eliteCourses.map(c=>({url:base+"/courses/"+c.slug,changeFrequency:"monthly" as const,priority:0.75}));

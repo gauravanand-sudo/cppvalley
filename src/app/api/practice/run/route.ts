@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     const hostname = request.nextUrl.hostname.toLowerCase();
     if (!hostname.endsWith(".vercel.app") || hostname === "vercel.app" ||
         (process.env.VERCEL_GIT_COMMIT_REF &&
-         process.env.VERCEL_GIT_COMMIT_REF !== "feature/practice-workspace-mvp")) {
+         !["feature/practice-workspace-mvp", "feature/elite-cpp-platform-overhaul"].includes(process.env.VERCEL_GIT_COMMIT_REF))) {
       return json({
         message: "C++ execution is restricted to the authenticated feature-branch preview.",
         code: "PREVIEW_ONLY",

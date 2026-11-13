@@ -108,8 +108,8 @@ export function LocalDashboard() {
   return <div className="cv-shell">
     <div className="cv-page-intro">
       <span className="cv-eyebrow">MY CPPVALLEY</span>
-      <h1>Your C++ learning dashboard</h1>
-      <p>Your lessons, solved coding problems, and progress through seven C++ engineering courses.</p>
+      <h1>Your engineering learning dashboard</h1>
+      <p>Track your C++, GPU and AI systems course outlines, verified CPU coding submissions and engineering progress.</p>
     </div>
     <div className={"cv-dashboard-alert " + (isCloud ? "cv-dashboard-cloud-connected" : "")} role="status">
       <strong>{isCloud ? "Account progress connected." :
@@ -123,12 +123,12 @@ export function LocalDashboard() {
       {isCloud && email ? <small>{email}</small> : null}
     </div>
     <div className="cv-dashboard-stats">
-      <div><span>{isCloud ? "Verified problems solved" : "Problems solved on this device"}</span><strong>{hydrated ? verified.length : "—"}<small> / {problemBankStats.runnable}</small></strong></div>
+      <div><span>{isCloud ? "Verified problems solved" : "C++ problems solved on this device"}</span><strong>{hydrated ? verified.length : "—"}<small> / {problemBankStats.runnable}</small></strong></div>
       <div><span>Lesson outlines reviewed</span><strong>{hydrated ? reviewed.length : "—"}<small> / {courseLessons.length}</small></strong></div>
       <div><span>Curated problem topics</span><strong>{problemBankStats.total}</strong></div>
     </div>
     <ProfileSettings />
-    <div className="cv-section-head"><div><span className="cv-eyebrow">COURSE PROGRESS</span><h2>Your seven learning paths</h2></div><Link href="/courses">Browse courses →</Link></div>
+    <div className="cv-section-head"><div><span className="cv-eyebrow">COURSE PROGRESS</span><h2>Your ten engineering courses</h2></div><Link href="/courses">Browse courses →</Link></div>
     <div className="cv-dashboard-courses">
       {eliteCourses.map(course => {
         const lessons = lessonsByCourse.get(course.slug) || [];

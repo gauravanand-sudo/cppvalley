@@ -525,3 +525,10 @@ body { background:var(--cv-bg); color:var(--cv-ink); font-family:var(--font-sans
 .cv-public-profile-card p{margin:0 0 8px;color:#677991}
 .cv-public-profile-card small{color:#9aa8b8;font-size:.75rem}
 @media(max-width:700px){.cv-profile-settings-fields{grid-template-columns:1fr}.cv-public-profile-card{padding:21px;gap:14px}.cv-public-avatar{height:60px;width:60px;font-size:1.5rem}}
+
+
+/* Route-aware navigation, with visible keyboard focus and the selected section. */
+.cv-main-nav a.cv-nav-current{color:#fff;border-bottom-color:#9295ff;background:#ffffff0b}
+.cv-main-nav a:focus-visible,.cv-profile-link:focus-visible,.cv-logo:focus-visible{
+ outline:2px solid #b8c5ff;outline-offset:-3px;border-radius:3px
+}

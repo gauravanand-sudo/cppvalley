@@ -22,17 +22,17 @@ export default function Image() {
         <div style={{ fontSize: 32, fontWeight: 800, color: "#ffabc1" }}>cppvalley</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           <div style={{ fontSize: 76, lineHeight: 0.96, letterSpacing: -3.2, fontWeight: 850, maxWidth: 960 }}>
-            Elite C++ Coding Practice
+            Quant/HFT C++, GPU & AI Systems
           </div>
           <div style={{ fontSize: 34, color: "#f5cad7", maxWidth: 940 }}>
-            Algorithms · Modern C++ · Concurrency · HFT & Systems
+            CUDA · GPU Kernels · AI Inference · Architecture
           </div>
         </div>
         <div style={{ display: "flex", gap: 16, fontSize: 24, color: "#b01443" }}>
           <span>Courses</span>
           <span>Interview Questions</span>
           <span>Blog Notes</span>
-          <span>Book Summaries</span>
+          <span>Career Paths</span>
         </div>
       </div>
     ),

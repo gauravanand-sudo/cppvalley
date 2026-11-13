@@ -1,57 +1,50 @@
-# CppValley Elite C++ — Release Readiness
+# CppValley — Production Readiness Checklist
 
-**Release branch:** `feature/elite-cpp-platform-overhaul` (draft PR #10; base: `feature/practice-workspace-mvp`).
-**Production release:** NOT APPROVED. Treat this as a developer / editorial preview until all hard blockers pass.
+**Release branch:** `feature/elite-cpp-platform-overhaul` (draft PR #10, based on the practice compiler PR #9).
+**Release approval:** NOT GRANTED. This is a developer preview, not a public production release.
 
-## Implemented, verified in the feature branch
+## Verified implementation goals
 
-- **Seven flagship course catalogs:** Core C++ & STL, DSA in C++, Concurrency, HFT Systems, C++ Design Patterns / LLD, Linux / Networking, and Advanced Modern C++.
-- **354 structured lesson outlines:** including the pre-existing 96-lesson HFT curriculum, 64 combined concurrency/lock-free lessons and 30 dedicated C++ design lessons. Every lesson links to three entries in the unified practice bank. These are *not* 354 completed video tutorials.
-- **400 curated topic cards:** exactly 100 each in Core C++, Concurrency, Design Patterns, HFT Systems. The bank tracks publication status independently.
-- **31 runnable original coding problems:** 8 previously present + 23 new input/output problems. The remaining **369** topics are **in review** with no implied Accepted verdict.
-- 69 new validation fixtures checked against an independent oracle; existing seed fixtures are present. All runnable problems have at least three server fixtures, sample(s), constraints, and C++17 code starters.
-- Main routes: `/problems`, `/study-plans`, `/courses`, `/courses/[slug]/lessons/[lesson]`, `/videos`, `/blog`, `/login`, `/dashboard`, and opt-in `/u/[username]`.
-- Compact split-screen coding view: syntax-highlighted Monaco editor, keyboard shortcuts, Run/Submit, sample/custom input, resizable description and console, editor focus mode, light/dark theme, draft persistence, problem prev/next and lesson cross-links.
-- `/practice` now permanently redirects to `/problems`; the original published practice slugs also redirect to canonical problem URLs.
-- Content graph assertion runs as part of Next.js sitemap generation. Broken lesson links, invalid fixture availability or wrong core counts cause a build error.
-- Protected preview compiler uses isolated, network-denied Vercel Sandbox instances, atomic Redis pilot quota, and restricted Preview settings. **Production code execution is disabled.**
+- Ten separate courses (C1–C10), four role-based career paths, explicit course prerequisites, ownership boundaries, exclusions and capstones. See `docs/CAREER-COURSE-ARCHITECTURE.md`.
+- Structured lesson outlines linked in the courses and four career paths. Lesson outline != complete recorded/verified lecture.
+- Original 400 curated CPU C++ topics still preserved: 31 runnable with server fixtures, 369 in editorial review.
+- Two additional draft GPU/AI practice briefs per specialty lesson, available via `/practice-labs`. They are NOT executable in the CPU-only C++17 judge.
+- Four career capstones plus one capstone brief per course, available via `/projects`.
+- Original CppValley infinity logo and ruby/charcoal styling preserved. User/login and draft API paths are unchanged.
+- A content-integrity assertion during the Next.js sitemap build validates course count, prerequisites, career links, topic references and judged fixtures.
 
-## Hard blockers before a public production launch
+## Mandatory gates before production launch
 
-- [ ] **Publish and verify all 400 runnable tasks, or publicly describe a staged rollout**. A list of 400 titles is not 400 completed coding problems. Every task requires independently reviewed statement, reference solution, test generator, hidden cases, performance constraints and editorial.
-- [ ] **Rotate the previously exposed Upstash Redis write and read-only tokens** in Upstash and Vercel. Do not paste replacements into chat or Git. Audit any sessions or unusual usage.
-- [ ] **Apply and review** `supabase/migrations/20261112_cppvalley_practice.sql` in the intended Supabase project, verify RLS, trigger behavior and indexes. Migration has not been applied by this PR.
-- [ ] Configure `SUPABASE_SERVICE_ROLE_KEY` in Vercel securely **server-side only** if authenticated submission persistence is desired; ensure it is not in `NEXT_PUBLIC_*`. Validate Supabase Auth allowlists, email confirmation/recovery and callback URLs in preview.
-- [ ] Move competitive hidden tests from the **public GitHub repository** into private test storage, with a full suite of randomized/edge-case inputs and reviewed reference solutions.
-- [ ] Replace private Preview SSO pilot judging with **real site-user authentication**, per-user budgets, durable queues, central submission history, abuse detection, monitoring and strict regional sandbox isolation.
-- [ ] Validate subprocess cleanup, source output caps, memory/CPU accounting, sanitizer/stress test harnesses for actual multithreaded C++ tasks and failure isolation under load.
-- [ ] Add Vercel budget alerts and monitor execution costs before removing preview rate limits.
-- [ ] Verify cross-device accepted verdict persistence against Supabase RLS and rejected client-forged Accepted rows.
-- [ ] Complete copyrighted-content review for all lessons, solutions, illustrations and branding. Use original CppValley design and materials; avoid copying LeetCode assets, layouts pixel-for-pixel, and question text.
-- [ ] Audit accessibility, mobile UX, navigation, security headers, content and canonical redirects, and confirm existing blog/video URLs are preserved.
-- [ ] Add CI quality gates: TypeScript compile, ESLint, unit tests for reference solutions, judge integration tests, production-preview smoke tests and security checks.
+### Security / account and judging
+- [ ] Rotate previously exposed Upstash Redis REST read-only and write tokens, update all Vercel secrets, investigate unusual usage and test failure-closed quotas.
+- [ ] Review and apply `supabase/migrations/20261112_cppvalley_practice.sql` to the intended Supabase database, then verify RLS policies, signup/login, profile opt-in and submission persistence from separate accounts.
+- [ ] Provide real account-based judging, per-user and global budgets, quotas, central job queues, abuse controls and audit logs. Do not enable a shared preview-only access gate in production.
+- [ ] Store genuine anti-cheating judge fixtures outside the public GitHub repository. Review randomized/edge-case correctness, reference implementations, resource caps and stderr handling.
+- [ ] Verify isolated GPU-backed sandboxes for CUDA kernel tasks before permitting GPU submissions; implement numerics/reference tests and resource/cost controls.
+- [ ] Establish human or well-specified rubric reviews for LLM platform and architecture cases; don't invent automated Accepted verdicts.
+- [ ] Set Vercel/GPU usage alerts, error dashboards and incident policies. Audit legal, licensing and personal-data obligations.
 
-## Course availability and monetization
+### Course content and publishing
+- [ ] Write real lesson explanations, code samples, exercises, references and proofs; outline counts are not completion claims.
+- [ ] Individually review automatic related-problem recommendations for topical relevance, especially Linux/HFT CPU practice cross-links.
+- [ ] Create verified exercise harnesses and evaluation criteria before flipping status from Outline to Runnable.
+- [ ] Review C++17/20/23 feature compatibility and CUDA toolkit/compute capability requirements for every GPU lab.
+- [ ] Publish video/notes only with verified availability. Do not accept course payments without payment, access, receipts, refunds and support workflows.
+- [ ] Convert the owner-uploaded 300-question external LeetCode tracker into attributed study-plan links, not copied problem statements or a fake CppValley judge bank.
 
-Only label completed materials as published. Both flagship courses are shown as in development; other course lesson pages are structured outlines, not full recorded lessons. Do not accept paid orders or promise course access until verified entitlements, complete checkout/webhooks, content delivery, refunds, and payment-policy requirements exist. Course pricing is a **hypothesis** until validated.
+### Website and release QA
+- [ ] Validate all ten course pages and modules, four career paths and every lesson link in desktop/mobile browsers.
+- [ ] Smoke-test Monaco editing, Run, Submit, wrong answers, compilation errors, timeouts, invalid auth and Redis quota limits on a protected preview.
+- [ ] Confirm old course URLs redirect correctly and original articles and video links remain live.
+- [ ] Review responsive navigation at tablet/mobile widths, keyboard controls, screen-reader labels, OG previews, sitemap and canonical URLs.
+- [ ] Add automated end-to-end tests for onboarding, account progress, profile privacy and course lesson navigation.
+- [ ] Complete threat modeling and operational security review; then only merge PR #9 followed by PR #10 after review.
 
-## What to test on the current preview
+## Release strategy
 
-1. Visit `/problems`, filter by Core C++, Concurrency, HFT Systems and Design Patterns; verify each shows exactly 100 topics.
-2. Filter by `Runnable`; verify 31 actual challenges. Open a newly published task and compare sample input/output.
-3. Visit each of the seven course pages, open Lesson 01, and verify exactly three linked practice topics.
-4. Follow a practice problem link back into its related course lesson.
-5. Check the responsive problem workspace in desktop and mobile sizes. Verify editor focus, split ratio, console size, saved drafts, keyboard shortcuts and reset.
-6. Test local progress with browser storage on/off; verify Supabase-connected progress only after DB migration.
-7. Register a user in preview, confirm email flow, and test public-profile opt-in and RLS privacy once the database migration is installed.
-8. Validate Preview judge actual Run/Submit behavior, including invalid C++, TLE, wrong answer, large input, retry and rate limits.
-9. Confirm production `cppvalley.com` remains unchanged until reviewed PRs are merged.
+1. **Editorial preview:** ten career-scoped course outlines, legacy CPU bank, specialty lab briefs and role capstones. No public grading claims.
+2. **Transparent C++ beta:** real account sessions, 31+ verified C++ challenges and working submissions with safe quotas, publicly indicating future problem availability.
+3. **GPU/AI learning release:** completed CUDA and AI instructional labs with specialized GPU/cluster/rubric evaluation.
+4. **Career portfolio release:** evaluated projects and interview assessments with verified human or automated criteria, plus operational maturity.
 
-## Rollout plan
-
-1. Merge PR #9 (sandbox/Monaco foundation) only after tests; then merge PR #10 (editor-first platform).
-2. Release a **transparent public beta** with the runnable subset and openly labeled upcoming tasks, if desired.
-3. Scale reviewed problems toward all 400; enable public submissions only after user auth, private fixtures and per-user quota work.
-4. Activate courses, payments, profiles, company preparation and rated contests progressively as corresponding features become real.
-
-The product should emphasize **elite C++ mastery** across STL, algorithms, object lifetime, templates, concurrency, systems engineering and low-latency/HFT—not just trading.
+This release is designed for **Quant/HFT C++**, **CUDA/GPU performance**, **AI inference infrastructure**, and **AI systems architecture / technical leadership**. It does not claim that taking a course guarantees hiring or seniority.

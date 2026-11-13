@@ -5,6 +5,12 @@
 
 This document supersedes the *seven-course* taxonomy described in `docs/CURRICULUM-2026-ACADEMIC-MAP.md`. The 538-topic owner workbook and the 26-week / 300-LeetCode tracker remain research inputs rather than published video content.
 
+## Curriculum size and status
+
+The current preview generates **444 structured lesson outlines** across ten courses. The distribution is C1 61, C2 64, C3 40, C4 96, C5 31, C6 30, C7 30, C8 32, C9 30 and C10 30.
+
+C1–C4 reference three topics per lesson from the original 400-topic C++ problem bank. The six GPU/AI specialization courses (C5–C10) have **366 separate lab-outline briefs**, two per lesson. These are **not** CUDA-judge or human-reviewed completion claims.
+
 ## Role-based course graph
 
 | Target role | Required course sequence | Optional deep dives |

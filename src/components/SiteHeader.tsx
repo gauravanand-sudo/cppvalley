@@ -6,11 +6,11 @@ import { AccountLink } from "@/components/AccountLink";
 import { BrandLockup } from "@/components/BrandLockup";
 
 const navigation = [
-  ["Problems", "/problems"],
-  ["Study Plans", "/study-plans"],
+  ["Career Paths", "/career-paths"],
   ["Courses", "/courses"],
-  ["Videos", "/videos"],
-  ["Articles", "/blog"],
+  ["Problems", "/problems"],
+  ["Projects", "/projects"],
+  ["Interview Prep", "/study-plans"],
 ] as const;
 
 export function SiteHeader() {

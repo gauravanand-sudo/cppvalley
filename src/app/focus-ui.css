@@ -128,3 +128,19 @@
 @media(max-width:780px){.cv-focus-hero{grid-template-columns:1fr;min-height:0;padding:26px}.cv-focus-hero-art{display:none}.cv-focus-course-grid,.cv-focus-path-index,.cv-focus-overview{grid-template-columns:1fr}.cv-focus-course-hero{padding:20px}.cv-focus-path-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:540px){.cv-focus-path-grid{grid-template-columns:1fr}.cv-focus-practice-bar{flex-direction:column;align-items:start}.cv-focus-course-hero{flex-direction:column;gap:9px}.cv-focus-tabs button{padding:10px 13px;font-size:.75rem}.cv-focus-modules summary{gap:7px;padding:12px}.cv-focus-modules li a{padding:10px 12px;gap:7px}.cv-focus-modules li a small{display:none}.cv-focus-section-head{align-items:center}}
 @media(prefers-reduced-motion:reduce){.cv-focus-path-card,.cv-focus-course-card,.cv-focus-chevron{transition:none}}
+
+/* Projects: four concise cards, course projects hidden until requested. */
+.cv-focus-project-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0 20px}
+.cv-focus-project-card{background:#fff;border:1px solid #ede3e8;border-radius:11px;padding:20px;display:flex;flex-direction:column;gap:11px;min-width:0}
+.cv-focus-project-card:hover{border-color:#d2a0b1;box-shadow:0 6px 20px #7c314112}
+.cv-focus-project-card h2{font-size:1.05rem;margin:0;color:#33272e}
+.cv-focus-project-card p{font-size:.79rem;line-height:1.65;color:#766871;margin:0;flex:1}
+.cv-focus-project-card strong{color:var(--cv-ruby);font-size:.77rem}
+.cv-focus-compact-details{background:#fff;border:1px solid #eee4e8;border-radius:10px;margin-bottom:24px;overflow:hidden}
+.cv-focus-compact-details summary{font-size:.8rem;font-weight:800;color:#a2244c;cursor:pointer;padding:15px 18px}
+.cv-focus-compact-details[open] summary{background:#fff7fa}
+.cv-focus-compact-details>div{display:grid}
+.cv-focus-compact-details a{display:flex;gap:12px;justify-content:space-between;padding:11px 17px;border-top:1px solid #f2eaee;font-size:.75rem;color:#4d3b44}
+.cv-focus-compact-details a:hover{background:#fff9fb}
+.cv-focus-compact-details a>span:last-child{color:var(--cv-ruby)}
+@media(max-width:700px){.cv-focus-project-grid{grid-template-columns:1fr}}

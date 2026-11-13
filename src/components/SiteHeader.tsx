@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AccountLink } from "@/components/AccountLink";
+import { BrandLockup } from "@/components/BrandLockup";
 
 const navigation = [
   ["Problems", "/problems"],
@@ -15,10 +16,7 @@ const navigation = [
 export function SiteHeader() {
   const pathname = usePathname();
   return <header className="cv-header"><div className="cv-nav-inner">
-    <Link href="/" className="cv-logo" aria-label="CppValley home">
-      <span className="cv-logo-mark">C<span>+</span></span>
-      <span>cpp<b>valley</b><i>.</i></span>
-    </Link>
+    <Link href="/" className="cv-logo" aria-label="CppValley home"><BrandLockup tone="light" /></Link>
     <nav className="cv-main-nav" aria-label="Main navigation">
       {navigation.map(([label,href]) => {
         const active = pathname === href || pathname.startsWith(href + "/") ||

@@ -29,7 +29,8 @@ type JudgeResult = {
 };
 type PilotStatus = { enabled: boolean; authRequired: boolean; message: string };
 
-export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
+type LinkedLesson = { href: string; title: string; course: string };
+export function PracticeWorkspace({ problem, relatedLessons = [] }: { problem: PracticeProblem; relatedLessons?: LinkedLesson[] }) {
   const storageKey = "cppvalley-practice-code-" + problem.slug;
   const [source, setSource] = useState(problem.starterCode);
   const [split, setSplit] = useState(42);
@@ -184,6 +185,20 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
             <ul className="pv-constraints">{problem.constraints.map(item => <li key={item}>{item}</li>)}</ul>
             <h2>Related concepts</h2>
             <div className="pv-problem-tags">{problem.tags.map(tag => <span key={tag}>{tag}</span>)}</div>
+            {relatedLessons.length > 0 && (
+              <section className="cv-workspace-related" aria-label="Related course lessons">
+                <h2>Learn this concept in a course</h2>
+                <p>Use a structured lesson when you want to understand the reasoning behind this challenge.</p>
+                <div>
+                  {relatedLessons.map(lesson => (
+                    <Link href={lesson.href} key={lesson.href}>
+                      <strong>{lesson.title}</strong>
+                      <small>{lesson.course} <span aria-hidden="true">↗</span></small>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
             <p className="pv-disclaimer">This early-access exercise uses standard input/output. More advanced concurrency challenges will use specialized class interfaces, instrumentation, and stress tests once the judging infrastructure is ready.</p>
           </div>
         </section>

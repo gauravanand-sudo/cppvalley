@@ -1,3 +1,5 @@
+> **Historical editorial plan (seven courses).** This document is preserved to explain how the original spreadsheets were analyzed. The active site now uses ten non-overlapping courses and four career paths. See [Career Course Architecture](CAREER-COURSE-ARCHITECTURE.md) for current course names, module ownership, 444 lesson outlines and 366 GPU/AI lab briefs.
+
 # CppValley — Academic Course Taxonomy and Naming Standard
 
 **Editorial working baseline:** November 2026. The two user-provided planning sheets are curriculum inputs, **not published content**:

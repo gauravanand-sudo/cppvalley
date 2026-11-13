@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { getSupabaseClient } from "@/lib/supabase-client";
 
 type ProfileRecord = {
@@ -50,7 +50,7 @@ export function ProfileSettings() {
     return () => { active = false; };
   }, []);
 
-  async function save(event: React.FormEvent<HTMLFormElement>) {
+  async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!USERNAME_RULE.test(username)) {
       setStatus("Username must be 3–30 lowercase letters, digits, or underscores.");

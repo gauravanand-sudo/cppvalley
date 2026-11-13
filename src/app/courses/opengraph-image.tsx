@@ -22,10 +22,10 @@ export default function Image() {
         <div style={{ fontSize: 30, fontWeight: 800, color: "#ffabc1" }}>cppvalley courses</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div style={{ fontSize: 70, lineHeight: 0.98, letterSpacing: -2.8, fontWeight: 850, maxWidth: 970 }}>
-            Seven paths to C++ mastery
+            Ten engineering courses
           </div>
           <div style={{ fontSize: 32, color: "#f5cad7", maxWidth: 920 }}>
-            Core C++ · DSA · Design · Linux · Concurrency · HFT
+            HFT C++ · CUDA · Inference · RAG · Distributed AI
           </div>
         </div>
         <div style={{ fontSize: 24, color: "#eac1ce" }}>Built for students preparing for serious engineering roles</div>

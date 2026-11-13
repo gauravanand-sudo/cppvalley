@@ -31,6 +31,12 @@ type MonacoApi = {
   editor: {
     create(element: HTMLElement, options: Record<string, unknown>): MonacoEditorInstance;
     setTheme(theme: string): void;
+    defineTheme(name: string, data: {
+      base: "vs" | "vs-dark";
+      inherit: boolean;
+      rules: Array<{ token: string; foreground?: string; fontStyle?: string }>;
+      colors: Record<string, string>;
+    }): void;
   };
   KeyMod: { CtrlCmd: number; Shift: number };
   KeyCode: { Enter: number; KeyS: number };
@@ -46,6 +52,74 @@ declare global {
     require?: AmdRequire;
     MonacoEnvironment?: { getWorkerUrl(_moduleId: string, _label: string): string };
   }
+}
+
+// Match the original CppValley ruby / charcoal wordmark without sacrificing
+// syntax readability. Monaco themes are registered once on editor initialization.
+const CPPVALLEY_DARK_THEME = "cppvalley-ruby-dark";
+const CPPVALLEY_LIGHT_THEME = "cppvalley-ruby-light";
+
+function matchingMonacoTheme(theme: "vs" | "vs-dark") {
+  return theme === "vs" ? CPPVALLEY_LIGHT_THEME : CPPVALLEY_DARK_THEME;
+}
+
+function defineCppValleyThemes(monaco: MonacoApi) {
+  monaco.editor.defineTheme(CPPVALLEY_DARK_THEME, {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "keyword", foreground: "F5A8C0" },
+      { token: "type", foreground: "E9B3C5" },
+      { token: "number", foreground: "E8BEA6" },
+      { token: "string", foreground: "DBBEAC" },
+      { token: "comment", foreground: "A78E98", fontStyle: "italic" },
+      { token: "preprocessor", foreground: "DD789A" },
+    ],
+    colors: {
+      "editor.background": "#211D20",
+      "editor.foreground": "#F0E8EA",
+      "editorCursor.foreground": "#FFD0DE",
+      "editor.selectionBackground": "#7D3B566A",
+      "editor.inactiveSelectionBackground": "#5F3A495A",
+      "editor.lineHighlightBackground": "#34282D",
+      "editorLineNumber.foreground": "#806F78",
+      "editorLineNumber.activeForeground": "#EEC1CD",
+      "editorGutter.background": "#211D20",
+      "editorWidget.background": "#2F252B",
+      "editorWidget.border": "#684253",
+      "editorSuggestWidget.highlightForeground": "#FFA8BF",
+      "editorBracketHighlight.foreground1": "#F4A6BE",
+      "editorBracketHighlight.foreground2": "#E4C09E",
+      "editorBracketHighlight.foreground3": "#D19BB1",
+      "editorWhitespace.foreground": "#66505A",
+    },
+  });
+  monaco.editor.defineTheme(CPPVALLEY_LIGHT_THEME, {
+    base: "vs",
+    inherit: true,
+    rules: [
+      { token: "keyword", foreground: "A30F3E" },
+      { token: "type", foreground: "84324B" },
+      { token: "number", foreground: "995031" },
+      { token: "string", foreground: "77563F" },
+      { token: "comment", foreground: "8C7B82", fontStyle: "italic" },
+      { token: "preprocessor", foreground: "AA3659" },
+    ],
+    colors: {
+      "editor.background": "#FFFBFC",
+      "editor.foreground": "#2B2529",
+      "editorCursor.foreground": "#B01443",
+      "editor.selectionBackground": "#F5CAD8",
+      "editor.inactiveSelectionBackground": "#F4E3E9",
+      "editor.lineHighlightBackground": "#FFF1F5",
+      "editorLineNumber.foreground": "#B7A4AC",
+      "editorLineNumber.activeForeground": "#991B43",
+      "editorGutter.background": "#FFFBFC",
+      "editorWidget.background": "#FFF8FA",
+      "editorWidget.border": "#DFC3CD",
+      "editorSuggestWidget.highlightForeground": "#AE1340",
+    },
+  });
 }
 
 let editorLoader: Promise<MonacoApi> | null = null;
@@ -157,10 +231,11 @@ export function MonacoCppEditor({ value, onChange, onRun, onSubmit, theme, fontS
       .then(monaco => {
         if (!active || !host) return;
         try {
+          defineCppValleyThemes(monaco);
           const instance = monaco.editor.create(host, {
             value: latestValueRef.current,
             language: "cpp",
-            theme,
+            theme: matchingMonacoTheme(theme),
             ariaLabel: "C++ code editor",
             automaticLayout: true,
             fontFamily: '"Cascadia Code", "Fira Code", Consolas, monospace',
@@ -238,7 +313,7 @@ export function MonacoCppEditor({ value, onChange, onRun, onSubmit, theme, fontS
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor || !window.monaco) return;
-    window.monaco.editor.setTheme(theme);
+    window.monaco.editor.setTheme(matchingMonacoTheme(theme));
     editor.updateOptions({ fontSize, lineHeight: Math.round(fontSize * 1.65) });
   }, [theme, fontSize]);
 

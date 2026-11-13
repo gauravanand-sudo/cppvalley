@@ -8,9 +8,8 @@ import { BrandLockup } from "@/components/BrandLockup";
 const navigation = [
   ["Career Paths", "/career-paths"],
   ["Courses", "/courses"],
-  ["Problems", "/problems"],
+  ["Practice", "/problems"],
   ["Projects", "/projects"],
-  ["Interview Prep", "/study-plans"],
 ] as const;
 
 export function SiteHeader() {
@@ -28,12 +27,6 @@ export function SiteHeader() {
         </Link>;
       })}
     </nav>
-    <form action="/problems" role="search" className="cv-nav-search">
-      <label className="cv-sr-only" htmlFor="cv-search">Search C++ problems</label>
-      <span aria-hidden="true">⌕</span>
-      <input id="cv-search" name="q" type="search" placeholder="Search problems…" />
-      <kbd aria-hidden="true">/</kbd>
-    </form>
     <AccountLink />
   </div></header>;
 }

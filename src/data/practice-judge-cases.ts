@@ -1,3 +1,5 @@
+import { expansionJudgeCases } from "./practice-expansion-judge";
+
 /** Fixtures remain server-side. Never import this module into client components. */
 export type JudgeCase = { input: string; expected: string };
 export const practiceJudgeCases: Record<string, JudgeCase[]> = {
@@ -41,4 +43,5 @@ export const practiceJudgeCases: Record<string, JudgeCase[]> = {
     {input:"1 3\n42 0 100\nROUTE\nPOLICY FASTEST\nROUTE\n",expected:"42\n42"},
     {input:"2 4\n7 1 10\n9 1 9\nROUTE\nPOLICY FASTEST\nROUTE\nROUTE\n",expected:"7\n9\n9"}
   ]
+  ,...expansionJudgeCases
 };

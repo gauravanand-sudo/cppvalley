@@ -14,21 +14,21 @@ export default function Image() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          background: "linear-gradient(135deg, #15243b 0%, #273858 100%)",
-          color: "#f5f8ff",
+          background: "linear-gradient(135deg, #251e22 0%, #661e36 100%)",
+          color: "#fff4f7",
           fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
         }}
       >
-        <div style={{ fontSize: 32, fontWeight: 800, color: "#cad8f8" }}>cppvalley</div>
+        <div style={{ fontSize: 32, fontWeight: 800, color: "#ffabc1" }}>cppvalley</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           <div style={{ fontSize: 76, lineHeight: 0.96, letterSpacing: -3.2, fontWeight: 850, maxWidth: 960 }}>
             Elite C++ Coding Practice
           </div>
-          <div style={{ fontSize: 34, color: "#cdd8ed", maxWidth: 940 }}>
+          <div style={{ fontSize: 34, color: "#f5cad7", maxWidth: 940 }}>
             Algorithms · Modern C++ · Concurrency · HFT & Systems
           </div>
         </div>
-        <div style={{ display: "flex", gap: 16, fontSize: 24, color: "#365c7d" }}>
+        <div style={{ display: "flex", gap: 16, fontSize: 24, color: "#b01443" }}>
           <span>Courses</span>
           <span>Interview Questions</span>
           <span>Blog Notes</span>

@@ -1,3 +1,5 @@
+import { expansionProblems } from "./practice-expansion";
+
 export type PracticeCategory = "HFT Systems" | "Concurrency" | "Core C++" | "Design Patterns";
 export type PracticeDifficulty = "Easy" | "Medium" | "Hard";
 export type PracticeExample = { input: string; output: string; explanation?: string };
@@ -127,6 +129,7 @@ export const practiceProblems: PracticeProblem[] = [
     examples: [{input:"3 4\n10 4 9\n20 3 8\n30 3 5\nROUTE\nPOLICY FASTEST\nROUTE\nROUTE",output:"20\n30\n30",explanation:"Fee tie goes to venue 20. Lowest latency is venue 30."}],
     starterCode: "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    // Model interchangeable routing strategies.\n    return 0;\n}\n"
   }
+  ,...expansionProblems
 ];
 
 export function getPracticeProblem(slug: string) {

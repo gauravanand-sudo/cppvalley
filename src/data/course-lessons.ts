@@ -1,5 +1,6 @@
 import { lessons as hftLessons } from "./curriculum";
 import { eliteCourses, type EliteCourse } from "./elite-courses";
+import { careerCourseTopics } from "./career-course-topics";
 import { problemBank, type BankProblem } from "./problem-bank";
 
 export type CourseLesson = {
@@ -14,6 +15,7 @@ export type CourseLesson = {
   outcome: string;
   videoId?: string;
   problemSlugs: string[];
+  practiceKind: "cpp-problems" | "specialty-labs";
 };
 
 /**
@@ -205,6 +207,7 @@ const tokens = (value: string) => value.toLowerCase().split(/[^a-z0-9]+/)
 const uniqueWords = (value: string) => new Set(tokens(value));
 
 function findRelevantProblems(course: EliteCourse, title: string, ordinal: number): string[] {
+  if (["C5","C6","C7","C8","C9","C10"].includes(course.code)) return [];
   const preferred = course.slug.includes("concurrency") ? ["Concurrency"] :
     course.slug.includes("hft") ? ["HFT Systems","Concurrency","Core C++"] :
     course.slug.includes("patterns") ? ["Design Patterns","Core C++"] :
@@ -232,6 +235,14 @@ function makeLesson(
 ): CourseLesson {
   const moduleTitle = course.modules[moduleNumber] ?? course.modules[0];
   const label = title.replace(/^[A-Z][a-z]+ [0-9]+: /,"");
+  const specialty = ["C5","C6","C7","C8","C9","C10"].includes(course.code);
+  const domain = course.code === "C5" ? "GPU memory, synchronization and CUDA correctness" :
+    course.code === "C6" ? "single-device GPU kernel efficiency and numerics" :
+    course.code === "C7" ? "inference runtime scheduling, KV memory and serving SLOs" :
+    course.code === "C8" ? "LLM application trust boundaries, retrieval and evaluation" :
+    course.code === "C9" ? "multi-GPU infrastructure, networking and failure handling" :
+    course.code === "C10" ? "architecture trade-offs, risk, quality and technical leadership" :
+    "C++ implementation contracts and performance";
   return {
     slug: String(number).padStart(3,"0") + "-" + slugify(title),
     number,
@@ -240,14 +251,21 @@ function makeLesson(
     moduleTitle,
     moduleNumber,
     objectives: details?.goals ?? [
-      "Explain the core ideas and invariants behind " + label.toLowerCase() + ".",
-      "Reason about real C++ implementation trade-offs, failure cases and complexity.",
-      "Apply the concept in an original, testable coding exercise.",
+      "Explain the mechanisms, contracts and invariants behind " + label.toLowerCase() + ".",
+      "Identify correctness risks, resource costs and failure modes in " + domain + ".",
+      specialty
+        ? "Design an appropriate experiment, prototype or architecture review with measurable acceptance criteria."
+        : "Implement and reason about this concept in portable, testable C++.",
     ],
-    lab: details?.lab ?? "Work through a focused C++ implementation and check its observable behavior under boundary cases.",
-    outcome: details?.proof ?? "Record a working example, test evidence, and a brief explanation of the implementation choices.",
+    lab: details?.lab ?? (specialty
+      ? "Draft a reproducible hands-on lab for " + title + ". Include setup, a baseline, failure cases and measurable results."
+      : "Implement a focused C++ example with boundary tests and explicitly documented invariants."),
+    outcome: details?.proof ?? (specialty
+      ? "Present evidence (code, workload traces, architecture decisions or benchmarks), not only a running demo."
+      : "Provide tested C++ code, reasoning about undefined behavior, and a correctness/performance report."),
     ...(details?.videoId ? {videoId:details.videoId} : {}),
     problemSlugs: findRelevantProblems(course,title,number),
+    practiceKind: specialty ? "specialty-labs" : "cpp-problems",
   };
 }
 
@@ -262,7 +280,7 @@ export const courseLessons: CourseLesson[] = eliteCourses.flatMap(course => {
     return concurrencySections.flatMap((titles, moduleNumber) =>
       titles.map(title => makeLesson(course, title, ++number, moduleNumber)));
   }
-  const sections = otherCourseTitles[course.slug] || [];
+  const sections = careerCourseTopics[course.slug] || otherCourseTitles[course.slug] || [];
   let number = 0;
   return sections.flatMap((titles, moduleNumber) =>
     titles.map(title => makeLesson(course, title, ++number, moduleNumber)));
@@ -283,5 +301,5 @@ export function lessonsForProblem(slug: string): CourseLesson[] {
 export function getCourseProblemCounts(courseSlug: string) {
   const refs=lessonsByCourse.get(courseSlug)||[];
   const uniques = new Set(refs.flatMap(lesson=>lesson.problemSlugs));
-  return { lessonCount:refs.length, uniqueProblems:uniques.size };
+  return { lessonCount:refs.length, uniqueProblems:uniques.size, specialtyLabs: refs.filter(l=>l.practiceKind==="specialty-labs").length * 2 };
 }

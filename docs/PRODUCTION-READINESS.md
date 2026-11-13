@@ -5,10 +5,10 @@
 
 ## Verified implementation goals
 
-- Ten separate courses (C1–C10), four role-based career paths, explicit course prerequisites, ownership boundaries, exclusions and capstones. See `docs/CAREER-COURSE-ARCHITECTURE.md`.
+- Ten separate courses (C1–C10), **444 structured lesson outlines**, four role-based career paths, explicit course prerequisites, ownership boundaries, exclusions and capstones. See `docs/CAREER-COURSE-ARCHITECTURE.md`.
 - Structured lesson outlines linked in the courses and four career paths. Lesson outline != complete recorded/verified lecture.
 - Original 400 curated CPU C++ topics still preserved: 31 runnable with server fixtures, 369 in editorial review.
-- Two additional draft GPU/AI practice briefs per specialty lesson, available via `/practice-labs`. They are NOT executable in the CPU-only C++17 judge.
+- **366 draft GPU/AI practice briefs**, two per specialty lesson, available via `/practice-labs`. They are NOT executable in the CPU-only C++17 judge.
 - Four career capstones plus one capstone brief per course, available via `/projects`.
 - Original CppValley infinity logo and ruby/charcoal styling preserved. User/login and draft API paths are unchanged.
 - A content-integrity assertion during the Next.js sitemap build validates course count, prerequisites, career links, topic references and judged fixtures.

@@ -18,15 +18,10 @@ export function SpecialtyLabsCatalog() {
   const pageCount=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));
   const activePage=Math.min(page,pageCount);
   return <div className="cv-shell cv-lab-library">
-    <div className="cv-page-intro cv-compact-intro">
-      <span className="cv-eyebrow">CUDA · GPU · AI PRACTICE</span>
+    <div className="cv-focus-heading">
+      <span className="cv-eyebrow">GPU & AI PRACTICE</span>
       <h1>Systems labs</h1>
-      <p>Two original practice briefs per GPU/AI course lesson. These are <strong>planning outlines</strong>, not executable submissions: GPU kernels need dedicated hardware, while architecture cases require rubric-based review.</p>
-    </div>
-    <div className="cv-editorial-note">
-      <b>Separate from the 400 C++ problem topics</b>
-      <p>The CPU-only C++17 judge does not grade CUDA, distributed clusters, RAG deployments or AI architecture. Their briefs are published for study planning and become runnable or reviewable only when appropriate infrastructure is built.</p>
-      <Link href="/problems">Open the 400-topic C++ bank →</Link>
+      <p>Explore CUDA, inference and architecture exercises. <strong>Outline only—not graded yet.</strong> <Link href="/problems" style={{color:"var(--cv-ruby)",fontWeight:750}}>C++ problems →</Link></p>
     </div>
     <div className="cv-lab-filter-row">
       <label>Course <select value={course} onChange={e=>{setCourse(e.target.value);setPage(1)}}>

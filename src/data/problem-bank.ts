@@ -2833,6 +2833,7 @@ export const problemBank: BankProblem[] = originalBacklog.map(item => {
   const ready = readyBySlug.get(item.slug);
   return {
     ...item,
+    status: ready ? "runnable" : "in-review",
     title: ready?.title ?? item.title,
     tags: ready?.tags ?? tokenTags.filter(([regex]) => regex.test(item.title)).map(([,tag]) => tag).slice(0,3),
     summary: ready?.summary ??

@@ -33,6 +33,11 @@ export function ProblemsCatalog({initialQuery="",initialCategory="",initialDiffi
  function setFilter<T>(setter:(value:T)=>void,value:T){setter(value);setPage(1);}
  return <div className="cv-shell cv-problems-shell">
   <div className="cv-page-intro cv-compact-intro"><span className="cv-eyebrow">THE CPPVALLEY PROBLEM BANK</span><h1>Problems</h1><p>Original C++ challenges, organized from foundational algorithms to concurrency and systems engineering. Verified problems have a working C++ judge; others are transparently marked as in review.</p></div>
+  <div className="cv-bank-specialty-link">
+    <strong>GPU, CUDA or AI Systems practice?</strong>
+    <span>Those labs use a different evaluation model from the CPU C++17 coding judge.</span>
+    <Link href="/practice-labs">Explore GPU & AI labs →</Link>
+  </div>
   <div className="cv-bank-stats">
     <div><strong>{problemBankStats.total}</strong><span>Curated topics</span></div><div><strong>{problemBankStats.runnable}</strong><span>Runnable now</span></div><div><strong>{problemBankStats.inReview}</strong><span>Specifications in review</span></div>
     <div className="cv-stats-progress"><span>Published & verified</span><div><i style={{width:100*problemBankStats.runnable/problemBankStats.total+"%"}}/></div><small>{Math.round(100*problemBankStats.runnable/problemBankStats.total)}% of bank</small></div>
@@ -46,7 +51,9 @@ export function ProblemsCatalog({initialQuery="",initialCategory="",initialDiffi
     <h2>Difficulty</h2>
     {(["",...practiceDifficulties] as string[]).map(d=><button key={d||"all"} className={difficulty===d?"cv-category-active":""} onClick={()=>setFilter(setDifficulty,d)}>{d||"All levels"}{d?<span className={"cv-level cv-"+d.toLowerCase()}>{d}</span>:null}</button>)}
     <div className="cv-sidebar-divider"/>
-    <Link className="cv-sidebar-link" href="/study-plans">↗ Structured study plans</Link>
+    <Link className="cv-sidebar-link" href="/practice-labs">↗ GPU & AI practice labs</Link>
+    <Link className="cv-sidebar-link" href="/career-paths">↗ Choose a career path</Link>
+    <Link className="cv-sidebar-link" href="/study-plans">↗ Interview practice plans</Link>
     <Link className="cv-sidebar-link" href="/courses">↗ Learn with courses</Link>
    </aside>
    <section className="cv-library-main">

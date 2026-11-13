@@ -40,6 +40,7 @@ export default async function CourseDetails({params}:Props){
          <span>{course.modules.length} modules</span><span>{lessons.length} lesson outlines</span>
          <span>{specialty?"2 lab briefs":"3 C++ practice topics"} per lesson</span>
        </div>
+       <div className="cv-focus-price-note"><strong>₹{course.priceInr.toLocaleString("en-IN")}</strong><span>Planned introductory price · Not on sale yet</span></div>
        {first&&<Link className="cv-btn cv-btn-primary" href={"/courses/"+course.slug+"/lessons/"+first.slug}>Start lesson 01 →</Link>}
      </div>
    </header>

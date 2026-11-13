@@ -14,21 +14,21 @@ export default function Image() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          background: "linear-gradient(135deg, #ffffff 0%, #edf5fb 100%)",
-          color: "#17202a",
+          background: "linear-gradient(135deg, #15243b 0%, #273858 100%)",
+          color: "#f5f8ff",
           fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
         }}
       >
-        <div style={{ fontSize: 30, fontWeight: 800, color: "#365c7d" }}>cppvalley courses</div>
+        <div style={{ fontSize: 30, fontWeight: 800, color: "#cad8f8" }}>cppvalley courses</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div style={{ fontSize: 70, lineHeight: 0.98, letterSpacing: -2.8, fontWeight: 850, maxWidth: 970 }}>
-            Choose a focused systems track
+            Seven paths to C++ mastery
           </div>
-          <div style={{ fontSize: 32, color: "#496273", maxWidth: 920 }}>
-            C++ Core · Systems · EDA/CAD · GPU/AI · Roadmaps
+          <div style={{ fontSize: 32, color: "#cdd8ed", maxWidth: 920 }}>
+            Core C++ · DSA · Design · Linux · Concurrency · HFT
           </div>
         </div>
-        <div style={{ fontSize: 24, color: "#667085" }}>Built for students preparing for serious engineering roles</div>
+        <div style={{ fontSize: 24, color: "#c3d0e5" }}>Built for students preparing for serious engineering roles</div>
       </div>
     ),
     size

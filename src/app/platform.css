@@ -497,3 +497,9 @@ body { background:var(--cv-bg); color:var(--cv-ink); font-family:var(--font-sans
 .cv-workspace-related a strong{font-size:.73rem;font-weight:760;color:#263956}
 .cv-workspace-related a small{font-size:.66rem;color:#7382aa;white-space:nowrap}
 @media(max-width:600px){.cv-workspace-related a{display:grid;gap:3px}.cv-workspace-related a small{white-space:normal}}
+
+/* Clearly distinguish server-verified account progress from browser fallback. */
+.cv-dashboard-cloud-connected{background:#edf9f2;border-color:#bce4ca;color:#276248}
+.cv-dashboard-alert a{margin-left:9px;color:inherit;font-weight:900;text-decoration:underline;text-underline-offset:3px}
+.cv-dashboard-alert small{display:block;margin-top:5px;opacity:.8;overflow-wrap:anywhere}
+.cv-dashboard-achievements .cv-verdict-error{color:#d05d5d}

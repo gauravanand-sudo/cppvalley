@@ -35,7 +35,7 @@ export function CourseDetailTabs(props:Props) {
         {props.modules.map((module,index)=>{
           const rows=props.lessons.filter(lesson=>lesson.moduleNumber===index);
           if(!rows.length)return null;
-          return <details key={module} open={index===0?undefined:undefined}>
+          return <details key={module} open={index===0}>
             <summary><span className="cv-focus-number">{String(index+1).padStart(2,"0")}</span><strong>{module}</strong><small>{rows.length} lessons</small><span aria-hidden="true" className="cv-focus-chevron">⌄</span></summary>
             <ol>{rows.map(row=><li key={row.slug}><Link href={"/courses/"+props.slug+"/lessons/"+row.slug}>
               <span>{String(row.number).padStart(2,"0")}</span><strong>{row.title}</strong><small>{props.specialty?"2 labs":row.ready?row.ready+" runnable":"Outline"}</small><span aria-hidden="true">→</span>

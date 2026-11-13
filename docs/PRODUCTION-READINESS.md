@@ -6,7 +6,7 @@
 ## Implemented, verified in the feature branch
 
 - **Seven flagship course catalogs:** Core C++ & STL, DSA in C++, Concurrency, HFT Systems, C++ Design Patterns / LLD, Linux / Networking, and Advanced Modern C++.
-- **326 structured lesson outlines:** including the pre-existing 96-lesson HFT curriculum and 30 concurrency lessons. Every lesson links to three entries in the unified practice bank. These are *not* 326 completed video tutorials.
+- **354 structured lesson outlines:** including the pre-existing 96-lesson HFT curriculum, 64 combined concurrency/lock-free lessons and 30 dedicated C++ design lessons. Every lesson links to three entries in the unified practice bank. These are *not* 326 completed video tutorials.
 - **400 curated topic cards:** exactly 100 each in Core C++, Concurrency, Design Patterns, HFT Systems. The bank tracks publication status independently.
 - **31 runnable original coding problems:** 8 previously present + 23 new input/output problems. The remaining **369** topics are **in review** with no implied Accepted verdict.
 - 69 new validation fixtures checked against an independent oracle; existing seed fixtures are present. All runnable problems have at least three server fixtures, sample(s), constraints, and C++17 code starters.

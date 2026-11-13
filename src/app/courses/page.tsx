@@ -12,7 +12,7 @@ export const metadata:Metadata={
  alternates:{canonical:"/courses"},
 };
 
-const cards:CourseCard[]=eliteCourses.map(course=>({
+const cards:CourseCard[]=eliteCourses.map((course):CourseCard=>({
   code:course.code,slug:course.slug,title:course.title,summary:course.summary,
   group:Number(course.code.slice(1))<=4?"cpp":Number(course.code.slice(1))<=6?"gpu":Number(course.code.slice(1))<=9?"ai":"architecture",
   lessons:(lessonsByCourse.get(course.slug)||[]).length,

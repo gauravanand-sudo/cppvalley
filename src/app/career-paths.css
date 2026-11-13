@@ -1,0 +1,125 @@
+/* Career-path and course architecture — original CppValley ruby/charcoal theme. */
+.cv-paths-intro{max-width:1000px}
+.cv-paths-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px;margin-bottom:28px}
+.cv-path-card{display:flex;flex-direction:column;gap:10px;padding:23px 25px;background:#fff;border:1px solid #e8dde2;border-radius:12px;min-width:0;transition:border .2s,box-shadow .2s}
+.cv-path-card:hover,.cv-home-career:hover{border-color:#c78198;box-shadow:0 10px 27px rgba(128,20,57,.07)}
+.cv-path-card-header{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.cv-path-card-icon{height:40px;width:40px;display:grid;place-items:center;font-size:1.5rem;color:#b01443;background:#fff0f4;border-radius:9px}
+.cv-path-card-header small{font-size:.67rem;color:#8c7b81;font-weight:750}
+.cv-path-card h2{font-size:1.15rem;margin:6px 0 0;letter-spacing:-.027em;color:#272025}
+.cv-path-card>p{margin:0;color:#76676d;font-size:.85rem;line-height:1.6}
+.cv-path-course-stack{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 14px}
+.cv-path-course-stack>span{display:inline-flex;align-items:center;gap:5px;font-size:.69rem;color:#68505b;padding:6px 8px;background:#fff6f8;border:1px solid #efdfe5;border-radius:6px}
+.cv-path-course-stack b{font-size:.65rem;color:#ae224e}
+.cv-path-card-bottom{margin-top:auto;border-top:1px solid #f0e6e9;padding-top:12px;display:flex;align-items:center;justify-content:space-between;gap:9px}
+.cv-path-card-bottom>span{font-size:.67rem;color:#86767c}
+.cv-path-card-bottom>b{font-size:.75rem;color:#b01443;white-space:nowrap}
+.cv-path-disclaimer{margin:25px 0}
+.cv-path-details{max-width:1320px}
+.cv-path-hero{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(260px,.7fr);gap:25px;align-items:center;margin:25px 0 38px;padding:35px 36px;background:linear-gradient(125deg,#fff,#fff1f5);border:1px solid #ecd9e1;border-radius:15px}
+.cv-path-hero h1{font-size:clamp(1.85rem,3vw,2.8rem);letter-spacing:-.053em;line-height:1.14;margin:12px 0}
+.cv-path-hero p{font-size:.93rem;color:#715e68;line-height:1.7;max-width:760px}
+.cv-path-role-tags{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}
+.cv-path-role-tags span{display:inline-block;background:#f9e5ec;border:1px solid #eccbd7;border-radius:6px;color:#9f2449;font-size:.69rem;font-weight:750;padding:6px 9px}
+.cv-path-entry{border:1px solid #ecd5de;background:#fffafa;border-radius:10px;padding:21px}
+.cv-path-entry>b{display:block;color:#5b3d49;font-size:.76rem;margin-bottom:4px}
+.cv-path-entry p{font-size:.8rem;line-height:1.6;margin:0 0 14px}
+.cv-path-entry p:last-child{margin-bottom:0}
+.cv-path-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,310px);gap:30px;align-items:start}
+.cv-path-layout>main{min-width:0}
+.cv-path-layout .cv-section-head p{font-size:.8rem;max-width:620px;line-height:1.6;color:#82747a}
+.cv-path-steps{list-style:none;padding:0;margin:0 0 26px;display:grid;gap:10px;counter-reset:cvpath}
+.cv-path-step{display:grid;grid-template-columns:42px minmax(0,1fr) 22px;gap:15px;padding:17px 18px;background:#fff;border:1px solid #e8dde2;border-radius:10px;align-items:start}
+.cv-path-step:hover{border-color:#d4a7b7;background:#fffafa}
+.cv-path-step-number{height:38px;width:38px;background:#fff0f4;color:#a71644;border-radius:9px;font-weight:900;display:grid;place-items:center}
+.cv-path-step h3{font-size:.98rem;color:#2c2529;margin:6px 0 5px}
+.cv-path-step p{font-size:.77rem;color:#7b6b72;line-height:1.6;margin:0}
+.cv-path-step-arrow{color:#ae1a46}
+.cv-path-step-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.cv-path-step-meta span{font-size:.67rem;color:#8a7b82}
+.cv-path-sidebar{display:grid;gap:14px}
+.cv-path-sidebar .cv-white-card,.cv-path-capstone,.cv-path-electives{padding:21px}
+.cv-path-sidebar h2,.cv-path-capstone h2,.cv-path-electives h2{font-size:1.06rem;margin:6px 0 12px;color:#33252d}
+.cv-path-sidebar ul,.cv-path-capstone ul{padding-left:20px;margin:11px 0 18px;display:grid;gap:10px}
+.cv-path-sidebar li,.cv-path-capstone li{font-size:.79rem;color:#6f5f67;line-height:1.5}
+.cv-path-sidebar p,.cv-path-capstone p,.cv-path-electives p{font-size:.81rem;line-height:1.7;color:#74636b}
+.cv-path-sidebar a:not(.cv-btn){font-size:.77rem;font-weight:800;color:#b01443}
+.cv-path-capstone{margin-bottom:26px}
+.cv-path-capstone h3{font-size:.87rem;color:#43323c}
+.cv-path-electives{margin-bottom:22px}
+.cv-path-electives a{display:flex;justify-content:space-between;gap:14px;border-top:1px solid #f1e6e9;padding:12px 0;font-size:.78rem;color:#543d47}
+.cv-path-electives a b{color:#af214b;white-space:nowrap}
+
+/* Small home career cards: the learner can choose a job before choosing lessons. */
+.cv-home-careers{padding:26px 0 32px}
+.cv-home-careers .cv-section-head{margin-bottom:15px}
+.cv-home-career-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.cv-home-career{background:#fff;display:flex;flex-direction:column;min-width:0;padding:19px;border:1px solid #eddee4;border-radius:11px;gap:8px}
+.cv-home-career-symbol{font-size:1.8rem;color:#b01443}
+.cv-home-career h3{margin:2px 0;font-size:.96rem;line-height:1.35;letter-spacing:-.02em;color:#282025}
+.cv-home-career p{font-size:.74rem;color:#7d6e75;line-height:1.55;margin:0}
+.cv-home-career small{font-size:.66rem;color:#9c808a}
+.cv-home-career b{font-size:.75rem;color:#ad1944;margin-top:auto;padding-top:7px}
+.cv-course-prereq-inline{margin:8px 0 0;color:#766973;font-size:.7rem}
+.cv-course-prereq-inline b{color:#9a3354}
+.cv-course-list-kicker{color:#ae204b;font-size:.7rem;font-weight:860;letter-spacing:.025em;margin-bottom:5px}
+.cv-course-boundaries{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:20px 0 25px}
+.cv-course-boundaries .cv-white-card{padding:19px;min-width:0}
+.cv-course-boundaries h2{font-size:.95rem;color:#33262b;margin:8px 0 10px}
+.cv-course-boundaries p{font-size:.76rem;color:#756770;line-height:1.65}
+.cv-course-boundaries b{font-size:.73rem;color:#654958}
+.cv-course-boundaries ul{padding-left:17px;margin:10px 0;display:grid;gap:7px}
+.cv-course-boundaries li{font-size:.72rem;color:#725f68;line-height:1.55}
+.cv-course-boundaries li a{color:#a62047;text-decoration:underline;text-underline-offset:2px}
+.cv-course-open-entry{font-weight:750;color:#795669!important}
+.cv-course-role-strip{display:flex;gap:9px;align-items:center;flex-wrap:wrap;background:#fff8fa;border:1px solid #ebd7e0;border-radius:8px;padding:11px 16px;margin:10px 0 24px}
+.cv-course-role-strip strong{font-size:.76rem;color:#56414c;margin-right:4px}
+.cv-course-role-strip a{background:#fff;border:1px solid #edcbd7;border-radius:6px;padding:6px 10px;color:#ae224e;font-size:.72rem;font-weight:850}
+.cv-lesson-labs-link{font-size:.76rem;font-weight:850;color:#b01443}
+.cv-lab-library{max-width:1280px}
+.cv-lab-filter-row{display:flex;flex-wrap:wrap;gap:14px;align-items:end;margin:20px 0}
+.cv-lab-filter-row label{display:grid;gap:5px;font-size:.71rem;font-weight:820;color:#705962;flex:1;min-width:190px}
+.cv-lab-filter-row select,.cv-lab-filter-row input{height:38px;padding:8px 11px;border:1px solid #e7d4dd;background:#fff;border-radius:7px;color:#392b32;font-size:.78rem;min-width:0;width:100%}
+.cv-lab-filter-row>span{font-size:.75rem;color:#806b74;padding-bottom:8px}
+.cv-lab-table{overflow:hidden}
+.cv-lab-row{display:grid;grid-template-columns:48px minmax(0,1fr) 75px 15px;gap:12px;padding:13px 17px;align-items:center;border-bottom:1px solid #f1e6eb}
+.cv-lab-row:last-child{border-bottom:none}
+.cv-lab-row:hover{background:#fff8fa}
+.cv-lab-kind{color:#ad1e4b;background:#fff0f5;font-weight:880;font-size:.72rem;text-align:center;border-radius:5px;padding:7px 2px}
+.cv-lab-row strong{display:block;color:#382c32;font-size:.78rem;line-height:1.5}
+.cv-lab-row small{font-size:.68rem;line-height:1.5;color:#938087}
+.cv-lab-row>b{color:#a9274d}
+.cv-lab-pagination{display:flex;gap:13px;justify-content:flex-end;align-items:center;margin:16px 0 24px}
+.cv-lab-pagination button{cursor:pointer;padding:8px 13px;background:#fff;border:1px solid #e5d2db;border-radius:7px;color:#a41b43;font-size:.76rem;font-weight:800}
+.cv-lab-pagination button:disabled{opacity:.45;cursor:not-allowed}
+.cv-lab-pagination span{font-size:.75rem;color:#816f77}
+.cv-lab-detail{max-width:1140px}
+.cv-lab-detail-grid{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:22px;margin-top:19px;align-items:start}
+.cv-lab-detail-grid>article,.cv-lab-detail-grid>aside{padding:25px}
+.cv-lab-detail h1{font-size:clamp(1.7rem,3vw,2.4rem);letter-spacing:-.04em;color:#30232b;margin:11px 0}
+.cv-lab-lead{font-size:.93rem;line-height:1.8;color:#63535c;margin-bottom:25px}
+.cv-lab-detail article section{padding:19px 0;border-top:1px solid #ecdee4}
+.cv-lab-detail article h2,.cv-lab-detail aside h2{font-size:1rem;color:#362931;margin-bottom:10px}
+.cv-lab-detail article p,.cv-lab-detail aside p{font-size:.81rem;line-height:1.75;color:#72626a}
+.cv-lab-detail article ul{padding-left:18px;display:grid;gap:8px}
+.cv-lab-detail li{color:#68535e;font-size:.8rem;line-height:1.55}
+.cv-lab-detail aside>a{display:block;color:#ac1745;font-size:.77rem;font-weight:750;margin-top:15px}
+.cv-project-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:20px 0 40px}
+.cv-project-card{padding:23px}
+.cv-project-card h2{font-size:1.14rem;color:#31252c;margin:12px 0}
+.cv-project-card p{font-size:.83rem;color:#6b5962;line-height:1.7}
+.cv-project-card h3{font-size:.83rem;margin:17px 0 8px;color:#4f3943}
+.cv-project-card ul{padding-left:18px;display:grid;gap:6px;margin-bottom:22px}
+.cv-project-card li{font-size:.78rem;color:#72616a;line-height:1.45}
+.cv-project-course-list{display:grid;gap:8px;margin-bottom:30px}
+.cv-project-course-list>a{background:#fff;display:grid;grid-template-columns:42px minmax(0,1fr) 20px;gap:12px;align-items:center;border:1px solid #ece0e5;border-radius:8px;padding:13px}
+.cv-project-course-list>a:hover{border-color:#d9adbe}
+.cv-project-course-list strong{font-size:.82rem;color:#47313d;display:block}
+.cv-project-course-list small{font-size:.72rem;color:#86727b;line-height:1.5;display:block;margin-top:4px}
+.cv-project-course-list b{color:#a91c49}
+.cv-bank-specialty-link{margin:14px 0 0;padding:12px 15px;background:#fff0f5;border:1px solid #edcfda;border-radius:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.cv-bank-specialty-link strong{font-size:.81rem;color:#6f2141}
+.cv-bank-specialty-link a{color:#b01443;font-size:.77rem;font-weight:850}
+@media(max-width:1100px){.cv-home-career-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cv-paths-grid{gap:12px}.cv-course-boundaries{grid-template-columns:repeat(2,minmax(0,1fr))}.cv-course-boundaries>div:last-child{grid-column:1/-1}}
+@media(max-width:850px){.cv-path-layout,.cv-path-hero{grid-template-columns:1fr}.cv-path-sidebar{grid-template-columns:repeat(2,minmax(0,1fr))}.cv-lab-detail-grid{grid-template-columns:1fr}.cv-paths-grid{grid-template-columns:1fr}}
+@media(max-width:630px){.cv-home-career-grid,.cv-project-grid,.cv-course-boundaries,.cv-path-sidebar{grid-template-columns:1fr}.cv-course-boundaries>div:last-child{grid-column:auto}.cv-path-hero{padding:23px 19px}.cv-path-card{padding:20px}.cv-path-step{grid-template-columns:36px minmax(0,1fr);gap:9px}.cv-path-step-arrow{display:none}.cv-lab-row{grid-template-columns:37px minmax(0,1fr);gap:9px}.cv-lab-row>.cv-availability,.cv-lab-row>b{display:none}.cv-lab-detail-grid>article,.cv-lab-detail-grid>aside{padding:18px}}

@@ -1,0 +1,10 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { studyPlans, getStudyPlan, studyPlanProblems } from "@/data/study-plans";
+type Props={params:Promise<{slug:string}>};
+export function generateStaticParams(){return studyPlans.map(p=>({slug:p.slug}));}
+export async function generateMetadata({params}:Props):Promise<Metadata>{const p=getStudyPlan((await params).slug);return {title:p?.title||"Study Plan",description:p?.description};}
+export default async function PlanDetail({params}:Props){const p=getStudyPlan((await params).slug);if(!p)notFound();const problems=studyPlanProblems(p);return <><SiteHeader/><main className="cv-subpage"><div className="cv-shell"><nav className="cv-mini-breadcrumb"><Link href="/study-plans">← Study plans</Link><span>/</span>{p.title}</nav><div className="cv-page-intro cv-compact-intro"><span className="cv-eyebrow">GUIDED PRACTICE</span><h1>{p.title}</h1><p>{p.description}</p></div><div className="cv-plan-detail-grid"><section className="cv-white-card cv-plan-problem-list"><div className="cv-plan-list-heading"><h2>{problems.length} topics</h2><span>{problems.filter(pr=>pr.status==="runnable").length} executable challenges</span></div>{problems.map((pr,i)=><Link href={"/problems/"+pr.slug} key={pr.slug}><span className="cv-plan-step">{String(i+1).padStart(2,"0")}</span><div><strong>{pr.title}</strong><small>{pr.category} · {pr.difficulty}</small></div><span className={pr.status==="runnable"?"cv-availability cv-available":"cv-availability cv-review"}>{pr.status==="runnable"?"Solve":"In review"}</span></Link>)}</section><aside className="cv-plan-aside"><div className="cv-white-card"><span className="cv-eyebrow">STUDY SMARTER</span><h3>Understand, implement, verify.</h3><p>Begin with a published challenge, work through its edge cases, and revisit the related course modules when you need deeper explanations.</p><Link className="cv-btn cv-btn-secondary" href="/courses">Browse courses →</Link></div></aside></div></div></main><SiteFooter/></>;}

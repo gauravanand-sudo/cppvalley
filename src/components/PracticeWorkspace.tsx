@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MonacoCppEditor } from "@/components/MonacoCppEditor";
-import type { PracticeProblem } from "@/data/practice";
+import { getSupabaseClient } from "@/lib/supabase-client";
+import { practiceProblems, type PracticeProblem } from "@/data/practice";
 
 type CaseResult = {
   index: number;
@@ -24,13 +25,18 @@ type JudgeResult = {
   total?: number;
   cases?: CaseResult[];
   code?: string;
+  persisted?: boolean;
 };
 type PilotStatus = { enabled: boolean; authRequired: boolean; message: string };
 
-export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
+type LinkedLesson = { href: string; title: string; course: string };
+export function PracticeWorkspace({ problem, relatedLessons = [] }: { problem: PracticeProblem; relatedLessons?: LinkedLesson[] }) {
   const storageKey = "cppvalley-practice-code-" + problem.slug;
   const [source, setSource] = useState(problem.starterCode);
-  const [split, setSplit] = useState(48);
+  const [split, setSplit] = useState(42);
+  const [focusCode, setFocusCode] = useState(false);
+  const [showTests, setShowTests] = useState(true);
+  const [testHeight, setTestHeight] = useState(24);
   const [activeSample, setActiveSample] = useState(0);
   const [inputMode, setInputMode] = useState<"samples" | "custom">("samples");
   const [customInput, setCustomInput] = useState("");
@@ -100,13 +106,17 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
       return;
     }
     setBusy(mode);
+    setShowTests(true);
     setResult(null);
     try {
+      const auth=await getSupabaseClient()?.auth.getSession();
+      const jwt=auth?.data.session?.access_token;
       const response = await fetch("/api/practice/run", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           ...(pilotStatus.authRequired ? { Authorization: "Bearer " + pilotKey } : {}),
+          ...(jwt ? { "X-CppValley-User-JWT": jwt } : {}),
         },
         body: JSON.stringify({
           slug: problem.slug,
@@ -133,17 +143,22 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
   }
 
   const selectedExample = problem.examples[activeSample] || problem.examples[0];
+  const currentIndex = practiceProblems.findIndex(item => item.slug === problem.slug);
+  const previous = practiceProblems[currentIndex - 1];
+  const next = practiceProblems[currentIndex + 1];
 
   return (
     <div className="pv-workspace">
       <div className="pv-workspace-top">
-        <div className="pv-breadcrumb"><Link href="/practice">← Problem library</Link><span>/</span><span>{problem.category}</span></div>
+        <div className="pv-breadcrumb"><Link href="/problems">← Problems</Link><span>/</span><span>{problem.category}</span><nav className="cv-compact-nav" aria-label="Problem navigation">{previous ? <Link href={"/problems/"+previous.slug} title={"Previous: "+previous.title}>← Prev</Link>:null}{next ? <Link href={"/problems/"+next.slug} title={"Next: "+next.title}>Next →</Link>:null}</nav></div>
         <div className="pv-workspace-actions">
-          <label className="pv-split-control">Description width <input type="range" min="30" max="70" value={split} onChange={event => setSplit(Number(event.target.value))} aria-label="Change width of problem description" /></label>
+          <label className="pv-split-control">Description <input type="range" min="25" max="70" value={split} disabled={focusCode} onChange={event => setSplit(Number(event.target.value))} aria-label="Change width of problem description" /></label>
+          <button type="button" className="cv-workspace-control" aria-pressed={focusCode} onClick={() => setFocusCode(value => !value)}>{focusCode ? "◧ Split view" : "▣ Focus editor"}</button>
+          <button type="button" className="cv-workspace-control" aria-pressed={!showTests} onClick={() => setShowTests(value => !value)}>{showTests ? "▾ Hide tests" : "▴ Show tests"}</button>
           <span className="pv-draft-indicator">Draft saved on this device</span>
         </div>
       </div>
-      <div className="pv-split" style={{ gridTemplateColumns: "minmax(0," + split + "fr) minmax(0," + (100 - split) + "fr)" }}>
+      <div className={"pv-split" + (focusCode ? " cv-focus-editor" : "")} style={{ gridTemplateColumns: focusCode ? "minmax(0,1fr)" : "minmax(0," + split + "fr) minmax(0," + (100 - split) + "fr)" }}>
         <section className="pv-pane pv-description-pane" aria-label="Problem description">
           <div className="pv-pane-header"><span className="pv-tab-active">▤ Description</span><span className="pv-pane-meta">Original CppValley problem</span></div>
           <div className="pv-description-body">
@@ -170,10 +185,24 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
             <ul className="pv-constraints">{problem.constraints.map(item => <li key={item}>{item}</li>)}</ul>
             <h2>Related concepts</h2>
             <div className="pv-problem-tags">{problem.tags.map(tag => <span key={tag}>{tag}</span>)}</div>
+            {relatedLessons.length > 0 && (
+              <section className="cv-workspace-related" aria-label="Related course lessons">
+                <h2>Learn this concept in a course</h2>
+                <p>Use a structured lesson when you want to understand the reasoning behind this challenge.</p>
+                <div>
+                  {relatedLessons.map(lesson => (
+                    <Link href={lesson.href} key={lesson.href}>
+                      <strong>{lesson.title}</strong>
+                      <small>{lesson.course} <span aria-hidden="true">↗</span></small>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
             <p className="pv-disclaimer">This early-access exercise uses standard input/output. More advanced concurrency challenges will use specialized class interfaces, instrumentation, and stress tests once the judging infrastructure is ready.</p>
           </div>
         </section>
-        <section className="pv-pane pv-editor-pane" aria-label="C++ code editor and tests">
+        <section className={"pv-pane pv-editor-pane" + (!showTests ? " cv-hide-tests" : "")} aria-label="C++ code editor and tests">
           <div className="pv-pane-header"><span className="pv-tab-active">⌘ Code</span><span className="pv-pane-meta">C++17</span></div>
           <div className="pv-editor-toolbar">
             <span className="pv-language-dot" />
@@ -207,7 +236,7 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
               fontSize={editorFontSize}
             />
           </div>
-          <div className="pv-tests">
+          <div className="pv-tests" style={{height: testHeight + "%",maxHeight:"48%"}}>
             <div className="pv-judge-gate">
               <div>
                 <span className={"pv-judge-status " + (pilotStatus?.enabled ? "pv-judge-ready" : "pv-judge-offline")}>
@@ -232,7 +261,7 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
             </div>
             <div className="pv-tests-head">
               <span>⌁ Test cases & results</span>
-              <span>Public samples: {problem.examples.length}</span>
+              <label className="cv-console-size">Console height <input type="range" min="16" max="48" value={testHeight} onChange={e => setTestHeight(Number(e.target.value))} aria-label="Change test console height" /></label><span>Public samples: {problem.examples.length}</span>
             </div>
             <div className="pv-input-mode" role="group" aria-label="Select sample or custom input">
               <button type="button" className={inputMode === "samples" ? "pv-input-active" : ""} onClick={() => setInputMode("samples")}>Sample cases</button>
@@ -266,6 +295,7 @@ export function PracticeWorkspace({ problem }: { problem: PracticeProblem }) {
               <div className={"pv-run-result " + (result.accepted === true ? "pv-result-passed" : "pv-result-info")} role="status">
                 <strong>{result.accepted === true ? "✓ Accepted" : result.accepted === false ? "Not accepted" : "Execution status"}</strong>
                 <p>{result.message}</p>
+                {result.mode === "submit" ? <p>{result.persisted ? "✓ Submission saved to your account." : "This verdict is stored locally only. Account submission storage is not configured or you are not signed in."}</p> : null}
                 {typeof result.passed === "number" && <p>{result.passed}/{result.total} cases passed or executed</p>}
                 {result.cases?.map(item => (
                   <div className="pv-case-result" key={item.index}>

@@ -1,0 +1,362 @@
+/* CppValley brand restoration.
+ * Source of truth: existing original logo asset and original logo-derived palette.
+ * Preserve the spacious Monaco editor and compact learning platform layout.
+ */
+:root {
+  --cv-ruby: #b01443;
+  --cv-ruby-hover: #8b1035;
+  --cv-ruby-pressed: #760d2e;
+  --cv-ruby-soft: #fff0f4;
+  --cv-ruby-outline: #e9ccd5;
+  --cv-charcoal: #242125;
+  --cv-charcoal-strong: #191719;
+  --cv-text: #332c31;
+  --cv-text-secondary: #756b72;
+  --cv-paper-warm: #fdfbfc;
+  --cv-border-warm: #ebe3e7;
+
+  /* Main site, original editorial pages and V3 learning pages. */
+  --brand: var(--cv-ruby);
+  --brand-dark: var(--cv-ruby-hover);
+  --brand-soft: var(--cv-ruby-soft);
+  --bg: var(--cv-paper-warm);
+  --ink: var(--cv-charcoal);
+  --muted: var(--cv-text-secondary);
+  --muted-dark: #554b51;
+  --surface-soft: #fff5f7;
+  --surface-blue: #fff7f9;
+  --border: var(--cv-border-warm);
+  --border-strong: #d9ced4;
+  --code: var(--cv-charcoal-strong);
+
+  --cv-ink: var(--cv-charcoal);
+  --cv-muted: #786d74;
+  --cv-line: var(--cv-border-warm);
+  --cv-paper: #fff;
+  --cv-bg: var(--cv-paper-warm);
+  --cv-accent: var(--cv-ruby);
+  --cv-accent-soft: var(--cv-ruby-soft);
+  --cv-dark: var(--cv-charcoal-strong);
+  accent-color: var(--cv-ruby);
+}
+html { color-scheme: light; }
+body { background: var(--cv-paper-warm); color: var(--cv-charcoal); }
+::selection { background: #f8bdcf; color: #2b2026; }
+:focus-visible { outline-color: var(--cv-ruby); }
+
+/* ORIGINAL, unmodified infinity + custom wordmark in the compact header. */
+.cv-header {
+  background: rgba(255,255,255,.975);
+  color: var(--cv-charcoal);
+  border-bottom: 1px solid var(--cv-border-warm);
+  box-shadow: 0 2px 14px rgba(36,33,37,.035);
+  backdrop-filter: blur(14px);
+}
+.cv-nav-inner { gap: 18px; }
+.cv-logo { width: 168px; height: 56px; flex: none; justify-content: center; overflow: hidden; }
+.cv-logo .market-brand {
+  width: 166px !important;
+  min-width: 166px !important;
+  height: 56px !important;
+  flex: none !important;
+  background-position: center center !important;
+  background-size: contain !important;
+}
+.cv-main-nav a { color: #595057; }
+.cv-main-nav a:hover,
+.cv-main-nav a:focus-visible,
+.cv-main-nav a.cv-nav-current {
+  color: var(--cv-ruby);
+  border-bottom-color: var(--cv-ruby);
+  background: #fff6f8;
+}
+.cv-logo:focus-visible,
+.cv-main-nav a:focus-visible,
+.cv-profile-link:focus-visible {
+  outline: 2px solid var(--cv-ruby);
+  outline-offset: -2px;
+}
+.cv-nav-search {
+  background: #f9f6f7;
+  border-color: #e8dfe3;
+}
+.cv-nav-search:focus-within { background: #fff; border-color: var(--cv-ruby); }
+.cv-nav-search > span { color: #9a7b87; }
+.cv-nav-search input { color: var(--cv-charcoal); }
+.cv-nav-search input::placeholder { color: #9b8e95; }
+.cv-nav-search kbd { color: #8f777f; border-color: #dbcfd5; }
+.cv-profile-link {
+  background: #fff4f7;
+  color: #8b1439;
+  border-color: #eed5de;
+}
+.cv-profile-link span:first-child { color: var(--cv-ruby); }
+.cv-profile-link:hover { background: #ffe6ee; border-color: #dbacbd; }
+
+/* Footer keeps the charcoal half of the logo palette. */
+.cv-footer { background: var(--cv-charcoal-strong); border-top-color: #443940; color: #e4dade; }
+.cv-footer-inner { align-items: center; }
+.cv-footer-brand {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 166px;
+  height: 58px;
+  background: #fff;
+  border: 1px solid #e8dee1;
+  border-radius: 9px;
+  overflow: hidden;
+}
+.cv-footer-brand .market-brand {
+  width: 160px !important;
+  min-width: 160px !important;
+  height: 54px !important;
+  flex: none !important;
+  background-size: contain !important;
+}
+.cv-footer p { color: #c9bfc4; }
+.cv-footer nav a { color: #eadce1; }
+.cv-footer nav a:hover { color: #ffaec5; }
+.cv-footer small { color: #b5a4ac; border-top-color: #473c42; }
+
+/* Primary actions and shared accents, across courses and practice. */
+.cv-eyebrow,
+.cv-course-track,
+.cv-section-head > a,
+.cv-home-table-link,
+.cv-sidebar-link,
+.cv-course-list-aside > b,
+.cv-course-side-resource > a,
+.cv-lesson-sidebar-head > a,
+.cv-editorial-note a,
+.cv-lesson-pagination > div > a,
+.cv-course-bottom b,
+.cv-lesson-pnum,
+.cv-objectives li > span,
+.cv-mini-breadcrumb a,
+.cv-compact-nav a {
+  color: var(--cv-ruby);
+}
+.cv-btn-primary,
+.cv-auth-form button.cv-btn-primary,
+.cv-profile-actions .cv-btn-primary {
+  background: var(--cv-ruby);
+  border-color: var(--cv-ruby);
+  color: white;
+}
+.cv-btn-primary:hover,
+.cv-auth-form button.cv-btn-primary:hover,
+.cv-profile-actions .cv-btn-primary:hover {
+  background: var(--cv-ruby-hover);
+  border-color: var(--cv-ruby-hover);
+  color: white;
+}
+.cv-btn-secondary { border-color: #dacfd5; color: #55474d; }
+.cv-btn-secondary:hover { border-color: #c58e9f; background: #fff6f8; color: var(--cv-ruby); }
+.cv-white-card,
+.cv-course-tile,
+.cv-course-list-item,
+.cv-problem-table-wrap,
+.cv-filter-sidebar,
+.cv-module-accordion,
+.cv-lesson-problems,
+.cv-dashboard-course,
+.cv-dashboard-achievements {
+  border-color: var(--cv-border-warm);
+}
+.cv-subpage,
+.cv-lesson-shell,
+.cv-home,
+.cv-workspace-main { background: var(--cv-paper-warm); }
+
+/* Landing: warm paper + ruby highlights, not generic indigo. */
+.cv-home-hero {
+  background: linear-gradient(120deg,#fff,#fff4f7);
+  border-color: #efdce3;
+}
+.cv-home-copy h1 { color: var(--cv-charcoal); }
+.cv-home-copy h1 span { color: var(--cv-ruby); }
+.cv-hero-terminal { background: #242024; border-color: #4c3b43; color: #f4ebef; }
+.cv-terminal-header { background: #322930; border-bottom-color: #524149; color: #d6bec8; }
+.cv-terminal-header > span:first-child { color: #e99db4; }
+.cv-terminal-header b { color: #f1e2e8; }
+.cv-terminal-lines > span { color: #8d7881; }
+.cv-terminal-lines code { color: #efe5e9; }
+.cv-terminal-lines code em { color: #f0a0b9; }
+.cv-terminal-lines code strong { color: #ffc0d2; }
+.cv-terminal-lines code i { color: #bba5ae; }
+.cv-terminal-result { background: #292528; border-top-color: #524049; color: #f0d9e1; }
+.cv-home-belt { border-color: var(--cv-border-warm); }
+.cv-home-belt > div > span { color: var(--cv-ruby); background: #fff0f4; }
+.cv-plan-spotlight {
+  background: linear-gradient(145deg,#fff,#fff0f4);
+  border-color: var(--cv-ruby-outline);
+}
+.cv-plan-spotlight > span { color: var(--cv-ruby); }
+.cv-home-bottom { background: #fff2f6; border-color: #efd5de; }
+
+/* Courses: honor category differentiation with shades of the same logo palette. */
+.cv-course-tile:hover,
+.cv-course-list-item:hover { border-color: #d89baf; box-shadow: 0 9px 24px rgba(105,18,47,.085); }
+.cv-course-icon,
+.cv-course-list-icon,
+.cv-module-number {
+  background: #fff0f4;
+  color: #a4123d;
+  border-color: #efd1da;
+}
+.cv-tile-blue .cv-course-icon,
+.cv-tile-blue .cv-course-list-icon { background: #fff1f5; color: #ae204c; border-color: #f1d5de; }
+.cv-tile-cyan .cv-course-icon,
+.cv-tile-cyan .cv-course-list-icon { background: #f8eded; color: #80373f; border-color: #ebd7db; }
+.cv-tile-pink .cv-course-icon,
+.cv-tile-pink .cv-course-list-icon { background: #fbe5ed; color: #9d244b; border-color: #eac7d6; }
+.cv-tile-green .cv-course-icon,
+.cv-tile-green .cv-course-list-icon { background: #f6e8ea; color: #88444e; border-color: #e9d4d7; }
+.cv-tile-amber .cv-course-icon,
+.cv-tile-amber .cv-course-list-icon { background: #f4e9e6; color: #895448; border-color: #e8d7d0; }
+.cv-course-status { background: #f9f4f6; color: #806a73; }
+.cv-course-hero-art {
+  background: linear-gradient(140deg,#fff6f8,#f4e1e7);
+  border-color: #ebd2db;
+}
+.cv-course-hero-art > div > span,
+.cv-course-hero-art strong { color: #77273f; }
+.cv-course-hero-art small { color: #9f6779; }
+.cv-course-topic-tags span { background: #fff7f9; border-color: #ecdfe4; color: #765a65; }
+.cv-module-accordion[open] > summary { background: #fff7f9; border-color: #f0e1e6; }
+.cv-module-accordion li a:hover,
+.cv-lesson-problems a:hover { background: #fff7f9; }
+.cv-lesson-sidebar { border-color: var(--cv-border-warm); }
+.cv-lesson-sidebar details[open] > summary { background: #fff6f8; color: #673546; }
+.cv-lesson-sidebar nav a:hover { background: #fff7f9; }
+.cv-lesson-sidebar nav a.cv-current-lesson {
+  background: #fff0f4;
+  border-left-color: var(--cv-ruby);
+  color: var(--cv-ruby-hover);
+}
+.cv-lesson-takeaway { background: #fff0f4; border-left-color: var(--cv-ruby); }
+.cv-lesson-takeaway b { color: #851d3e; }
+.cv-lesson-pagination > div > a { border-color: #eadbe1; }
+.cv-lesson-pagination > div > a:hover { border-color: var(--cv-ruby); background: #fff7f9; }
+
+/* Problems and study plans: filters, tabs, progress, linked concepts. */
+.cv-bank-stats > div,
+.cv-library-toolbar { border-color: var(--cv-border-warm); }
+.cv-filter-sidebar button:hover { background: #fff5f8; color: #96183e; }
+.cv-filter-sidebar button.cv-category-active,
+.cv-library-tabs button.cv-tab-active {
+  background: #fff0f4;
+  color: #9b143c;
+}
+.cv-sidebar-divider { background: var(--cv-border-warm); }
+.cv-problem-table tbody tr:hover,
+.cv-plan-problem-list > a:hover { background: #fff8fa; }
+.cv-problem-link:hover,
+.cv-draft-related a:hover { color: var(--cv-ruby); }
+.cv-stats-progress i,
+.cv-progress-bar > i { background: var(--cv-ruby); }
+.cv-search-input { background: #fcf9fa; border-color: #e9e0e4; }
+.cv-search-input:focus-within { border-color: var(--cv-ruby); }
+.cv-editorial-note { background: #fff3f7; border-color: #f0dce3; color: #67545c; }
+.cv-editorial-note b,
+.cv-editorial-note strong { color: #5e333f; }
+.cv-plan-list-heading { background: #fff5f8; border-color: #f1dfe6; }
+.cv-draft-related a,
+.cv-plan-step { color: var(--cv-ruby); }
+.cv-workspace-related a { background: #fff6f8; border-color: #eedce3; }
+.cv-workspace-related a:hover { background: #ffedf3; border-color: #dba9ba; }
+.cv-workspace-related a strong { color: #41343b; }
+.cv-workspace-related a small { color: #94536a; }
+
+/* Dashboard and accounts. Success, warning and verdict labels retain their meaning. */
+.cv-dashboard-course:hover,
+.cv-dashboard-achievements > a:hover { background: #fff7f9; }
+.cv-profile-settings-fields input:focus { outline-color: var(--cv-ruby); border-color: var(--cv-ruby); }
+.cv-profile-toggle { background: #fff9fb; border-color: #ecdee4; }
+.cv-profile-toggle input { accent-color: var(--cv-ruby); }
+.cv-public-avatar { background: #f9dce6; color: #84143c; }
+.cv-auth-card a:not(.cv-btn):hover { color: var(--cv-ruby); }
+
+/* The Monaco area remains dark, independent, and optimized for coding. */
+.cv-workspace-main { background: #f1ecef !important; }
+.cv-workspace-main .pv-pane { border-color: #dfd5da; }
+.cv-workspace-main .pv-description-pane .pv-pane-header { background: #fff7f9; }
+.pv-breadcrumb a,
+.cv-workspace-main .cv-compact-nav a { color: #98133b; }
+.pv-split-control input,
+.cv-console-size input { accent-color: var(--cv-ruby); }
+.pv-tab-active { border-bottom-color: var(--cv-ruby); color: #5a2d3d; }
+.pv-problem-context { color: var(--cv-ruby); }
+.pv-description-body h1,
+.pv-description-body h2 { color: var(--cv-charcoal); }
+.pv-problem-summary { color: #6c5f66; }
+.pv-example { background: #fff8fa; border-color: #ebdfe4; }
+.pv-example-grid pre { background: #f8f1f4; color: #342b31; }
+.pv-problem-tags span { background: #fff6f8; border-color: #e8dce1; color: #795c68; }
+.pv-disclaimer { border-left-color: var(--cv-ruby); background: #fff3f7; color: #695860; }
+.pv-editor-pane { background: #201d20; border-color: #352b30; }
+.pv-editor-pane .pv-pane-header { background: #30272c; border-color: #4b3b43; }
+.pv-editor-pane .pv-tab-active { color: #fbe8ee; border-bottom-color: #ec7498; }
+.pv-editor-pane .pv-pane-meta { color: #c3a8b3; }
+.pv-editor-toolbar { background: #262126; color: #dbc7cf; border-bottom-color: #45343d; }
+.pv-editor-toolbar button { color: #ead7df; background: #40343b; border-color: #5a4650; }
+.pv-editor-toolbar button:hover { background: #55404a; }
+.pv-language-dot { background: #db7996; }
+.pv-code-shell,
+.pv-editor-fallback,
+.pv-editor-loading { background: #1e1c1f; }
+.pv-code-input { background: #1e1c1f; color: #f0e5e9; caret-color: #f9b9cd; }
+.pv-line-numbers { background: #242024; color: #a48e99; }
+.pv-tests { background: #272126; border-top-color: #493640; color: #eadce1; }
+.pv-tests-head { border-bottom-color: #493640; color: #f3dfe6; }
+.pv-sample-tabs button { background: #3b3037; border-color: #5e4550; color: #e0c4ce; }
+.pv-sample-tabs .pv-sample-selected,
+.pv-input-mode button.pv-input-active { background: #85304a; border-color: #d87894; color: #fff; }
+.pv-sample-content pre { background: #201b1f; border-color: #4e3b43; color: #f0e3e8; }
+.pv-run-result { background: #30272d; border-color: #624552; }
+.pv-run-result strong { color: #fff0f4; }
+.pv-run-button { background: #40363e; border-color: #6b4e5a; color: #f5e3e9; }
+.pv-run-button:hover { background: #564049; }
+.pv-submit-bar { background: #231d21; border-top-color: #4f3742; }
+.pv-submit-button { background: var(--cv-ruby); border-color: #d33c6d; color: #fff; }
+.pv-submit-button:hover { background: var(--cv-ruby-hover); border-color: #b01443; }
+.pv-editor-toolbar select,
+.cv-workspace-control { accent-color: var(--cv-ruby); }
+.cv-workspace-main .cv-workspace-control[aria-pressed="true"] { background: #fff0f4; color: #97113a; border-color: #e4afc0; }
+
+/* Keep legacy written pages on the SAME brand palette. */
+.g-site-header,
+.site-header { border-color: var(--cv-border-warm); }
+.g-pill,
+.g-section-kicker,
+.g-inline-link,
+.g-detail-actions a:hover,
+.g-footer a:hover,
+.g-primary-nav a:hover,
+.g-nav-cta:hover,
+.g-catalog-search:focus-within { color: var(--cv-ruby); }
+.g-button-primary,
+.g-nav-cta { background: var(--cv-ruby); border-color: var(--cv-ruby); color: white; }
+.g-button-primary:hover,
+.g-nav-cta:hover { background: var(--cv-ruby-hover); color: white; }
+.g-topline { background: var(--cv-charcoal); color: #f9dde6; }
+.pv-kicker,
+.pv-open-problem,
+.pv-problem-title:hover { color: var(--cv-ruby); }
+
+/* Keep logo legible and search accessible at mobile widths. */
+@media (max-width: 1200px) {
+  .cv-nav-inner { gap: 11px; }
+  .cv-logo { width: 150px; }
+  .cv-logo .market-brand { width: 148px !important; min-width: 148px !important; }
+}
+@media (max-width: 760px) {
+  .cv-logo { height: 42px; width: 142px; }
+  .cv-logo .market-brand { width: 140px !important; min-width: 140px !important; height: 46px !important; }
+  .cv-nav-inner { gap: 7px; }
+  .cv-main-nav a.cv-nav-current { border-bottom-color: var(--cv-ruby); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cv-course-tile, .cv-course-list-item { transition: none; }
+}

@@ -54,7 +54,7 @@ export function pilotJudgeConfig(): PilotJudgeConfig | null {
   // If the ref is exposed, reject any mismatched branch.
   if (rawAuthMode === "vercel-preview" &&
       process.env.VERCEL_GIT_COMMIT_REF &&
-      process.env.VERCEL_GIT_COMMIT_REF !== "feature/practice-workspace-mvp") return null;
+      !["feature/practice-workspace-mvp", "feature/elite-cpp-platform-overhaul"].includes(process.env.VERCEL_GIT_COMMIT_REF)) return null;
 
   const previewKey = process.env.CPPVALLEY_PRACTICE_PREVIEW_KEY || "";
   if (rawAuthMode === "pilot-key" && previewKey.length < 32) return null;

@@ -8,6 +8,7 @@ import {
 } from "@/lib/practice/judge-access";
 import { executeJudge0, type JudgeVerdict } from "@/lib/practice/judge0";
 import { executeSandboxCases } from "@/lib/practice/sandbox-judge";
+import { persistVerifiedSubmission } from "@/lib/practice/submission-store";
 
 export const runtime = "nodejs";
 export const maxDuration = 45;
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
     const hostname = request.nextUrl.hostname.toLowerCase();
     if (!hostname.endsWith(".vercel.app") || hostname === "vercel.app" ||
         (process.env.VERCEL_GIT_COMMIT_REF &&
-         process.env.VERCEL_GIT_COMMIT_REF !== "feature/practice-workspace-mvp")) {
+         !["feature/practice-workspace-mvp", "feature/elite-cpp-platform-overhaul"].includes(process.env.VERCEL_GIT_COMMIT_REF))) {
       return json({
         message: "C++ execution is restricted to the authenticated feature-branch preview.",
         code: "PREVIEW_ONLY",
@@ -195,6 +196,18 @@ export async function POST(request: NextRequest) {
           ? "A sample case failed. Compare actual and expected output."
           : "Submission did not pass all validation cases.";
 
+    const persisted = value.mode === "submit"
+      ? await persistVerifiedSubmission({
+          jwt: request.headers.get("x-cppvalley-user-jwt"),
+          problemSlug: problem.slug,
+          source: value.source,
+          accepted,
+          status: results[results.length-1]?.status || "Execution Error",
+          passed: passedCount,
+          total: cases.length,
+        })
+      : false;
+
     return json({
       message,
       mode: value.mode,
@@ -202,6 +215,7 @@ export async function POST(request: NextRequest) {
       passed: passedCount,
       total: cases.length,
       cases: results,
+      persisted,
     });
   } catch {
     return json({

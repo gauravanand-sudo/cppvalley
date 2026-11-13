@@ -503,3 +503,25 @@ body { background:var(--cv-bg); color:var(--cv-ink); font-family:var(--font-sans
 .cv-dashboard-alert a{margin-left:9px;color:inherit;font-weight:900;text-decoration:underline;text-underline-offset:3px}
 .cv-dashboard-alert small{display:block;margin-top:5px;opacity:.8;overflow-wrap:anywhere}
 .cv-dashboard-achievements .cv-verdict-error{color:#d05d5d}
+
+
+/* Privacy-first public profiles and account personalization. */
+.cv-profile-settings{padding:22px;margin-bottom:30px}
+.cv-profile-settings .cv-section-head{margin-bottom:15px}
+.cv-profile-settings>p{font-size:.8rem;color:#79879c}
+.cv-profile-settings-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.cv-profile-settings-fields label{display:grid;gap:7px;color:#58647b;font-size:.74rem;font-weight:800}
+.cv-profile-settings-fields input{border:1px solid #d6deed;background:#fbfcff;border-radius:8px;padding:11px 12px;font-size:.83rem;color:#273951;outline-color:#7072dd}
+.cv-profile-toggle{display:flex;gap:11px;align-items:start;margin-top:19px;padding:13px 15px;background:#f7f8fc;border:1px solid #e4e8f0;border-radius:8px;cursor:pointer}
+.cv-profile-toggle input{width:16px;height:16px;accent-color:#6268de;margin-top:3px}
+.cv-profile-toggle strong{font-size:.82rem;display:block;color:#25344d}
+.cv-profile-toggle small{display:block;font-size:.69rem;line-height:1.5;color:#8290a3;margin-top:5px}
+.cv-profile-actions{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin-top:16px}
+.cv-profile-actions>p{font-size:.75rem;color:#65788c;margin:0}
+.cv-public-profile{max-width:940px}
+.cv-public-profile-card{display:flex;align-items:center;gap:22px;padding:30px;margin:20px 0}
+.cv-public-avatar{height:82px;width:82px;border-radius:18px;display:grid;place-items:center;background:#dfebff;color:#3f5fa4;font-size:2rem;font-weight:900;flex:none}
+.cv-public-profile-card h1{font-size:2rem;letter-spacing:-.05em;margin:10px 0 5px}
+.cv-public-profile-card p{margin:0 0 8px;color:#677991}
+.cv-public-profile-card small{color:#9aa8b8;font-size:.75rem}
+@media(max-width:700px){.cv-profile-settings-fields{grid-template-columns:1fr}.cv-public-profile-card{padding:21px;gap:14px}.cv-public-avatar{height:60px;width:60px;font-size:1.5rem}}

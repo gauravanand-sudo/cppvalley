@@ -144,3 +144,11 @@
 .cv-focus-compact-details a:hover{background:#fff9fb}
 .cv-focus-compact-details a>span:last-child{color:var(--cv-ruby)}
 @media(max-width:700px){.cv-focus-project-grid{grid-template-columns:1fr}}
+
+
+/* Introductory course prices: clear but secondary to learning progression. */
+.cv-focus-intro-price{font-weight:900;font-size:.95rem;color:var(--cv-ruby);font-variant-numeric:tabular-nums}
+.cv-focus-price-note{display:flex;align-items:baseline;gap:10px;margin:7px 0 13px}
+.cv-focus-price-note strong{font-size:1.35rem;letter-spacing:-.035em;color:var(--cv-ruby);font-variant-numeric:tabular-nums}
+.cv-focus-price-note span{font-size:.71rem;color:#81727b}
+@media(max-width:540px){.cv-focus-price-note{gap:8px;flex-wrap:wrap}}

@@ -25,24 +25,24 @@ export default async function Image({ params }: CourseOgProps) {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          background: "linear-gradient(135deg, #15243b 0%, #273858 100%)",
-          color: "#f5f8ff",
+          background: "linear-gradient(135deg, #251e22 0%, #661e36 100%)",
+          color: "#fff4f7",
           fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ fontSize: 30, fontWeight: 800, color: "#cad8f8" }}>cppvalley</div>
-          <div style={{ fontSize: 24, color: "#365c7d", border: "1px solid #6982b0", borderRadius: 999, padding: "10px 20px" }}>{pillar}</div>
+          <div style={{ fontSize: 30, fontWeight: 800, color: "#ffabc1" }}>cppvalley</div>
+          <div style={{ fontSize: 24, color: "#b01443", border: "1px solid #c77b94", borderRadius: 999, padding: "10px 20px" }}>{pillar}</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           <div style={{ fontSize: 66, lineHeight: 0.98, letterSpacing: -2.6, fontWeight: 850, maxWidth: 1000 }}>
             {title}
           </div>
-          <div style={{ fontSize: 30, color: "#cad6e8", maxWidth: 960 }}>
+          <div style={{ fontSize: 30, color: "#f2c7d5", maxWidth: 960 }}>
             {description}
           </div>
         </div>
-        <div style={{ fontSize: 24, color: "#c6d2e6" }}>C++ · Algorithms · Concurrency · Systems Engineering</div>
+        <div style={{ fontSize: 24, color: "#eac9d3" }}>C++ · Algorithms · Concurrency · Systems Engineering</div>
       </div>
     ),
     size

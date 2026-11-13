@@ -485,3 +485,15 @@ body { background:var(--cv-bg); color:var(--cv-ink); font-family:var(--font-sans
  .cv-course-facts{gap:7px}
  .cv-problem-table{min-width:635px}
 }
+
+
+/* Course-to-problem return path: compact, scannable related lessons. */
+.cv-workspace-related{margin-top:26px;padding:15px 0 6px;border-top:1px solid #e6ebf3}
+.cv-workspace-related h2{font-size:.89rem;margin:0 0 6px;color:#23314b}
+.cv-workspace-related>p{color:#7b899b;font-size:.74rem;line-height:1.6;margin:0 0 12px}
+.cv-workspace-related>div{display:grid;gap:7px}
+.cv-workspace-related a{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px;background:#f7f9ff;border:1px solid #e4eafa;border-radius:7px;transition:background .2s}
+.cv-workspace-related a:hover{background:#edf1ff;border-color:#b9c6ed}
+.cv-workspace-related a strong{font-size:.73rem;font-weight:760;color:#263956}
+.cv-workspace-related a small{font-size:.66rem;color:#7382aa;white-space:nowrap}
+@media(max-width:600px){.cv-workspace-related a{display:grid;gap:3px}.cv-workspace-related a small{white-space:normal}}

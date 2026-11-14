@@ -28,9 +28,9 @@ export const careerPaths: CareerPath[] = [
     entry:"Comfort with programming and basic data structures. Prior finance experience is not required.",
     courseSlugs:["core-cpp-interviews","cpp-concurrency-lockfree-systems","linux-os-networking-systems-engineers","low-latency-cpp-hft-systems"],
     optionalCourseSlugs:[],
-    interviewTopics:["C++ object lifetime and undefined behavior","Algorithms and complexity","Lock-free correctness and memory ordering","Linux processes, networking and CPU behavior","Order books, feed handling, order routing and risk","Trade-off and latency-debugging interviews"],
+    interviewTopics:["Timed C++ algorithms: graphs, heaps, hash maps, dynamic programming and complexity","Object lifetime, UB, iterator invalidation and diagnosing unsafe C++","Lock-free correctness, linearizability and acquire/release memory ordering","Linux, CPU caches, NUMA, networking, packet paths and perf counters","Exchange feed recovery, order books, order routing, risk and deterministic replay","Open-ended system design, evolving requirements, collaborative coding and code review","Tail-latency incident analysis, rollback and project trade-off defense","Probability/statistics only when the specific quant-facing role requests it"],
     project:"A testable exchange-feed simulator, order book, order-routing gateway, pre-trade risk engine and deterministic replay pipeline.",
-    evidence:["Data-race and property-based tests","Binary feed parser with gap recovery","Order-matching invariant proofs","p50/p99 tail-latency and throughput report","Resilience and failure-injection demonstration"],
+    evidence:["Data-race, sanitizer, fuzz and property-based tests","Feed parser, gap recovery and matching invariants","Reproducible p50/p99/p99.9 performance evidence","Incident, risk and failure-injection report","Two timed coding mocks, code-review defense and changing-spec onsite rehearsal"],
     icon:"⌁",accent:"ruby",
   },
   {

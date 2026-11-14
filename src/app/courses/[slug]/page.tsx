@@ -42,6 +42,7 @@ export default async function CourseDetails({params}:Props){
        </div>
        <div className="cv-focus-price-note"><strong>₹{course.priceInr.toLocaleString("en-IN")}</strong><span>Planned introductory price · Not on sale yet</span></div>
        {first&&<Link className="cv-btn cv-btn-primary" href={"/courses/"+course.slug+"/lessons/"+first.slug}>Start lesson 01 →</Link>}
+       {course.code==="C4"&&<div className="cv-focus-simple-links"><Link href="/hft-interview-prep">28 project briefs + 6 HFT mock interviews →</Link></div>}
      </div>
    </header>
    <CourseDetailTabs slug={course.slug} modules={course.modules} lessons={lessons.map(l=>({

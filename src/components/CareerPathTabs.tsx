@@ -36,12 +36,12 @@ export function CareerPathTabs({path,courses,electives}:Props){
       </div>}
       {active==="interviews"&&<div className="cv-focus-panel">
         <h2>What to prepare</h2><ul>{path.interviewTopics.map(t=><li key={t}>{t}</li>)}</ul>
-        <Link className="cv-btn cv-btn-primary" href="/study-plans">Open interview prep →</Link>
+        <Link className="cv-btn cv-btn-primary" href={path.slug==="quant-hft-cpp"?"/hft-interview-prep":"/study-plans"}>{path.slug==="quant-hft-cpp"?"Open HFT interview lab →":"Open interview prep →"}</Link>
       </div>}
       {active==="project"&&<div className="cv-focus-panel">
         <h2>Career capstone</h2><p>{path.project}</p>
         <h3>Evidence to demonstrate</h3><ul>{path.evidence.map(t=><li key={t}>{t}</li>)}</ul>
-        <Link href="/projects" className="cv-btn cv-btn-secondary">Browse project briefs →</Link>
+        <Link href={path.slug==="quant-hft-cpp"?"/hft-interview-prep":"/projects"} className="cv-btn cv-btn-secondary">{path.slug==="quant-hft-cpp"?"Browse 28 HFT project briefs →":"Browse project briefs →"}</Link>
         <small>These are planned project rubrics, not awarded certifications.</small>
       </div>}
     </div>

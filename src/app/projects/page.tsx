@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { careerPaths } from "@/data/career-paths";
 import { eliteCourses } from "@/data/elite-courses";
+import { hftProjects } from "@/data/hft-interview-prep";
 
 export const metadata:Metadata={
  title:"Engineering Projects — HFT · CUDA · AI Systems",
@@ -24,6 +25,7 @@ export default function ProjectsPage() {
        <strong>View capstone →</strong>
      </Link>)}
    </section>
+   <div className="cv-focus-practice-bar"><div><h2>HFT C++ project lab</h2><p>{hftProjects.length} original project briefs with tests, acceptance criteria and interview defenses.</p></div><Link href="/hft-interview-prep" className="cv-btn cv-btn-primary">Explore HFT projects →</Link></div>
    <details className="cv-focus-compact-details">
      <summary>Course-level projects ({eliteCourses.length})</summary>
      <div>{eliteCourses.map(c=><Link href={"/courses/"+c.slug} key={c.slug}><span>{c.code} · {c.title}</span><span>→</span></Link>)}</div>

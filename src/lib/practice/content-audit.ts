@@ -6,6 +6,7 @@ import { practiceProblems } from "@/data/practice";
 import { practiceJudgeCases } from "@/data/practice-judge-cases";
 import { careerPaths } from "@/data/career-paths";
 import { specialtyLabs, specialtyLabsForLesson } from "@/data/specialty-practice";
+import { hftProjects, hftProjectStages, hftSkillLanes, hftMockLoops, hftFirmSignals } from "@/data/hft-interview-prep";
 
 /**
  * Fail the deployment build rather than ship an internally inconsistent
@@ -47,6 +48,17 @@ export function assertContentIntegrity() {
   const courseCodes = new Set(eliteCourses.map(course => course.code));
   fail(courseCodes.size === 10, "Unique course codes C1–C10 required.");
   fail(careerPaths.length === 4, "Exactly four career paths are required.");
+  fail(hftProjects.length === 28, "Expected 28 original HFT project briefs.");
+  fail(new Set(hftProjects.map(p=>p.id)).size === hftProjects.length, "HFT project IDs must be unique.");
+  fail(hftSkillLanes.length === 7 && hftMockLoops.length === 6, "HFT skill and mock coverage incomplete.");
+  fail(hftFirmSignals.length === 4 && hftFirmSignals.every(f=>f.link.startsWith("https://")), "HFT firm research sources missing.");
+  for (const stage of hftProjectStages) {
+    fail(hftProjects.filter(p=>p.stage===stage.code).length>=6, "Too few interview projects for "+stage.code);
+  }
+  for (const project of hftProjects) {
+    fail(project.deliverables.length>=2 && project.acceptance.length>=2 && project.defense.length>30,
+      "Missing project rubric for "+project.id);
+  }
 
   for (const course of eliteCourses) {
     const lessons = courseLessons.filter(lesson => lesson.courseSlug === course.slug);

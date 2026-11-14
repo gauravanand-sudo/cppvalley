@@ -46,7 +46,7 @@ export function HftInterviewPrep() {
         </div>
         <div className="cv-hft-section-heading"><h2>Readiness gaps to close</h2><span>7 skill lanes · select to expand</span></div>
         <div className="cv-hft-accordion">
-          {hftSkillLanes.map((lane,i)=><details key={lane.id} open={undefined}>
+          {hftSkillLanes.map(lane=><details key={lane.id}>
             <summary><div><small>{lane.course}</small><strong>{lane.title}</strong></div><span aria-hidden="true">+</span></summary>
             <div className="cv-hft-detail-body"><p>{lane.gap}</p><ul>{lane.topics.map(t=><li key={t}>{t}</li>)}</ul>
               <div className="cv-hft-proof"><b>Evidence target</b><p>{lane.proof}</p></div>
